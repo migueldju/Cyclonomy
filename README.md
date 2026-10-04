@@ -1,4 +1,4 @@
-# Fantasy Ciclismo
+# Cyclonomy
 
 App móvil (Android e iOS) de fantasy de ciclismo al estilo Mister: ligas privadas, mercado diario con
 subastas a ciegas, cláusulas, inscripciones por carrera y puntos según los resultados reales.
