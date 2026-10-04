@@ -1,3 +1,6 @@
+-- PASO 2 de 2 · Fotos de perfil (Storage) y tareas programadas (pg_cron).
+-- Ejecútalo después del paso 1, en otra consulta del SQL Editor.
+
 -- =====================================================================================
 -- 0006 · Piezas propias de Supabase: fotos de perfil (Storage) y tareas programadas (pg_cron).
 -- (Los tests locales no ejecutan este archivo.)

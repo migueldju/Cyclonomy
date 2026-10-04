@@ -1,7 +1,8 @@
 """Conexión a Postgres (Supabase). Usa psycopg 3 y la cadena de conexión DATABASE_URL.
 
-En Supabase: Project Settings → Database → Connection string (usa el usuario postgres o uno con
-permisos de escritura; la ingesta no pasa por RLS).
+En Supabase: botón Connect → Session pooler
+(postgresql://postgres.<ref>:<clave>@aws-0-<región>.pooler.supabase.com:5432/postgres). La conexión directa
+usa IPv6 y falla desde muchas redes. La ingesta escribe como postgres: no pasa por RLS.
 """
 from __future__ import annotations
 

@@ -6,7 +6,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Añade esta URL en Supabase → Authentication → URL Configuration → Redirect URLs
 // (y la de Expo Go, exp://..., mientras desarrollas)
-export const redirectTo = makeRedirectUri({ scheme: 'fantasyciclismo', path: 'auth/callback' });
+export const redirectTo = makeRedirectUri({ scheme: 'cyclonomy', path: 'auth/callback' });
 
 export async function exchangeFromUrl(url: string) {
   const code = new URL(url).searchParams.get('code');
