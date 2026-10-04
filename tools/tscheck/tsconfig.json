@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "lib": ["ES2022", "DOM"], "module": "ESNext", "moduleResolution": "Bundler",
+    "jsx": "react-jsx", "strict": true, "noImplicitAny": false, "noEmit": true, "skipLibCheck": true, "noUnusedLocals": true,
+    "paths": { "@/*": ["../../app/src/*"] }, "types": []
+  },
+  "include": ["stubs.d.ts", "../../app/app/**/*.tsx", "../../app/src/**/*.ts", "../../app/src/**/*.tsx"]
+}

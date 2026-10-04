@@ -1,0 +1,14 @@
+codigo,nombre,nivel_profundidad,max_inscritos,es_cri
+TDF,Tour de France,1,8,False
+GT,"Grandes Vueltas (Giro, Vuelta)",1,8,False
+WC,Campeonato del Mundo,1,6,False
+WC_ITT,Mundial CRI,1,3,True
+MON,Monumentos,1,7,False
+MWT,WT principal (1.MWT / 2.MWT),1,7,False
+SWT,WT secundaria (1.SWT / 2.SWT),2,7,False
+CC,Campeonato continental,2,6,False
+CC_ITT,Campeonato continental CRI,2,3,True
+NC,Campeonato nacional,2,6,False
+NC_ITT,Campeonato nacional CRI,2,3,True
+PRO,.Pro (1.Pro / 2.Pro),3,6,False
+C1,.1 (1.1 / 2.1),4,6,False

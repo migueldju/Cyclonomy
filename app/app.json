@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Fantasy Ciclismo",
+    "slug": "fantasy-ciclismo",
+    "scheme": "fantasyciclismo",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "com.tuempresa.fantasyciclismo",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.tuempresa.fantasyciclismo",
+      "edgeToEdgeEnabled": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-image-picker",
+        { "photosPermission": "La app usa tus fotos para la imagen de tu perfil." }
+      ]
+    ]
+  }
+}

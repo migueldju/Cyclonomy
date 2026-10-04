@@ -1,0 +1,6 @@
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0
+psycopg[binary]>=3.1
+procyclingstats>=0.2      # opcional: si está, se usa primero para leer plantillas, listas de salida y resultados
+tzdata                     # zonas horarias en Windows
