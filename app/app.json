@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Fantasy Ciclismo",
-    "slug": "fantasy-ciclismo",
-    "scheme": "fantasyciclismo",
+    "name": "Cyclonomy",
+    "slug": "cyclonomy",
+    "scheme": "cyclonomy",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.tuempresa.fantasyciclismo",
+      "bundleIdentifier": "com.tuempresa.cyclonomy",
       "supportsTablet": false
     },
     "android": {
-      "package": "com.tuempresa.fantasyciclismo",
+      "package": "com.tuempresa.cyclonomy",
       "edgeToEdgeEnabled": true
     },
     "plugins": [

@@ -13,7 +13,7 @@ import requests
 
 BASE = "https://www.procyclingstats.com/"
 CACHE = Path(os.environ.get("PCS_CACHE_DIR", "pcs_cache"))
-HEADERS = {"User-Agent": os.environ.get("PCS_USER_AGENT", "fantasy-ciclismo/0.1 (contacto: tu@email.com)")}
+HEADERS = {"User-Agent": os.environ.get("PCS_USER_AGENT", "cyclonomy/0.1 (contacto: tu@email.com)")}
 MIN_DELAY = float(os.environ.get("PCS_MIN_DELAY", "3"))
 NOT_FOUND = "__404__"
 

@@ -53,7 +53,7 @@ def notify(subject: str, body: str) -> None:
     if os.environ.get("SMTP_HOST") and os.environ.get("ALERT_EMAIL"):
         try:
             msg = EmailMessage()
-            msg["Subject"], msg["To"] = f"[fantasy-ciclismo] {subject}", os.environ["ALERT_EMAIL"]
+            msg["Subject"], msg["To"] = f"[cyclonomy] {subject}", os.environ["ALERT_EMAIL"]
             msg["From"] = os.environ.get("SMTP_FROM", os.environ.get("SMTP_USER", "ingesta@localhost"))
             msg.set_content(body)
             with smtplib.SMTP(os.environ["SMTP_HOST"], int(os.environ.get("SMTP_PORT", "587")), timeout=20) as s:

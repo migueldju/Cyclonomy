@@ -11,7 +11,7 @@ import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
 import { space } from '@/theme';
 
-/** Se abre con el enlace de invitación: fantasyciclismo://unirse/ABC123 */
+/** Se abre con el enlace de invitación: cyclonomy://unirse/ABC123 */
 export default function Unirse() {
   const { code } = useLocalSearchParams<{ code: string }>();
   const { session } = useAuth();

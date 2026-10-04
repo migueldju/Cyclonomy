@@ -38,7 +38,7 @@ export default function Login() {
     <Screen padded>
       <View style={[styles.hero, { marginTop: insets.top + space.xl }]}>
         <Bib value="1" size="l" />
-        <Txt variant="hero" style={styles.title}>Fantasy Ciclismo</Txt>
+        <Txt variant="hero" style={styles.title}>Cyclonomy</Txt>
         <Txt variant="small">Ficha, inscribe y suma con los resultados reales.</Txt>
       </View>
       <Input label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"

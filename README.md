@@ -1,6 +1,6 @@
 # Cyclonomy
 
-App móvil (Android e iOS) de fantasy de ciclismo al estilo Mister: ligas privadas, mercado diario con
+Cyclonomy: app móvil (Android e iOS) de fantasy de ciclismo al estilo Mister: ligas privadas, mercado diario con
 subastas a ciegas, cláusulas, inscripciones por carrera y puntos según los resultados reales.
 Las reglas completas están en el documento de especificación.
 
@@ -22,13 +22,21 @@ no se puede trucar desde el móvil.
 
 ## 1. Supabase
 
-1. Crea un proyecto en supabase.com e instala la CLI (`npm i -g supabase`).
-2. `supabase link --project-ref <tu-proyecto>` y `supabase db push` (aplica `supabase/migrations`).
-3. Carga categorías y puntos: `psql "$DATABASE_URL" -f supabase/seed.sql`.
+1. Crea un proyecto en supabase.com.
+2. Crea el esquema y carga los datos iniciales. Elige una de las dos formas:
+   - **SQL Editor (sin instalar nada):** ejecuta `supabase/sql_editor/paso1_esquema_y_datos.sql` y después
+     `supabase/sql_editor/paso2_storage_y_tareas.sql`, cada uno en una consulta nueva.
+     `comprobar.sql` dice en qué estado está la base; si el paso 1 falla con «already exists»,
+     ejecuta `paso0_reiniciar.sql` (borra solo lo de este proyecto) y repite el paso 1.
+   - **CLI:** `supabase link --project-ref <tu-proyecto>`, `supabase db push` y
+     `psql "$DATABASE_URL" -f supabase/seed.sql`.
+3. `DATABASE_URL` es la cadena del **Session pooler** (botón Connect del proyecto):
+   `postgresql://postgres.<ref>:<clave>@aws-0-<región>.pooler.supabase.com:5432/postgres`.
+   La conexión directa (`db.<ref>.supabase.co`) usa IPv6 y falla desde muchas redes.
 4. Authentication → Providers: activa Email y Google (necesitas un cliente OAuth de Google Cloud).
-5. Authentication → URL Configuration → Redirect URLs: añade `fantasyciclismo://auth/callback`
+5. Authentication → URL Configuration → Redirect URLs: añade `cyclonomy://auth/callback`
    (y la URL `exp://…/--/auth/callback` que te muestre Expo Go mientras desarrollas).
-6. Database → Extensions: activa `pg_cron` si `0006` no pudo hacerlo. La tarea `fantasy-run-due-jobs`
+6. Database → Extensions: activa `pg_cron` si el paso 2 (o `0006`) no pudo hacerlo. La tarea `fantasy-run-due-jobs`
    se ejecuta cada minuto y decide qué toca en hora de Madrid (mercados, cambio de semana, valores).
 7. Para usar la carga manual de datos desde la app:
    `insert into app_admin values ('<tu user id>');`
@@ -38,7 +46,7 @@ no se puede trucar desde el móvil.
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r ingest/requirements.txt
-export DATABASE_URL="postgresql://postgres:<clave>@db.<proyecto>.supabase.co:5432/postgres"
+export DATABASE_URL="postgresql://postgres.<ref>:<clave>@aws-0-<región>.pooler.supabase.com:5432/postgres"
 
 # inicio de temporada
 python -m ingest teams --season 2027 --points-year 2026 --birthdates --seed-values
