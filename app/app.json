@@ -19,8 +19,13 @@
       "expo-font",
       [
         "expo-image-picker",
-        { "photosPermission": "La app usa tus fotos para la imagen de tu perfil." }
-      ]
+        {
+          "photosPermission": "La app usa tus fotos para la imagen de tu perfil."
+        }
+      ],
+      "expo-splash-screen",
+      "expo-status-bar",
+      "expo-web-browser"
     ]
   }
 }

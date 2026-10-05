@@ -42,3 +42,23 @@ export const categoryColor: Record<string, string> = {
   MWT: '#1E272C', SWT: '#6B7A82', CC: '#2A9BB8', CC_ITT: '#2A9BB8', NC: '#C0613A', NC_ITT: '#C0613A',
   PRO: '#17834A', C1: '#9AA5AA',
 };
+
+// Nombre corto de cada categoría, para las filas donde no cabe el nombre completo
+export const categoryShort: Record<string, string> = {
+  TDF: 'Tour de Francia', GT: 'Gran Vuelta', MON: 'Monumento', WC: 'Mundial', WC_ITT: 'Mundial CRI',
+  MWT: 'MWT', SWT: 'SWT', CC: 'Continental', CC_ITT: 'Continental CRI',
+  NC: 'Nacional', NC_ITT: 'Nacional CRI', PRO: 'Pro', C1: '1',
+};
+
+/** Nombre corto; en WT, .Pro y .1 la clase: 1.MWT / 2.MWT, 1.SWT / 2.SWT, 1.Pro / 2.Pro, 1.1 / 2.1 (clásica / vuelta) */
+export function categoryLabel(code: string, isStageRace: boolean, fallback = code): string {
+  if (['MWT', 'SWT', 'PRO', 'C1'].includes(code)) return `${isStageRace ? 2 : 1}.${categoryShort[code]}`;
+  return categoryShort[code] ?? fallback;
+}
+
+// Categorías de mayor a menor importancia (orden de los filtros del calendario)
+export const categoryOrder = ['TDF', 'GT', 'MON', 'WC', 'WC_ITT', 'MWT', 'SWT', 'CC', 'CC_ITT', 'NC', 'NC_ITT', 'PRO', 'C1'];
+export const categoryRank = (code: string) => {
+  const i = categoryOrder.indexOf(code);
+  return i < 0 ? categoryOrder.length : i;
+};

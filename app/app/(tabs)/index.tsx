@@ -2,16 +2,18 @@ import { router } from 'expo-router';
 import { Share, StyleSheet, View } from 'react-native';
 import { Bib } from '@/components/Bib';
 import { Button } from '@/components/Button';
+import { Flag } from '@/components/Flag';
+import { RiderAvatar } from '@/components/RiderAvatar';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { api } from '@/lib/api';
-import { dateRange, ordinal, points, time, todayISO } from '@/lib/format';
+import { dateRange, moneyShort, ordinal, points, time, todayISO } from '@/lib/format';
 import { inviteMessage } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
-import { categoryColor, colors, space } from '@/theme';
+import { categoryColor, categoryLabel, colors, space } from '@/theme';
 
 export default function Inicio() {
   const { leagueId, me } = useLeague();
@@ -19,7 +21,8 @@ export default function Inicio() {
   const today = useLoader(() => api.today(id), [id], !!leagueId);
   const calendar = useLoader(() => api.calendar(id), [id], !!leagueId);
   const offers = useLoader(() => api.offers(id), [id], !!leagueId);
-  const reload = () => { today.reload(); calendar.reload(); offers.reload(); };
+  const top = useLoader(() => api.ranking(id, 3), [id], !!leagueId);
+  const reload = () => { today.reload(); calendar.reload(); offers.reload(); top.reload(); };
 
   const upcoming = (calendar.data ?? []).filter((r) => r.status === 'upcoming' && r.start_date >= todayISO()).slice(0, 5);
   const received = (offers.data ?? []).filter((o) => o.direction === 'received');
@@ -34,6 +37,7 @@ export default function Inicio() {
           <Txt variant="hero">{points(me?.points_total)}</Txt>
           <Txt variant="small">Esta semana: {points(me?.points_week)}</Txt>
         </View>
+        <Button small kind="secondary" label="Normativa" onPress={() => router.push('/normativa')} />
       </View>
 
       {me?.sanctioned_this_week ? (
@@ -51,6 +55,30 @@ export default function Inicio() {
           </View>
         </Section>
       ) : null}
+
+      <Section title="Mejores ciclistas"
+               action={<Button small kind="quiet" label="Ranking" onPress={() => router.push('/ranking')} />}>
+        {top.data?.length ? top.data.map((r, i) => (
+          <Row key={r.rider_id} onPress={() => router.push(`/ciclista/${r.rider_id}`)} last={i === top.data!.length - 1}>
+            <Txt variant="number" style={{ width: 20, color: colors.inkSoft }}>{i + 1}</Txt>
+            <RiderAvatar url={r.photo_url} name={r.name} team={r.pro_team} />
+            <View style={{ flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+                <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{r.name}</Txt>
+                <Flag code={r.nationality} />
+              </View>
+              <Txt variant="small" numberOfLines={1}>
+                {r.pro_team ?? 'Sin equipo'} · {r.is_mine ? 'tuyo' : r.owner_team ?? 'libre'}
+              </Txt>
+            </View>
+            <View style={{ alignItems: 'flex-end' }}>
+              <Txt variant="number">{points(r.season_points)}</Txt>
+              <Txt variant="small">{moneyShort(r.market_value)}</Txt>
+            </View>
+          </Row>
+        )) : <Empty text={top.loading ? 'Cargando…' : 'Aún no hay ciclistas cargados.'} />}
+      </Section>
+      <ErrorText error={top.error} />
 
       {received.length ? (
         <Section>
@@ -78,9 +106,6 @@ export default function Inicio() {
       </Section>
       <ErrorText error={calendar.error} />
 
-      <View style={{ padding: space.l }}>
-        <Button kind="secondary" label="Normativa de la liga" onPress={() => router.push('/normativa')} />
-      </View>
     </Screen>
   );
 }
@@ -108,7 +133,8 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
         <Txt variant="small">
-          {dateRange(r.start_date, r.end_date)} · {r.my_entry_count ? `${r.my_entry_count}/${r.max_entries} inscritos` : 'sin inscripción'}
+          {dateRange(r.start_date, r.end_date)} · {categoryLabel(r.category, r.is_stage_race, r.category_name)} ·{' '}
+          {r.my_entry_count ? `${r.my_entry_count}/${r.max_entries} inscritos` : 'sin inscripción'}
         </Txt>
       </View>
       <Button small label="Inscribir" onPress={() => router.push(`/carrera/${r.race_id}`)} />

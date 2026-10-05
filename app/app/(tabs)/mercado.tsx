@@ -44,6 +44,7 @@ export default function Mercado() {
             key={r.listing_id}
             name={r.rider_name}
             team={r.pro_team}
+            nationality={r.nationality}
             note={[r.age ? `${r.age} años` : null, `${r.season_points} pts`].filter(Boolean).join(' · ')}
             value={r.base_value}
             last={i === data.length - 1}

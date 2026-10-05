@@ -21,7 +21,7 @@ export function Button({
         pressed && { opacity: 0.8 }, (disabled || busy) && styles.disabled, style,
       ]}>
       {busy ? <ActivityIndicator color={k.fg} /> : (
-        <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg }}>{label}</Txt>
+        <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg, letterSpacing: 0.3 }}>{label}</Txt>
       )}
     </Pressable>
   );

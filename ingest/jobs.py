@@ -79,6 +79,7 @@ def load_teams(db, season: int, points_year: int | None = None, birthdates: bool
                                points=int(round(points.get(r["slug"], 0))))
             seen.append(r["slug"])
     inactive = store.deactivate_missing(db, seen)
+    removed = store.delete_stale_teams(db, season, [t["slug"] for t in teams])
     if birthdates:
         for slug in store.riders_without_birthdate(db):
             bd = sources.fetch_birthdate(slug)
@@ -86,7 +87,7 @@ def load_teams(db, season: int, points_year: int | None = None, birthdates: bool
                 store.set_birthdate(db, slug, bd)
     if seed_values:
         db.execute("select public.seed_initial_values()")
-    summary = dict(teams=len(teams), riders=len(set(seen)), inactive=inactive)
+    summary = dict(teams=len(teams), riders=len(set(seen)), inactive=inactive, removed_teams=removed)
     log.info("Equipos cargados: %s", summary)
     return summary
 

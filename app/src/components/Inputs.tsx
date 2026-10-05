@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     borderColor: colors.line, backgroundColor: colors.paper,
   },
   segmentOn: { borderColor: colors.ink, backgroundColor: colors.ink },
-  segmentText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink },
+  segmentText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
   segmentTextOn: { color: colors.paper },
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   stepBtn: {

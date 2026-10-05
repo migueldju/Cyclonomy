@@ -5,6 +5,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { redirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/theme';
 
@@ -21,7 +22,8 @@ export default function Registro() {
     setBusy(true);
     setError(null);
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim(), password, options: { data: { full_name: name.trim() } },
+      email: email.trim(), password,
+      options: { data: { full_name: name.trim() }, emailRedirectTo: redirectTo },
     });
     setBusy(false);
     if (error) setError(error.message);

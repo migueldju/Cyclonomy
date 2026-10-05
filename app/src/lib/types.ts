@@ -87,6 +87,7 @@ export interface RosterRow {
   game_offer_amount: number | null;
   game_offer_expires: string | null;
   transferable: boolean;
+  photo_url: string | null;
 }
 
 export interface MarketRow {
@@ -196,4 +197,60 @@ export interface ScoringRule {
   kind: string;
   position: number;
   points: number;
+}
+
+export interface RankingRow {
+  rider_id: number;
+  name: string;
+  pro_team: string | null;
+  nationality: string | null;
+  age: number | null;
+  market_value: number;
+  season_points: number;
+  owner_member_id: string | null;
+  owner_team: string | null;
+  is_mine: boolean;
+  photo_url: string | null;
+}
+
+export type ResultKind = 'stage' | 'gc' | 'points' | 'kom';
+
+export interface RiderResult {
+  stage_id: number | null;          // null: resultado del historial (temporada anterior al juego)
+  race_key: string;                 // agrupa los resultados de una misma carrera
+  race_start: string;
+  race_end: string;
+  race_name: string;
+  category: string;
+  is_stage_race: boolean;
+  number: number;
+  date: string;
+  kind: ResultKind;
+  position: number;
+  points: number;
+}
+
+/** Foto de Wikimedia Commons: su licencia obliga a mostrar autor y licencia, con enlace */
+export interface RiderPhoto {
+  url: string;
+  author: string;
+  license: string;
+  license_url: string | null;
+  page_url: string | null;
+}
+
+export interface RiderDetail {
+  rider: {
+    id: number;
+    name: string;
+    pro_team: string | null;
+    nationality: string | null;
+    age: number | null;
+    market_value: number;
+    season_points: number;
+    photo: RiderPhoto | null;
+  };
+  owner: { member_id: string; team_name: string; is_mine: boolean; clause: number } | null;
+  values: { day: string; value: number }[];
+  results: RiderResult[];
 }

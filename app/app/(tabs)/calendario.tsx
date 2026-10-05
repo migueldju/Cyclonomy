@@ -9,7 +9,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { api } from '@/lib/api';
 import { dateRange, dateTime, dayMonth, points, todayISO } from '@/lib/format';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { categoryColor, colors, fonts, space, type } from '@/theme';
+import { categoryColor, categoryRank, colors, fonts, space, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -24,7 +24,7 @@ export default function Calendario() {
   const categories = useMemo(() => {
     const seen = new Map<string, string>();
     (data ?? []).forEach((r) => seen.set(r.category, r.category_name));
-    return [...seen.entries()];
+    return [...seen.entries()].sort((a, b) => categoryRank(a[0]) - categoryRank(b[0]));
   }, [data]);
 
   const rows = useMemo(() => {
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 16, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.paper,
   },
   chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink },
+  chipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   item: { backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l },

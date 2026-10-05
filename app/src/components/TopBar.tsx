@@ -18,7 +18,7 @@ export function TopBar({ back }: { back?: boolean }) {
     <View style={[styles.bar, { paddingTop: insets.top + space.s }]}>
       <View style={styles.left}>
         {back ? (
-          <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Volver" hitSlop={10}>
+          <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel="Volver" hitSlop={10}>
             <Ionicons name="chevron-back" size={24} color={colors.paper} />
           </Pressable>
         ) : null}
@@ -41,6 +41,12 @@ export function TopBar({ back }: { back?: boolean }) {
       </View>
     </View>
   );
+}
+
+// Si la pantalla se abrió sin nada detrás (enlace, recarga en la web), volver lleva a Inicio
+function goBack() {
+  if (router.canGoBack()) router.back();
+  else router.replace('/');
 }
 
 const styles = StyleSheet.create({
