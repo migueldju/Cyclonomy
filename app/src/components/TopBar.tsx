@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLeague } from '../context/LeagueContext';
+import { t } from '../i18n';
 import { moneyShort, ordinal } from '../lib/format';
 import { colors, fonts, space, type } from '../theme';
 import { Bib } from './Bib';
@@ -18,11 +19,11 @@ export function TopBar({ back }: { back?: boolean }) {
     <View style={[styles.bar, { paddingTop: insets.top + space.s }]}>
       <View style={styles.left}>
         {back ? (
-          <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel="Volver" hitSlop={10}>
+          <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={10}>
             <Ionicons name="chevron-back" size={24} color={colors.paper} />
           </Pressable>
         ) : null}
-        <Pressable onPress={() => router.push('/perfil')} accessibilityRole="button" accessibilityLabel="Mi perfil">
+        <Pressable onPress={() => router.push('/perfil')} accessibilityRole="button" accessibilityLabel={t('topbar.profile')}>
           {me?.avatar_url ? (
             <Image source={{ uri: me.avatar_url }} style={styles.avatar} />
           ) : (

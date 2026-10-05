@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GestureResponderEvent, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
+import { t } from '../i18n';
 import { dayMonth, moneyShort } from '../lib/format';
 import { colors, space } from '../theme';
 import { Txt } from './Txt';
@@ -18,7 +19,7 @@ export function ValueChart({ points }: { points: { day: string; value: number }[
   if (points.length < 2) {
     return (
       <Txt variant="small" style={{ padding: space.l }}>
-        Aún no hay evolución: el valor se actualiza cada día y aquí verás cómo cambia.
+        {t('chart.empty')}
       </Txt>
     );
   }
@@ -52,12 +53,15 @@ export function ValueChart({ points }: { points: { day: string; value: number }[
       <View style={styles.readout}>
         <Txt variant="number">{moneyShort(points[shown].value)}</Txt>
         <Txt variant="small">
-          {dayMonth(points[shown].day)} · {change >= 0 ? '+' : '−'}{Math.abs(change * 100).toFixed(1).replace('.', ',')} % desde el {dayMonth(points[0].day)}
+          {t('chart.change', { day: dayMonth(points[shown].day),
+                              pct: `${change >= 0 ? '+' : '−'}${Math.abs(change * 100).toFixed(1).replace('.', t('fmt.decimal'))}`,
+                              since: dayMonth(points[0].day) })}
         </Txt>
       </View>
       <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={{ height: HEIGHT }}
             accessible accessibilityRole="image"
-            accessibilityLabel={`Valor de mercado: de ${moneyShort(first)} el ${dayMonth(points[0].day)} a ${moneyShort(values[values.length - 1])} el ${dayMonth(points[points.length - 1].day)}`}>
+            accessibilityLabel={t('chart.a11y', { from: moneyShort(first), fromDay: dayMonth(points[0].day),
+                                                  to: moneyShort(values[values.length - 1]), toDay: dayMonth(points[points.length - 1].day) })}>
         {width ? (
           <>
             <Svg width={width} height={HEIGHT}>

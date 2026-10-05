@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 export function inviteMessage(league: string, code: string) {
-  return `Únete a mi liga «${league}» en Cyclonomy.\nCódigo: ${code}\nEnlace: cyclonomy://unirse/${code}`;
+  return t('invite.message', { league, code, link: `cyclonomy://unirse/${code}` });
 }

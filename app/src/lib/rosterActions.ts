@@ -1,4 +1,5 @@
 import type { SheetAction } from '../components/Modal';
+import { t } from '../i18n';
 import { api } from './api';
 import { dateTime, moneyShort } from './format';
 import type { RosterRow } from './types';
@@ -9,26 +10,24 @@ export function actionsFor(r: RosterRow, opts: { onChangeClause?: () => void } =
   const out: SheetAction[] = [];
   if (r.game_offer_id && r.game_offer_amount) {
     out.push({
-      label: `Vender al juego por ${moneyShort(r.game_offer_amount)}`, kind: 'primary',
-      hint: `La oferta caduca ${dateTime(r.game_offer_expires)}. El ciclista queda libre al momento.`,
+      label: t('actions.sellToGame', { amount: moneyShort(r.game_offer_amount) }), kind: 'primary',
+      hint: t('actions.sellToGameHint', { when: dateTime(r.game_offer_expires) }),
       onPress: () => api.acceptGameOffer(r.game_offer_id!),
     });
   }
   if (opts.onChangeClause) {
     out.push({
-      label: 'Cambiar la cláusula',
-      hint: `Del 150 % al 500 % de lo que pagaste (${moneyShort(clauseLevelValue(r.price_paid, 0))} a `
-        + `${moneyShort(clauseLevelValue(r.price_paid, CLAUSE_LEVELS - 1))}). Subir cuesta la mitad de la subida; `
-        + 'bajar te devuelve un cuarto de la bajada.',
+      label: t('actions.changeClause'),
+      hint: t('actions.changeClauseHint', { from: moneyShort(clauseLevelValue(r.price_paid, 0)),
+                                            to: moneyShort(clauseLevelValue(r.price_paid, CLAUSE_LEVELS - 1)) }),
       onPress: opts.onChangeClause,
     });
   }
   out.push(r.for_sale
-    ? { label: 'Quitar de la venta', hint: 'Sale del mercado y se anulan las pujas.',
+    ? { label: t('actions.unsell'), hint: t('actions.unsellHint'),
         onPress: () => api.setForSale(r.ownership_id, false) }
-    : { label: 'Poner a la venta',
-        hint: 'Sale al mercado durante 48 horas y los demás pueden pujar. 12 horas antes del cierre el juego te '
-          + 'ofrecerá su valor ±10 %.',
+    : { label: t('actions.sell'),
+        hint: t('actions.sellHint'),
         onPress: () => api.setForSale(r.ownership_id, true) });
   return out;
 }

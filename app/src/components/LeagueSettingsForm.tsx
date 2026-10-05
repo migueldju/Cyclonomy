@@ -1,5 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { View } from 'react-native';
+import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
 import type { LeagueSettings, PayoutMode } from '../lib/types';
 import { space } from '../theme';
@@ -8,22 +9,19 @@ import { Input, Segmented, Stepper, Toggle } from './Inputs';
 import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
-export const DEPTH_OPTIONS = [
-  { value: 1, label: 'WT de primer nivel' },
-  { value: 2, label: 'WT completo' },
-  { value: 3, label: 'Hasta .Pro' },
-  { value: 4, label: 'Hasta .1' },
+// Funciones y no constantes: se evalúan en el idioma actual
+export const depthOptions = () => [
+  { value: 1, label: t('settings.depth1') },
+  { value: 2, label: t('settings.depth2') },
+  { value: 3, label: t('settings.depth3') },
+  { value: 4, label: t('settings.depth4') },
 ];
-export const DEPTH_HINT: Record<number, string> = {
-  1: 'Tour, Giro, Vuelta, Monumentos, WT principal y Mundial.',
-  2: 'Todo el WorldTour, más campeonatos continentales y nacionales.',
-  3: 'Lo anterior más las carreras .Pro.',
-  4: 'Todo el calendario hasta las carreras .1.',
-};
-export const PAYOUT_OPTIONS: { value: PayoutMode; label: string }[] = [
-  { value: 'per_point', label: 'Por puntos' },
-  { value: 'by_position', label: 'Por puesto semanal' },
-  { value: 'mixed', label: 'Mixto' },
+export const depthHint = (n: number) =>
+  ({ 1: t('settings.depth1Hint'), 2: t('settings.depth2Hint'), 3: t('settings.depth3Hint'), 4: t('settings.depth4Hint') } as Record<number, string>)[n];
+export const payoutOptions = (): { value: PayoutMode; label: string }[] => [
+  { value: 'per_point', label: t('settings.payoutPoints') },
+  { value: 'by_position', label: t('settings.payoutPosition') },
+  { value: 'mixed', label: t('settings.payoutMixed') },
 ];
 
 export const DEFAULT_SETTINGS: Required<Pick<LeagueSettings,
@@ -46,7 +44,7 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
   const prizes = s.payout_by_position;
 
   async function submit() {
-    if (!name.trim()) { setError('Ponle un nombre a la liga.'); return; }
+    if (!name.trim()) { setError(t('settings.nameRequired')); return; }
     setBusy(true);
     setError(null);
     try {
@@ -60,46 +58,46 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
 
   return (
     <View>
-      <Input label="Nombre de la liga" value={name} onChangeText={setName} maxLength={60} />
+      <Input label={t('settings.name')} value={name} onChangeText={setName} maxLength={60} />
       {children}
-      <Stepper label="Máximo de ciclistas por equipo" value={s.max_riders} min={16} max={40}
+      <Stepper label={t('settings.maxRiders')} value={s.max_riders} min={16} max={40}
                onChange={(v) => set('max_riders', v)} />
-      <Segmented label="Profundidad del calendario" options={DEPTH_OPTIONS} value={s.calendar_depth}
+      <Segmented label={t('settings.depth')} options={depthOptions()} value={s.calendar_depth}
                  onChange={(v) => set('calendar_depth', v)} />
-      <Txt variant="small" style={{ marginTop: -space.s, marginBottom: space.l }}>{DEPTH_HINT[s.calendar_depth]}</Txt>
-      <Stepper label="Ciclistas nuevos en el mercado cada día" value={s.market_size} min={1} max={30}
+      <Txt variant="small" style={{ marginTop: -space.s, marginBottom: space.l }}>{depthHint(s.calendar_depth)}</Txt>
+      <Stepper label={t('settings.marketSize')} value={s.market_size} min={1} max={30}
                onChange={(v) => set('market_size', v)} />
-      <Stepper label="Hora de actualización del mercado" value={s.market_hour} min={0} max={23}
+      <Stepper label={t('settings.marketHour')} value={s.market_hour} min={0} max={23}
                onChange={(v) => set('market_hour', v)} format={(v) => `${String(v).padStart(2, '0')}:00`} />
-      <Toggle label="Clausulazos" value={s.clauses_enabled} onChange={(v) => set('clauses_enabled', v)}
-              hint="Pagar la cláusula de un ciclista de otro jugador para quedárselo. Bloqueados los domingos de 21:00 a 24:00." />
-      <Segmented label="Reparto de dinero" options={PAYOUT_OPTIONS} value={s.payout_mode}
+      <Toggle label={t('settings.clauses')} value={s.clauses_enabled} onChange={(v) => set('clauses_enabled', v)}
+              hint={t('settings.clausesHint')} />
+      <Segmented label={t('settings.payout')} options={payoutOptions()} value={s.payout_mode}
                  onChange={(v) => set('payout_mode', v)} />
 
       {s.payout_mode !== 'by_position' ? (
-        <Input label="Euros por cada punto" keyboardType="number-pad" value={String(s.payout_per_point)}
-               onChangeText={(t) => set('payout_per_point', parseAmount(t) ?? 0)}
-               hint="Se paga cada lunes por los puntos de la semana anterior." />
+        <Input label={t('settings.perPoint')} keyboardType="number-pad" value={String(s.payout_per_point)}
+               onChangeText={(v) => set('payout_per_point', parseAmount(v) ?? 0)}
+               hint={t('settings.perPointHint')} />
       ) : null}
 
       {s.payout_mode !== 'per_point' ? (
         <View style={{ marginBottom: space.l }}>
-          <Txt variant="label" style={{ marginBottom: 6 }}>Premio por puesto en la semana</Txt>
+          <Txt variant="label" style={{ marginBottom: 6 }}>{t('settings.prizes')}</Txt>
           {prizes.map((p, i) => (
             <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
-              <Txt variant="number" style={{ width: 36 }}>{i + 1}.º</Txt>
+              <Txt variant="number" style={{ width: 36 }}>{t('fmt.ordinal', { n: i + 1 })}</Txt>
               <View style={{ flex: 1 }}>
-                <Input label={`Premio del ${i + 1}.º`} keyboardType="number-pad" value={String(p)}
-                       onChangeText={(t) => set('payout_by_position', prizes.map((x, j) => (j === i ? parseAmount(t) ?? 0 : x)))}
+                <Input label={t('settings.prizeFor', { n: i + 1 })} keyboardType="number-pad" value={String(p)}
+                       onChangeText={(v) => set('payout_by_position', prizes.map((x, j) => (j === i ? parseAmount(v) ?? 0 : x)))}
                        hint={money(p)} />
               </View>
             </View>
           ))}
           <View style={{ flexDirection: 'row', gap: space.s }}>
-            <Button small kind="secondary" label="Añadir puesto"
+            <Button small kind="secondary" label={t('settings.addPrize')}
                     onPress={() => set('payout_by_position', [...prizes, 0])} />
             {prizes.length > 0 ? (
-              <Button small kind="quiet" label="Quitar el último"
+              <Button small kind="quiet" label={t('settings.removePrize')}
                       onPress={() => set('payout_by_position', prizes.slice(0, -1))} />
             ) : null}
           </View>

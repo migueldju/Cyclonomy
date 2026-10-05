@@ -10,9 +10,10 @@ import { StatusDot } from '@/components/StatusDot';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, dateTime, moneyShort, points } from '@/lib/format';
-import { colors, space } from '@/theme';
+import { categoryName, colors, space } from '@/theme';
 
 /** Inscripción de una carrera: hasta el máximo de su categoría, hasta la salida de la 1.ª etapa */
 export default function Inscripcion() {
@@ -38,7 +39,7 @@ export default function Inscripcion() {
   }, [data]);
 
   if (!data) {
-    return <Screen><ErrorText error={error} /><Empty text={loading ? 'Cargando…' : 'No se pudo cargar la carrera.'} /></Screen>;
+    return <Screen><ErrorText error={error} /><Empty text={loading ? t('common.loading') : t('entry.loadError')} /></Screen>;
   }
   const max = data.max_entries;
 
@@ -74,21 +75,19 @@ export default function Inscripcion() {
           <Txt variant="hero" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
           <Flag code={data.race.country} height={16} />
         </View>
-        <Txt variant="small">{data.race.category_name} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
+        <Txt variant="small">{categoryName(data.race.category)} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
         <Txt>
-          {data.open ? `Puedes inscribir hasta ${max} ciclistas hasta el ${dateTime(data.race.entries_close_at)}.`
-            : 'La inscripción está cerrada.'}
-          {data.auto ? ' Esta inscripción la hizo el sistema automáticamente.' : ''}
+          {data.open ? t('entry.open', { max, when: dateTime(data.race.entries_close_at) }) : t('entry.closed')}
+          {data.auto ? ` ${t('entry.auto')}` : ''}
         </Txt>
         {data.open ? (
           <Txt variant="small">
-            Si no te inscribes, al empezar la carrera el sistema elegirá a tus ciclistas de la lista de salida con más
-            puntos, y después por valor.
+            {t('entry.autoHint')}
           </Txt>
         ) : null}
       </View>
 
-      <Section title={`Tus ciclistas · ${chosen.size}/${max}`}>
+      <Section title={t('entry.yourRiders', { n: chosen.size, max })}>
         {riders.length ? riders.map((r, i) => {
           const on = chosen.has(r.rider_id);
           const disabled = !data.open || (!on && (!r.available || chosen.size >= max));
@@ -104,22 +103,22 @@ export default function Inscripcion() {
                 </View>
                 <Txt variant="small">
                   {[r.pro_team, `${points(r.season_points)}`,
-                    data.has_startlist ? (r.on_startlist ? 'en la lista de salida' : 'no está en la lista de salida') : null,
-                    !r.available ? (r.status === 'leaving' ? 'se va el lunes' : 'disponible desde el lunes') : null]
+                    data.has_startlist ? (r.on_startlist ? t('entry.onStartlist') : t('entry.notOnStartlist')) : null,
+                    !r.available ? (r.status === 'leaving' ? t('status.leaving') : t('entry.fromMonday')) : null]
                     .filter(Boolean).join(' · ')}
                 </Txt>
               </View>
               <Txt variant="number">{moneyShort(r.market_value)}</Txt>
             </Pressable>
           );
-        }) : <Empty text="No tienes ciclistas." />}
+        }) : <Empty text={t('entry.noRiders')} />}
       </Section>
 
       {data.open ? (
         <View style={{ padding: space.l }}>
           <ErrorText error={saveError} />
-          {saved ? <Txt style={{ color: colors.green, marginBottom: space.s }}>Inscripción guardada.</Txt> : null}
-          <Button label={`Guardar inscripción (${chosen.size}/${max})`} onPress={save} busy={busy} />
+          {saved ? <Txt style={{ color: colors.green, marginBottom: space.s }}>{t('entry.saved')}</Txt> : null}
+          <Button label={t('entry.save', { n: chosen.size, max })} onPress={save} busy={busy} />
         </View>
       ) : null}
     </Screen>

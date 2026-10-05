@@ -172,19 +172,26 @@ def stored_results(db, stage_id: int) -> dict[str, list[tuple[str, int]]]:
 
 
 def set_results(db, stage_id: int, results: dict[str, list[tuple[str, int]]], is_stage_race: bool) -> int:
-    """Guarda los resultados (solo de ciclistas del juego). En vueltas, el líder de la montaña tras la etapa
+    """Guarda los resultados: en result solo los ciclistas del juego (puntúan) y en result_full todos (se enseñan). En vueltas, el líder de la montaña tras la etapa
     es el 1.º de la clasificación de la montaña."""
     rows = {k: v for k, v in results.items() if k in ("stage", "gc", "points", "kom")}
     if is_stage_race and rows.get("kom"):
         leader = min(rows["kom"], key=lambda x: x[1])
         rows["kom_leader"] = [(leader[0], 1)]
     db.execute("delete from public.result where stage_id = %s", (stage_id,))
+    db.execute("delete from public.result_full where stage_id = %s", (stage_id,))
     n = 0
     for kind, items in rows.items():
         if not items:
             continue
         slugs = [s for s, _ in items]
         positions = [int(p) for _, p in items]
+        # clasificación completa, también los que no están en el juego (para enseñarla)
+        db.execute(
+            "insert into public.result_full (stage_id, kind, position, rider_slug, rider_id) "
+            "select %s, %s, x.pos, x.slug, rd.id from unnest(%s::text[], %s::int[]) as x(slug, pos) "
+            "left join public.rider rd on rd.pcs_slug = x.slug on conflict do nothing",
+            (stage_id, kind, slugs, positions))
         n += db.scalar(
             "with ins as (insert into public.result (stage_id, kind, rider_id, position) "
             "  select %s, %s, rd.id, x.pos from unnest(%s::text[], %s::int[]) as x(slug, pos) "

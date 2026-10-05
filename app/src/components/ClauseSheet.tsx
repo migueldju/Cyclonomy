@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { t } from '../i18n';
 import { api } from '../lib/api';
 import { money, moneyShort } from '../lib/format';
 import { CLAUSE_LEVELS, clauseChange, clauseLevel, clauseLevelValue } from '../lib/rosterActions';
@@ -50,7 +51,7 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={`Cláusula de ${row.rider_name}`}>
+    <Sheet visible={visible} onClose={onClose} title={t('clause.title', { name: row.rider_name })}>
       <View style={styles.headline}>
         <Txt variant="title" style={{ color: colors.inkSoft }}>{moneyShort(row.clause)}</Txt>
         <Txt variant="title" style={{ color: colors.inkSoft }}>→</Txt>
@@ -58,15 +59,15 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
         <Txt variant="small">({pct(chosen)})</Txt>
       </View>
       <Txt style={{ marginBottom: space.m }}>
-        {same ? 'Toca o arrastra la barra para subirla o bajarla.'
-          : change > 0 ? <>Pagas <Txt variant="number">{money(change)}</Txt></>
-          : <>Recibes <Txt variant="number" style={{ color: colors.green }}>{money(-change)}</Txt></>}
+        {same ? t('clause.hint')
+          : change > 0 ? <>{t('clause.pay')} <Txt variant="number">{money(change)}</Txt></>
+          : <>{t('clause.receive')} <Txt variant="number" style={{ color: colors.green }}>{money(-change)}</Txt></>}
         {!same && after != null ? (
-          <Txt variant="small" style={short ? { color: colors.red } : undefined}>{'  ·  '}saldo después: {money(after)}</Txt>
+          <Txt variant="small" style={short ? { color: colors.red } : undefined}>{'  ·  '}{t('clause.balanceAfter', { amount: money(after) })}</Txt>
         ) : null}
       </Txt>
 
-      <RangeSlider single steps={CLAUSE_LEVELS} low={0} high={chosen} label="Escalón de la cláusula"
+      <RangeSlider single steps={CLAUSE_LEVELS} low={0} high={chosen} label={t('clause.level')}
                    onChange={(_, h) => setChosen(h)} />
       {/* un porcentaje bajo cada escalón */}
       <View style={styles.ticks}>
@@ -80,14 +81,13 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
 
       <ErrorText error={error} />
       <Button onPress={confirm} busy={busy} disabled={same || short} style={{ marginTop: space.l }}
-              label={same ? 'Elige otro escalón' : change > 0
-                ? `Subir a ${moneyShort(target)} · pagar ${money(change)}`
-                : `Bajar a ${moneyShort(target)} · recibir ${money(-change)}`} />
+              label={same ? t('clause.chooseOther') : change > 0
+                ? t('clause.raiseTo', { clause: moneyShort(target), amount: money(change) })
+                : t('clause.lowerTo', { clause: moneyShort(target), amount: money(-change) })} />
       <Txt variant="small" style={{ marginTop: space.s }}>
-        % de lo que pagaste ({moneyShort(row.price_paid)}). Subir cuesta la mitad de la subida; bajar te devuelve un
-        cuarto de la bajada.
+        {t('clause.rule', { paid: moneyShort(row.price_paid) })}
       </Txt>
-      <Button label="Cancelar" kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
+      <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
     </Sheet>
   );
 }

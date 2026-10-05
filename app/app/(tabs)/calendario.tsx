@@ -7,10 +7,11 @@ import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
-import { dateRange, dateTime, dayMonth, points, todayISO } from '@/lib/format';
+import { dateRange, dateTime, dayMonth, ordinal, points, todayISO } from '@/lib/format';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { categoryColor, categoryRank, colors, fonts, space, type } from '@/theme';
+import { categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -24,7 +25,7 @@ export default function Calendario() {
 
   const categories = useMemo(() => {
     const seen = new Map<string, string>();
-    (data ?? []).forEach((r) => seen.set(r.category, r.category_name));
+    (data ?? []).forEach((r) => seen.set(r.category, categoryName(r.category)));
     return [...seen.entries()].sort((a, b) => categoryRank(a[0]) - categoryRank(b[0]));
   }, [data]);
 
@@ -44,11 +45,11 @@ export default function Calendario() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.road }}>
       <View style={styles.filters}>
-        <TextInput value={query} onChangeText={setQuery} placeholder="Buscar carrera" placeholderTextColor={colors.inkSoft}
-                   style={styles.search} accessibilityLabel="Buscar carrera" />
+        <TextInput value={query} onChangeText={setQuery} placeholder={t('calendar.search')} placeholderTextColor={colors.inkSoft}
+                   style={styles.search} accessibilityLabel={t('calendar.search')} />
         <FlatList
           horizontal showsHorizontalScrollIndicator={false}
-          data={[[null, 'Todas'] as [string | null, string], ...categories]}
+          data={[[null, t('calendar.all')] as [string | null, string], ...categories]}
           keyExtractor={(c) => String(c[0])}
           contentContainerStyle={{ gap: space.s }}
           renderItem={({ item: [code, name] }) => {
@@ -74,7 +75,7 @@ export default function Calendario() {
           setTimeout(() => list.current?.scrollToIndex({ index: info.index, animated: false }), 100);
         }}
         ListEmptyComponent={<Txt variant="small" style={{ padding: space.l }}>
-          {loading ? 'Cargando…' : 'Ninguna carrera coincide con la búsqueda.'}
+          {loading ? t('common.loading') : t('calendar.noMatch')}
         </Txt>}
         renderItem={({ item }) => (
           <RaceItem r={item} open={open === item.race_id} leagueId={id}
@@ -89,7 +90,7 @@ function normalize(s: string) {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
-const STATUS = { upcoming: 'próxima', live: 'en curso', finished: 'terminada' };
+const status = (s: 'upcoming' | 'live' | 'finished') => t(`calendar.status.${s}`);
 
 function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boolean; onToggle: () => void; leagueId: string }) {
   return (
@@ -101,11 +102,11 @@ function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boole
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
           <Txt variant="small">
-            {dateRange(r.start_date, r.end_date)} · {r.category_name}
-            {r.is_stage_race ? ` · ${r.n_stages} etapas` : ''} · {STATUS[r.status]}
+            {dateRange(r.start_date, r.end_date)} · {categoryName(r.category)}
+            {r.is_stage_race ? ` · ${t('calendar.stages', { n: r.n_stages })}` : ''} · {status(r.status)}
           </Txt>
         </View>
-        <Txt variant="label">{open ? 'Cerrar' : 'Ver'}</Txt>
+        <Txt variant="label">{open ? t('common.close') : t('common.see')}</Txt>
       </Pressable>
       {open ? <RaceDetailView r={r} leagueId={leagueId} /> : null}
     </View>
@@ -124,30 +125,30 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
       {r.entries_open ? (
         <View style={styles.detailLine}>
           <Txt variant="small" style={{ flex: 1 }}>
-            Inscripción abierta hasta {dateTime(r.entries_close_at)} · {r.my_entry_count}/{r.max_entries}
+            {t('calendar.entriesOpen', { when: dateTime(r.entries_close_at) })} · {r.my_entry_count}/{r.max_entries}
           </Txt>
-          <Button small label="Inscribir" onPress={() => router.push(`/carrera/${r.race_id}`)} />
+          <Button small label={t('race.enter')} onPress={() => router.push(`/carrera/${r.race_id}`)} />
         </View>
       ) : null}
       <ErrorText error={error} />
       {d ? (
         <>
-          <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? 'Etapas' : 'Carrera'}</Txt>
+          <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? t('calendar.stagesTitle') : t('calendar.race')}</Txt>
           <View style={styles.table}>
             <View style={[styles.tr, styles.th]}>
-              <Txt variant="label" style={{ width: 84 }}>{r.is_stage_race ? 'Etapa' : ''}</Txt>
-              <Txt variant="label" style={{ width: 52 }}>Fecha</Txt>
-              <Txt variant="label" style={{ flex: 1 }}>Mejor de la liga</Txt>
-              <Txt variant="label" style={styles.numCol}>Tus pts</Txt>
+              <Txt variant="label" style={{ width: 84 }}>{r.is_stage_race ? t('calendar.stage') : ''}</Txt>
+              <Txt variant="label" style={{ width: 52 }}>{t('calendar.date')}</Txt>
+              <Txt variant="label" style={{ flex: 1 }}>{t('calendar.bestInLeague')}</Txt>
+              <Txt variant="label" style={styles.numCol}>{t('calendar.yourPoints')}</Txt>
             </View>
             {d.stages.map((s, i) => (
               <Pressable key={s.stage_id} onPress={() => router.push(`/etapa/${s.stage_id}`)} accessibilityRole="button"
                          style={({ pressed }) => [styles.tr, i === d.stages.length - 1 && styles.trLast,
                                                   pressed && { backgroundColor: colors.road }]}>
-                <Txt style={{ width: 84 }}>{r.is_stage_race ? (s.number === 0 ? 'Prólogo' : `Etapa ${s.number}`) : 'Resultado'}</Txt>
+                <Txt style={{ width: 84 }}>{r.is_stage_race ? (s.number === 0 ? t('race.prologue') : t('race.stageN', { n: s.number })) : t('calendar.result')}</Txt>
                 <Txt variant="small" style={{ width: 52 }}>{dayMonth(s.date)}</Txt>
                 <Txt variant="small" style={{ flex: 1 }} numberOfLines={1}>
-                  {s.status === 'scored' ? (s.top_member ? s.top_member.team_name : 'sin puntos') : 'pendiente'}
+                  {s.status === 'scored' ? (s.top_member ? s.top_member.team_name : t('calendar.noPoints')) : t('calendar.pending')}
                 </Txt>
                 <Txt variant="number" style={styles.numCol}>{s.status === 'scored' ? points(s.my_points) : '—'}</Txt>
               </Pressable>
@@ -156,17 +157,17 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
 
           {d.league_total.length ? (
             <>
-              <Txt variant="label" style={styles.subhead}>Puntos de la liga en la carrera</Txt>
+              <Txt variant="label" style={styles.subhead}>{t('calendar.leaguePoints')}</Txt>
               <View style={styles.table}>
                 <View style={[styles.tr, styles.th]}>
-                  <Txt variant="label" style={styles.posCol}>Pos.</Txt>
+                  <Txt variant="label" style={styles.posCol}>{t('calendar.pos')}</Txt>
                   <View style={styles.flagCell} />
-                  <Txt variant="label" style={{ flex: 1 }}>Equipo</Txt>
-                  <Txt variant="label" style={styles.numCol}>Puntos</Txt>
+                  <Txt variant="label" style={{ flex: 1 }}>{t('calendar.team')}</Txt>
+                  <Txt variant="label" style={styles.numCol}>{t('kind.points')}</Txt>
                 </View>
                 {d.league_total.map((m, i) => (
                   <View key={m.member_id} style={[styles.tr, i === d.league_total.length - 1 && styles.trLast]}>
-                    <Txt variant="number" style={styles.posCol}>{i + 1}.º</Txt>
+                    <Txt variant="number" style={styles.posCol}>{ordinal(i + 1)}</Txt>
                     <View style={styles.flagCell}><Flag code={m.country} /></View>
                     <Txt style={{ flex: 1 }} numberOfLines={1}>{m.team_name}</Txt>
                     <Txt variant="number" style={styles.numCol}>{points(m.points)}</Txt>
@@ -178,32 +179,42 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
 
           {d.gc.length ? (
             <>
-              <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? 'General' : 'Clasificación'}</Txt>
+              <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? t('kind.gc') : t('admin.classification')}</Txt>
               {/* tabla: posición · bandera (columna fija, todas alineadas) · ciclista · equipo de la liga que puntuó */}
               <View style={styles.table}>
                 <View style={[styles.tr, styles.th]}>
-                  <Txt variant="label" style={styles.posCol}>Pos.</Txt>
+                  <Txt variant="label" style={styles.posCol}>{t('calendar.pos')}</Txt>
                   <View style={styles.flagCell} />
-                  <Txt variant="label" style={{ flex: 1 }}>Ciclista</Txt>
-                  <Txt variant="label" style={styles.teamCol}>Puntúa para</Txt>
+                  <Txt variant="label" style={{ flex: 1 }}>{t('calendar.rider')}</Txt>
+                  <Txt variant="label" style={styles.teamCol}>{t('calendar.scoresFor')}</Txt>
                 </View>
-                {d.gc.map((g, i) => (
-                  <Pressable key={g.rider_id} onPress={() => router.push(`/ciclista/${g.rider_id}`)} accessibilityRole="button"
-                             style={({ pressed }) => [styles.tr, i === d.gc.length - 1 && styles.trLast,
-                                                      pressed && { backgroundColor: colors.road }]}>
-                    <Txt variant="number" style={styles.posCol}>{g.position}.º</Txt>
-                    <View style={styles.flagCell}><Flag code={g.nationality} /></View>
-                    <Txt numberOfLines={1} style={{ flex: 1 }}>{g.name}</Txt>
-                    <Txt variant="small" numberOfLines={1} style={[styles.teamCol, g.scored_for.length ? styles.scoredFor : null]}>
-                      {g.scored_for.length ? g.scored_for.join(', ') : '—'}
-                    </Txt>
-                  </Pressable>
-                ))}
+                {d.gc.map((g, i) => {
+                  const cells = (
+                    <>
+                      <Txt variant="number" style={styles.posCol}>{ordinal(g.position)}</Txt>
+                      <View style={styles.flagCell}><Flag code={g.nationality} /></View>
+                      <Txt numberOfLines={1} style={[{ flex: 1 }, g.rider_id == null && { color: colors.inkSoft }]}>{g.name}</Txt>
+                      <Txt variant="small" numberOfLines={1} style={[styles.teamCol, g.scored_for.length ? styles.scoredFor : null]}>
+                        {g.rider_id == null ? t('stage.notInGame') : g.scored_for.length ? g.scored_for.join(', ') : '—'}
+                      </Txt>
+                    </>
+                  );
+                  const rowStyle = [styles.tr, i === d.gc.length - 1 && styles.trLast];
+                  // los que no están en el juego no tienen ficha: fila sin botón
+                  return g.rider_id == null ? (
+                    <View key={`x${g.position}-${g.name}`} style={rowStyle}>{cells}</View>
+                  ) : (
+                    <Pressable key={g.rider_id} onPress={() => router.push(`/ciclista/${g.rider_id}`)} accessibilityRole="button"
+                               style={({ pressed }) => [...rowStyle, pressed && { backgroundColor: colors.road }]}>
+                      {cells}
+                    </Pressable>
+                  );
+                })}
               </View>
             </>
           ) : null}
         </>
-      ) : !error ? <Txt variant="small">Cargando…</Txt> : null}
+      ) : !error ? <Txt variant="small">{t('common.loading')}</Txt> : null}
     </View>
   );
 }

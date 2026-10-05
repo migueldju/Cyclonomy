@@ -9,6 +9,7 @@ import { Empty, ErrorText, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { money, moneyShort, ordinal, points } from '@/lib/format';
 import type { RosterRow } from '@/lib/types';
@@ -36,12 +37,12 @@ export default function Jugador() {
             <Flag code={player?.country} height={16} />
           </View>
           <Txt variant="small">
-            {player ? `${ordinal(player.pos)} · ${points(player.points_total)} · plantilla ${moneyShort(player.team_value)}` : ''}
+            {player ? `${ordinal(player.pos)} · ${points(player.points_total)} · ${t('standings.squadValue', { amount: moneyShort(player.team_value) })}` : ''}
           </Txt>
         </View>
         {/* escudo del equipo: la imagen del perfil del jugador; si no tiene, su inicial */}
         {player ? (player.avatar_url ? (
-          <Image source={{ uri: player.avatar_url }} style={styles.crest} accessibilityLabel={`Escudo de ${player.team_name}`} />
+          <Image source={{ uri: player.avatar_url }} style={styles.crest} accessibilityLabel={t('player.crest', { team: player.team_name })} />
         ) : (
           <View style={[styles.crest, styles.crestEmpty]}>
             <Txt style={styles.crestInitial}>{player.team_name.trim().slice(0, 1).toUpperCase()}</Txt>
@@ -53,8 +54,8 @@ export default function Jugador() {
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
                     photo={r.photo_url} nationality={r.nationality}
                     note={riderStatusNote(r.status)} value={r.market_value}
-                    detail={`cláusula ${moneyShort(r.clause)}`} onPress={() => setPicked(r)} last={i === rows.length - 1} />
-        )) : <Empty text={roster.loading ? 'Cargando…' : 'Este jugador no tiene ciclistas.'} />}
+                    detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={i === rows.length - 1} />
+        )) : <Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
       </Section>
       <ErrorText error={roster.error} />
 
@@ -63,13 +64,13 @@ export default function Jugador() {
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
         subtitle={picked ? (picked.transferable
-          ? `Valor ${money(picked.market_value)} · cláusula ${money(picked.clause)} · ${points(picked.season_points)} esta temporada`
-          : 'Este ciclista tiene un traspaso pendiente hasta el lunes: no se puede ofertar ni pagar su cláusula.') : undefined}
+          ? t('player.riderSubtitle', { value: money(picked.market_value), clause: money(picked.clause), points: points(picked.season_points) })
+          : t('player.pendingTransfer')) : undefined}
         actions={picked?.transferable ? [
-          { label: `Pagar la cláusula: ${moneyShort(picked.clause)}`, kind: 'primary',
-            hint: 'El dinero va a su dueño. El ciclista pasa a tu plantilla el lunes a las 00:00; si ya estaba inscrito en una carrera, sigue puntuando para su dueño en ella.',
+          { label: t('player.payClause', { amount: moneyShort(picked.clause) }), kind: 'primary',
+            hint: t('player.payClauseHint'),
             onPress: () => api.payClause(picked.ownership_id) },
-          { label: 'Hacer una oferta', hint: 'Su dueño tiene 48 horas para aceptarla o rechazarla.',
+          { label: t('player.makeOffer'), hint: t('player.makeOfferHint'),
             onPress: () => { const p = picked; setTimeout(() => setOffering(p), 350); } },
         ] : []}
         onDone={done}
@@ -77,10 +78,10 @@ export default function Jugador() {
       <AmountSheet
         visible={!!offering}
         onClose={() => setOffering(null)}
-        title={offering ? `Oferta por ${offering.rider_name}` : ''}
-        subtitle={offering ? `Valor de mercado: ${money(offering.market_value)}` : undefined}
+        title={offering ? t('player.offerFor', { name: offering.rider_name }) : ''}
+        subtitle={offering ? `${t('rider.marketValue')}: ${money(offering.market_value)}` : undefined}
         initial={offering?.market_value}
-        confirmLabel="Enviar oferta"
+        confirmLabel={t('player.sendOffer')}
         onConfirm={(amount) => api.makeOffer(offering!.ownership_id, amount)}
         onDone={done}
       />

@@ -8,6 +8,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { t } from '@/i18n';
 import { signInWithGoogle } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { colors, space } from '@/theme';
@@ -23,7 +24,7 @@ export default function Login() {
     setBusy('email');
     setError(null);
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    if (error) setError(error.message === 'Invalid login credentials' ? 'Email o contraseña incorrectos.' : error.message);
+    if (error) setError(error.message === 'Invalid login credentials' ? t('login.wrong') : error.message);
     setBusy(null);
   }
 
@@ -39,20 +40,20 @@ export default function Login() {
       <View style={[styles.hero, { marginTop: insets.top + space.xl }]}>
         <Bib value="1" size="l" />
         <Txt variant="hero" style={styles.title}>Cyclonomy</Txt>
-        <Txt variant="small">Ficha, inscribe y suma con los resultados reales.</Txt>
+        <Txt variant="small">{t('login.tagline')}</Txt>
       </View>
-      <Input label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
+      <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" textContentType="emailAddress" />
-      <Input label="Contraseña" value={password} onChangeText={setPassword} secureTextEntry
+      <Input label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry
              autoComplete="password" textContentType="password" />
-      <Link href="/recuperar" style={styles.forgot}><Txt variant="small" style={styles.link}>¿Has olvidado la contraseña?</Txt></Link>
+      <Link href="/recuperar" style={styles.forgot}><Txt variant="small" style={styles.link}>{t('login.forgot')}</Txt></Link>
       <ErrorText error={error} />
-      <Button label="Entrar" onPress={withEmail} busy={busy === 'email'} disabled={!email || !password} />
-      <Button label="Continuar con Google" kind="secondary" onPress={withGoogle} busy={busy === 'google'}
+      <Button label={t('login.signIn')} onPress={withEmail} busy={busy === 'email'} disabled={!email || !password} />
+      <Button label={t('login.google')} kind="secondary" onPress={withGoogle} busy={busy === 'google'}
               style={{ marginTop: space.m }} />
       <View style={styles.footer}>
-        <Txt variant="small">¿No tienes cuenta? </Txt>
-        <Link href="/registro"><Txt style={styles.link}>Crear cuenta</Txt></Link>
+        <Txt variant="small">{t('login.noAccount')} </Txt>
+        <Link href="/registro"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
       </View>
     </Screen>
   );

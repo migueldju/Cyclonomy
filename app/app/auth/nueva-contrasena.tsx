@@ -5,6 +5,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, space } from '@/theme';
 
@@ -27,11 +28,11 @@ export default function NuevaContrasena() {
         const { error } = await supabase.auth.exchangeCodeForSession(String(code));
         // un código ya usado (p. ej. al recargar) falla, pero si ya hay sesión se puede seguir
         if (error && !(await supabase.auth.getSession()).data.session) {
-          setError('El enlace ha caducado o ya se ha usado. Pide otro desde «¿Has olvidado la contraseña?».');
+          setError(t('newpass.expired'));
           return;
         }
       } else if (!(await supabase.auth.getSession()).data.session) {
-        setError('Abre esta pantalla desde el enlace del email de recuperación.');
+        setError(t('newpass.openFromEmail'));
         return;
       }
       setReady(true);
@@ -39,8 +40,8 @@ export default function NuevaContrasena() {
   }, [code]);
 
   async function save() {
-    if (password.length < 8) { setError('La contraseña necesita al menos 8 caracteres.'); return; }
-    if (password !== repeat) { setError('Las dos contraseñas no coinciden.'); return; }
+    if (password.length < 8) { setError(t('auth.passwordShort')); return; }
+    if (password !== repeat) { setError(t('newpass.mismatch')); return; }
     setBusy(true);
     setError(null);
     const { error } = await supabase.auth.updateUser({ password });
@@ -51,26 +52,26 @@ export default function NuevaContrasena() {
 
   return (
     <Screen padded>
-      <Txt variant="display" style={{ marginTop: space.xxl * 2, marginBottom: space.l }}>Contraseña nueva</Txt>
+      <Txt variant="display" style={{ marginTop: space.xxl * 2, marginBottom: space.l }}>{t('newpass.title')}</Txt>
       {done ? (
         <>
-          <Txt style={{ marginBottom: space.l, color: colors.green }}>Contraseña guardada. Ya puedes entrar con ella.</Txt>
-          <Button label="Ir a la app" onPress={() => router.replace('/')} />
+          <Txt style={{ marginBottom: space.l, color: colors.green }}>{t('newpass.saved')}</Txt>
+          <Button label={t('newpass.goToApp')} onPress={() => router.replace('/')} />
         </>
       ) : ready ? (
         <>
-          <Input label="Contraseña nueva" value={password} onChangeText={setPassword} secureTextEntry
+          <Input label={t('newpass.title')} value={password} onChangeText={setPassword} secureTextEntry
                  autoComplete="new-password" textContentType="newPassword" />
-          <Input label="Repite la contraseña" value={repeat} onChangeText={setRepeat} secureTextEntry
+          <Input label={t('newpass.repeat')} value={repeat} onChangeText={setRepeat} secureTextEntry
                  autoComplete="new-password" textContentType="newPassword" />
           <ErrorText error={error} />
-          <Button label="Guardar la contraseña" onPress={save} busy={busy} disabled={!password || !repeat} />
+          <Button label={t('newpass.save')} onPress={save} busy={busy} disabled={!password || !repeat} />
         </>
       ) : (
         <>
-          {error ? null : <Txt>Comprobando el enlace…</Txt>}
+          {error ? null : <Txt>{t('newpass.checking')}</Txt>}
           <ErrorText error={error} />
-          {error ? <Button label="Volver a entrar" onPress={() => router.replace('/login')} /> : null}
+          {error ? <Button label={t('auth.backToLogin')} onPress={() => router.replace('/login')} /> : null}
         </>
       )}
     </Screen>

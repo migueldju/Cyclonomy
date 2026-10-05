@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { GestureResponderEvent, PanResponder, StyleSheet, View } from 'react-native';
+import { t } from '../i18n';
 import { colors } from '../theme';
 
 const THUMB = 26;
@@ -64,10 +65,10 @@ export function RangeSlider({ steps, low, high, onChange, label, single }: {
       <View style={[styles.fill, { left: pos(low) + THUMB / 2, width: pos(high) - pos(low) }]} pointerEvents="none" />
       {single ? null : (
         <View {...lowPan.panHandlers} style={[styles.thumb, { left: pos(low) }]} accessibilityRole="adjustable"
-              accessibilityLabel="Valor mínimo" hitSlop={10} />
+              accessibilityLabel={t('slider.min')} hitSlop={10} />
       )}
       <View {...highPan.panHandlers} style={[styles.thumb, { left: pos(high) }]} accessibilityRole="adjustable"
-            accessibilityLabel={single ? label : 'Valor máximo'} hitSlop={10} />
+            accessibilityLabel={single ? label : t('slider.max')} hitSlop={10} />
     </View>
   );
 }

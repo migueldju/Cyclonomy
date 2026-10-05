@@ -1,3 +1,5 @@
+import { getLang } from '../i18n';
+
 // Países para el equipo de cada jugador: código ISO de 2 letras (como los de los ciclistas) y nombre en español
 export const COUNTRIES: [string, string][] = [
   ['af', 'Afganistán'], ['al', 'Albania'], ['de', 'Alemania'], ['ad', 'Andorra'], ['ao', 'Angola'],
@@ -28,5 +30,21 @@ export const COUNTRIES: [string, string][] = [
   ['zw', 'Zimbabue'],
 ];
 
-export const countryName = (code: string | null | undefined) =>
-  COUNTRIES.find(([c]) => c === code)?.[1] ?? null;
+const spanish = (code: string | null | undefined) => COUNTRIES.find(([c]) => c === code)?.[1] ?? null;
+
+let names: { lang: string; dn: { of: (c: string) => string | undefined } | null } | null = null;
+
+/** Nombre del país en el idioma de la app (con Intl.DisplayNames si existe: no en todos los móviles); si no, en español */
+export function countryName(code: string | null | undefined): string | null {
+  if (!code) return null;
+  if (getLang() === 'es') return spanish(code);
+  try {
+    if (!names || names.lang !== getLang()) {
+      const DN = (Intl as unknown as { DisplayNames?: new (l: string[], o: { type: string }) => { of: (c: string) => string } }).DisplayNames;
+      names = { lang: getLang(), dn: DN ? new DN([getLang()], { type: 'region' }) : null };
+    }
+    return names.dn?.of(code.toUpperCase()) ?? spanish(code);
+  } catch {
+    return spanish(code);
+  }
+}

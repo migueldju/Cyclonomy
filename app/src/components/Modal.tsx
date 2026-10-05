@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
 import { colors, fonts, space, type } from '../theme';
 import { Button } from './Button';
@@ -12,7 +13,7 @@ export function Sheet({ visible, onClose, title, children }: {
 }) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Cerrar" />
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
           <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>
@@ -55,7 +56,7 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
   return (
     <Sheet visible={visible} onClose={onClose} title={title}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
-      {actions.length === 0 ? <Txt variant="small">No hay acciones disponibles para este ciclista.</Txt> : null}
+      {actions.length === 0 ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
       {actions.map((a, i) => (
         <View key={a.label} style={{ marginBottom: space.m }}>
           <Button label={a.label} kind={a.kind ?? 'secondary'} onPress={() => run(i)} busy={busy === i}
@@ -64,7 +65,7 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
         </View>
       ))}
       <ErrorText error={error} />
-      <Button label="Cerrar" kind="quiet" onPress={onClose} />
+      <Button label={t('common.close')} kind="quiet" onPress={onClose} />
     </Sheet>
   );
 }
@@ -107,7 +108,7 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
         onChangeText={setText}
         keyboardType="number-pad"
         style={styles.amount}
-        accessibilityLabel="Cantidad en euros"
+        accessibilityLabel={t('sheet.amountLabel')}
         placeholder="0"
         placeholderTextColor={colors.inkSoft}
       />
@@ -116,10 +117,10 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
           <Button key={p} small kind="secondary" label={`+${p * 100} %`} onPress={() => bump(p)} />
         ))}
       </View>
-      {min != null ? <Txt variant="small" style={{ marginBottom: space.m }}>Mínimo: {money(min)}</Txt> : null}
+      {min != null ? <Txt variant="small" style={{ marginBottom: space.m }}>{t('sheet.minimum', { amount: money(min) })}</Txt> : null}
       <ErrorText error={error} />
       <Button label={confirmLabel} onPress={confirm} busy={busy} disabled={amount == null || (min != null && amount < min)} />
-      <Button label="Cancelar" kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
+      <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
     </Sheet>
   );
 }

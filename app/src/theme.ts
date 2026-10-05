@@ -1,3 +1,6 @@
+import { t } from './i18n';
+import type { Key } from './i18n/types';
+
 // Identidad visual: la carretera y el dorsal.
 // Asfalto para la barra superior, gris de marca vial de fondo, amarillo maillot para la acción principal.
 export const colors = {
@@ -17,11 +20,11 @@ export const colors = {
 };
 
 export const fonts = {
-  body: 'Barlow_400Regular',
-  bodyMedium: 'Barlow_500Medium',
-  bodyBold: 'Barlow_600SemiBold',
-  display: 'BarlowCondensed_600SemiBold',
-  number: 'BarlowCondensed_700Bold',
+  body: 'FiraSans_400Regular',
+  bodyMedium: 'FiraSans_500Medium',
+  bodyBold: 'FiraSans_600SemiBold',
+  display: 'FiraSansCondensed_600SemiBold',
+  number: 'FiraSansCondensed_700Bold',
 };
 
 // Escala tipográfica (1,2): 13 · 15 · 18 · 22 · 26 · 32
@@ -43,17 +46,22 @@ export const categoryColor: Record<string, string> = {
   PRO: '#17834A', C1: '#9AA5AA',
 };
 
-// Nombre corto de cada categoría, para las filas donde no cabe el nombre completo
-export const categoryShort: Record<string, string> = {
-  TDF: 'Tour de Francia', GT: 'Gran Vuelta', MON: 'Monumento', WC: 'Mundial', WC_ITT: 'Mundial CRI',
-  MWT: 'MWT', SWT: 'SWT', CC: 'Continental', CC_ITT: 'Continental CRI',
-  NC: 'Nacional', NC_ITT: 'Nacional CRI', PRO: 'Pro', C1: '1',
-};
+// Clases UCI de las categorías WT, .Pro y .1 (las demás tienen nombre corto traducido)
+const CATEGORY_CLASS: Record<string, string> = { MWT: 'MWT', SWT: 'SWT', PRO: 'Pro', C1: '1' };
+
+/** Nombre completo de la categoría en el idioma actual (la base de datos lo guarda en español) */
+export function categoryName(code: string): string {
+  const key = `cat.${code}` as Key;
+  const s = t(key);
+  return s === key ? code : s;
+}
 
 /** Nombre corto; en WT, .Pro y .1 la clase: 1.MWT / 2.MWT, 1.SWT / 2.SWT, 1.Pro / 2.Pro, 1.1 / 2.1 (clásica / vuelta) */
-export function categoryLabel(code: string, isStageRace: boolean, fallback = code): string {
-  if (['MWT', 'SWT', 'PRO', 'C1'].includes(code)) return `${isStageRace ? 2 : 1}.${categoryShort[code]}`;
-  return categoryShort[code] ?? fallback;
+export function categoryLabel(code: string, isStageRace: boolean): string {
+  if (CATEGORY_CLASS[code]) return `${isStageRace ? 2 : 1}.${CATEGORY_CLASS[code]}`;
+  const key = `catShort.${code}` as Key;
+  const s = t(key);
+  return s === key ? code : s;
 }
 
 // Categorías de mayor a menor importancia (orden de los filtros del calendario)

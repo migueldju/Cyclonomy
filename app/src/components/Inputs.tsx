@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Switch, TextInput, TextInputProps, View } from 'react-native';
 import { colors, fonts, space, type } from '../theme';
+import { t } from '../i18n';
 import { Txt } from './Txt';
 
 export function Input({ label, hint, ...rest }: TextInputProps & { label: string; hint?: string }) {
@@ -43,11 +44,11 @@ export function Stepper({ label, value, onChange, min, max, step = 1, format }: 
   return (
     <View style={[styles.stepRow, { marginBottom: space.l }]}>
       <Txt style={{ flex: 1 }}>{label}</Txt>
-      <Pressable onPress={() => set(value - step)} style={styles.stepBtn} accessibilityLabel={`Menos ${label}`}>
+      <Pressable onPress={() => set(value - step)} style={styles.stepBtn} accessibilityLabel={t('input.less', { label })}>
         <Txt variant="lead">−</Txt>
       </Pressable>
       <Txt variant="number" style={{ minWidth: 64, textAlign: 'center' }}>{format ? format(value) : value}</Txt>
-      <Pressable onPress={() => set(value + step)} style={styles.stepBtn} accessibilityLabel={`Más ${label}`}>
+      <Pressable onPress={() => set(value + step)} style={styles.stepBtn} accessibilityLabel={t('input.more', { label })}>
         <Txt variant="lead">+</Txt>
       </Pressable>
     </View>
