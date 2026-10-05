@@ -21,9 +21,10 @@ async function select<T>(query: PromiseLike<{ data: unknown; error: { message: s
 export const api = {
   // ligas
   myLeagues: () => rpc<MyLeague[]>('my_leagues'),
-  createLeague: (name: string, teamName: string, settings: LeagueSettings) =>
-    rpc<string>('create_league', { p_name: name, p_team_name: teamName, p_settings: settings }),
-  joinLeague: (code: string, teamName: string) => rpc<string>('join_league', { p_code: code, p_team_name: teamName }),
+  createLeague: (name: string, teamName: string, settings: LeagueSettings, country: string) =>
+    rpc<string>('create_league', { p_name: name, p_team_name: teamName, p_settings: settings, p_country: country }),
+  joinLeague: (code: string, teamName: string, country: string) =>
+    rpc<string>('join_league', { p_code: code, p_team_name: teamName, p_country: country }),
   league: (leagueId: string) => select<League>(supabase.from('league').select('*').eq('id', leagueId).single()),
   updateLeague: (leagueId: string, settings: LeagueSettings) =>
     rpc<void>('update_league_settings', { p_league: leagueId, p_settings: settings }),

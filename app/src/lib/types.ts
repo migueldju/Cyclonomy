@@ -64,6 +64,7 @@ export interface StandingRow {
   points_total: number;
   points_week: number;
   team_value: number;
+  country: string | null;
 }
 
 export interface RosterRow {
@@ -160,7 +161,10 @@ export interface StageScores {
     id: number; number: number; date: string; status: string; race_id: number; race_name: string; is_stage_race: boolean;
     country: string | null;
   };
-  members: { member_id: string; team_name: string; points: number; is_mine: boolean }[];
+  members: {
+    member_id: string; team_name: string; points: number; is_mine: boolean; country: string | null;
+    riders: { rider_id: number; name: string; points: number }[];      // sus inscritos y lo que puntuó cada uno
+  }[];
   riders: {
     rider_id: number; name: string; points: number; owner: string | null; entered_by_me: boolean;
     pro_team: string | null; nationality: string | null; photo_url: string | null; entered_by: string[];
@@ -183,6 +187,7 @@ export interface RaceEntries {
   max_entries: number;
   teams: {
     member_id: string; team_name: string; is_mine: boolean; hidden: boolean; entered: boolean; auto: boolean;
+    country: string | null;
     riders: EntryRider[];
   }[];
   // lista de salida completa por equipo real; teams = equipos de la liga que han inscrito al corredor
@@ -202,8 +207,8 @@ export interface RaceDetail {
     my_points: number;
     top_member: { team_name: string; points: number } | null;
   }[];
-  league_total: { member_id: string; team_name: string; points: number }[];
-  gc: { position: number; rider_id: number; name: string }[];
+  league_total: { member_id: string; team_name: string; points: number; country: string | null }[];
+  gc: { position: number; rider_id: number; name: string; nationality: string | null; scored_for: string[] }[];
 }
 
 export interface EntryData {

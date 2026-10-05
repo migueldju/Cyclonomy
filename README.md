@@ -9,7 +9,7 @@ app/          App Expo (React Native + TypeScript, expo-router)
 supabase/     Base de datos: esquema, lógica del juego (funciones SQL), seguridad, tareas programadas
   migrations/   0001 catálogo · 0002 juego · 0003 lógica interna · 0004 funciones de la app
                 0005 seguridad · 0006 Storage y pg_cron · 0007 cola de la ingesta
-                0008 ranking y ficha de ciclista · 0009 historial y fotos · 0010 fotos en las listas · 0011 país de las carreras · 0012 escalones de cláusula · 0013 ventas en el mercado · 0014 historial sin repetidos · 0015 inscripciones y puntuaciones de etapa · 0016 lista de salida completa
+                0008 ranking y ficha de ciclista · 0009 historial y fotos · 0010 fotos en las listas · 0011 país de las carreras · 0012 escalones de cláusula · 0013 ventas en el mercado · 0014 historial sin repetidos · 0015 inscripciones y puntuaciones de etapa · 0016 lista de salida completa · 0017 puntos por ciclista en cada equipo · 0018 clasificación con equipos de la liga · 0019 país del equipo
                 0008 ranking y ficha de ciclista
   seed/         CSV editables: categorías y tabla de puntos
   seed.sql      generado desde los CSV (tools/build_seed.py)

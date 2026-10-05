@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
 import { DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
@@ -14,6 +15,7 @@ export default function CrearLiga() {
   const insets = useSafeAreaInsets();
   const { selectLeague } = useLeague();
   const [team, setTeam] = useState('');
+  const [country, setCountry] = useState<string | null>(null);
 
   return (
     <Screen padded>
@@ -27,12 +29,14 @@ export default function CrearLiga() {
         submitLabel="Crear liga"
         onSubmit={async (name, s) => {
           if (!team.trim()) throw new Error('Ponle nombre a tu equipo.');
-          const id = await api.createLeague(name, team.trim(), s);
+          if (!country) throw new Error('Elige el país de tu equipo.');
+          const id = await api.createLeague(name, team.trim(), s, country);
           await selectLeague(id);
           resetTo('/');
         }}>
         <View>
           <Input label="Nombre de tu equipo" value={team} onChangeText={setTeam} maxLength={40} />
+          <CountryPicker value={country} onChange={setCountry} />
         </View>
       </LeagueSettingsForm>
     </Screen>

@@ -1,10 +1,11 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Flag } from '@/components/Flag';
 import { RiderRow } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Row, Section } from '@/components/Section';
+import { Empty, ErrorText, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
@@ -25,6 +26,7 @@ export default function Etapa() {
   const scores = useLoader(() => api.stageScores(id, Number(stageId)), [id, stageId], !!leagueId);
   const entries = useLoader(() => api.raceEntries(id, Number(stageId)), [id, stageId], !!leagueId);
   const [tab, setTab] = useState<View_ | null>(null);
+  const [openTeam, setOpenTeam] = useState<string | null>(null);
 
   const st = scores.data?.stage;
   const scored = st?.status === 'scored';
@@ -64,15 +66,36 @@ export default function Etapa() {
             <Txt style={{ paddingHorizontal: space.l }}>No hay clasificaciones disponibles todavía.</Txt>
           ) : null}
           <Section title="Equipos de la liga">
-            {scores.data?.members.length ? scores.data.members.map((m, i) => (
-              <Row key={m.member_id} last={i === scores.data!.members.length - 1}>
-                <Txt variant="number" style={{ width: 36 }}>{i + 1}.º</Txt>
-                <Txt style={[{ flex: 1 }, m.is_mine && styles.mine]} numberOfLines={1}>{m.team_name}</Txt>
-                <Txt variant="number">{points(m.points)}</Txt>
-              </Row>
-            )) : <Empty text={scores.loading ? 'Cargando…' : 'No hay equipos en la liga.'} />}
+            {scores.data?.members.length ? scores.data.members.map((m, i) => {
+              const isOpen = openTeam === m.member_id;
+              const last = i === scores.data!.members.length - 1;
+              return (
+                <View key={m.member_id} style={!last && styles.line}>
+                  {/* desplegable: los puntos de cada ciclista inscrito por el equipo */}
+                  <Pressable onPress={() => setOpenTeam(isOpen ? null : m.member_id)} accessibilityRole="button"
+                             accessibilityState={{ expanded: isOpen }}
+                             style={({ pressed }) => [styles.teamRow, pressed && { backgroundColor: colors.road }]}>
+                    <Txt variant="number" style={{ width: 36 }}>{i + 1}.º</Txt>
+                    <View style={{ width: 18 }}><Flag code={m.country} /></View>
+                    <Txt style={[{ flex: 1 }, m.is_mine && styles.mine]} numberOfLines={1}>{m.team_name}</Txt>
+                    <Txt variant="number">{points(m.points)}</Txt>
+                    <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft} />
+                  </Pressable>
+                  {isOpen ? (
+                    <View style={styles.teamRiders}>
+                      {m.riders.length ? m.riders.map((r) => (
+                        <Pressable key={r.rider_id} onPress={() => open(r.rider_id)} style={styles.teamRider}>
+                          <Txt style={{ flex: 1 }} numberOfLines={1}>{r.name}</Txt>
+                          <Txt variant="number" style={!r.points ? { color: colors.inkSoft } : undefined}>{points(r.points)}</Txt>
+                        </Pressable>
+                      )) : <Txt variant="small">Sin ciclistas inscritos en esta carrera.</Txt>}
+                    </View>
+                  ) : null}
+                </View>
+              );
+            }) : <Empty text={scores.loading ? 'Cargando…' : 'No hay equipos en la liga.'} />}
           </Section>
-          <Section title="Ciclistas">
+          <Section title="Puntuaciones">
             {scores.data?.riders.length ? scores.data.riders.map((r, i) => (
               <RiderRow key={r.rider_id} name={r.name} team={r.pro_team} photo={r.photo_url} nationality={r.nationality}
                         note={r.entered_by.length ? `inscrito por ${r.entered_by.join(', ')}`
@@ -136,6 +159,10 @@ const styles = StyleSheet.create({
   segOn: { backgroundColor: colors.ink },
   segText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
   mine: { fontFamily: fonts.bodyBold },
+  line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  teamRow: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
+  teamRiders: { paddingLeft: space.l + 36 + 18 + 2 * space.m, paddingRight: space.l + 18 + space.m, paddingBottom: space.m },
+  teamRider: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 5 },
   teamHead: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.l, paddingVertical: space.s,
     backgroundColor: colors.road, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line,
