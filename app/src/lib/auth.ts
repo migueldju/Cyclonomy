@@ -8,6 +8,9 @@ WebBrowser.maybeCompleteAuthSession();
 // (y la de Expo Go, exp://..., mientras desarrollas)
 export const redirectTo = makeRedirectUri({ scheme: 'cyclonomy', path: 'auth/callback' });
 
+// Enlace del email de recuperación de contraseña: abre la pantalla para poner una nueva
+export const resetRedirectTo = makeRedirectUri({ scheme: 'cyclonomy', path: 'auth/nueva-contrasena' });
+
 export async function exchangeFromUrl(url: string) {
   const code = new URL(url).searchParams.get('code');
   if (code) {
