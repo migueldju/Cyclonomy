@@ -87,13 +87,24 @@ def load_teams(db, season: int, points_year: int | None = None, birthdates: bool
                 store.set_birthdate(db, slug, bd)
     if seed_values:
         db.execute("select public.seed_initial_values()")
-    summary = dict(teams=len(teams), riders=len(set(seen)), inactive=inactive, removed_teams=removed)
+        new = 0
+    else:
+        # ciclistas nuevos (fichajes que PCS añade durante la temporada): su fecha de nacimiento, aunque no se
+        # pida --birthdates, y su valor inicial. Sin esto entrarían con el valor mínimo (30.000 €).
+        missing = db.fetchall("select pcs_slug from public.rider r where r.active and r.birthdate is null "
+                              "and not exists (select 1 from public.rider_value_history h where h.rider_id = r.id)")
+        for (slug,) in missing:
+            bd = sources.fetch_birthdate(slug)
+            if bd:
+                store.set_birthdate(db, slug, bd)
+        new = store.value_new_riders(db)
+    summary = dict(teams=len(teams), riders=len(set(seen)), inactive=inactive, removed_teams=removed, new_valued=new)
     log.info("Equipos cargados: %s", summary)
     return summary
 
 
-def load_calendar(db, season: int) -> dict:
-    races = sources.fetch_calendar(season)
+def load_calendar(db, season: int, from_date: dt.date | None = None) -> dict:
+    races = sources.fetch_calendar(season, from_date=from_date)
     n_races = n_stages = skipped = 0
     for r in races:
         race_id = store.upsert_race(db, r, season)
@@ -158,10 +169,13 @@ def plan_day(db, now: dt.datetime | None = None) -> int:
 def run_task(db, task: dict) -> str:
     slug, season = task["slug"], task["season"]
     if task["kind"] == "startlist":
-        slugs = sources.fetch_startlist(slug, season)
+        full = sources.fetch_startlist_full(slug, season)
+        slugs = [r["slug"] for r in full] or sources.fetch_startlist(slug, season)
         if not slugs:
             raise NotReady("lista de salida vacía")
         n = store.set_startlist(db, task["race_id"], slugs)
+        if full:
+            store.set_startlist_full(db, task["race_id"], full)
         db.execute("select public.auto_lineup(%s)", (task["race_id"],))
         return f"lista de salida: {len(slugs)} ciclistas ({n} del juego); alineaciones automáticas hechas"
 

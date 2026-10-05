@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/Button';
+import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
@@ -17,6 +18,7 @@ export default function Unirse() {
   const { session } = useAuth();
   const { selectLeague, setPendingInvite } = useLeague();
   const [team, setTeam] = useState('');
+  const [country, setCountry] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const clean = String(code ?? '').toUpperCase();
@@ -27,7 +29,7 @@ export default function Unirse() {
     setBusy(true);
     setError(null);
     try {
-      const id = await api.joinLeague(clean, team.trim());
+      const id = await api.joinLeague(clean, team.trim(), country!);
       setPendingInvite(null);
       await selectLeague(id);
       resetTo('/');
@@ -45,8 +47,9 @@ export default function Unirse() {
       {session ? (
         <>
           <Input label="Nombre de tu equipo" value={team} onChangeText={setTeam} maxLength={40} />
+          <CountryPicker value={country} onChange={setCountry} />
           <ErrorText error={error} />
-          <Button label="Unirme a la liga" onPress={join} busy={busy} disabled={!team.trim()} />
+          <Button label="Unirme a la liga" onPress={join} busy={busy} disabled={!team.trim() || !country} />
           <Txt variant="small" style={{ marginTop: space.m }}>
             Empezarás con 8.000.000 € y 16 ciclistas al azar.
           </Txt>

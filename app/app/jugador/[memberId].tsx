@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
+import { Flag } from '@/components/Flag';
 import { ActionSheet, AmountSheet } from '@/components/Modal';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
@@ -11,7 +12,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { api } from '@/lib/api';
 import { money, moneyShort, ordinal, points } from '@/lib/format';
 import type { RosterRow } from '@/lib/types';
-import { space } from '@/theme';
+import { colors, fonts, space, type } from '@/theme';
 
 /** Plantilla de otro jugador: desde aquí se hacen ofertas y se pagan cláusulas */
 export default function Jugador() {
@@ -28,11 +29,24 @@ export default function Jugador() {
 
   return (
     <Screen onRefresh={roster.reload} refreshing={roster.loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl }}>
-        <Txt variant="hero">{player?.team_name ?? ''}</Txt>
-        <Txt variant="small">
-          {player ? `${ordinal(player.pos)} · ${points(player.points_total)} · plantilla ${moneyShort(player.team_value)}` : ''}
-        </Txt>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l, paddingTop: space.xl }}>
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+            <Txt variant="hero" style={{ flexShrink: 1 }}>{player?.team_name ?? ''}</Txt>
+            <Flag code={player?.country} height={16} />
+          </View>
+          <Txt variant="small">
+            {player ? `${ordinal(player.pos)} · ${points(player.points_total)} · plantilla ${moneyShort(player.team_value)}` : ''}
+          </Txt>
+        </View>
+        {/* escudo del equipo: la imagen del perfil del jugador; si no tiene, su inicial */}
+        {player ? (player.avatar_url ? (
+          <Image source={{ uri: player.avatar_url }} style={styles.crest} accessibilityLabel={`Escudo de ${player.team_name}`} />
+        ) : (
+          <View style={[styles.crest, styles.crestEmpty]}>
+            <Txt style={styles.crestInitial}>{player.team_name.trim().slice(0, 1).toUpperCase()}</Txt>
+          </View>
+        )) : null}
       </View>
       <Section>
         {rows.length ? rows.map((r, i) => (
@@ -73,3 +87,9 @@ export default function Jugador() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  crest: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.line },
+  crestEmpty: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.asphaltSoft },
+  crestInitial: { fontFamily: fonts.display, fontSize: type.display, color: colors.paper },
+});

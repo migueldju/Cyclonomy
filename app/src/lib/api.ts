@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type {
   CalendarRow, Category, EntryData, League, LeagueSettings, MarketRow, Me, MyLeague, OfferRow, RaceDetail,
-  RankingRow, RiderDetail, RosterRow, ScoringRule, StageScores, StandingRow, TodayRow,
+  RaceEntries, RankingRow, RiderDetail, RosterRow, ScoringRule, StageScores, StandingRow, TodayRow,
 } from './types';
 
 // Todas las escrituras pasan por funciones de Postgres que validan las reglas del juego.
@@ -21,9 +21,10 @@ async function select<T>(query: PromiseLike<{ data: unknown; error: { message: s
 export const api = {
   // ligas
   myLeagues: () => rpc<MyLeague[]>('my_leagues'),
-  createLeague: (name: string, teamName: string, settings: LeagueSettings) =>
-    rpc<string>('create_league', { p_name: name, p_team_name: teamName, p_settings: settings }),
-  joinLeague: (code: string, teamName: string) => rpc<string>('join_league', { p_code: code, p_team_name: teamName }),
+  createLeague: (name: string, teamName: string, settings: LeagueSettings, country: string) =>
+    rpc<string>('create_league', { p_name: name, p_team_name: teamName, p_settings: settings, p_country: country }),
+  joinLeague: (code: string, teamName: string, country: string) =>
+    rpc<string>('join_league', { p_code: code, p_team_name: teamName, p_country: country }),
   league: (leagueId: string) => select<League>(supabase.from('league').select('*').eq('id', leagueId).single()),
   updateLeague: (leagueId: string, settings: LeagueSettings) =>
     rpc<void>('update_league_settings', { p_league: leagueId, p_settings: settings }),
@@ -43,6 +44,8 @@ export const api = {
   today: (leagueId: string) => rpc<TodayRow[]>('get_today', { p_league: leagueId }),
   stageScores: (leagueId: string, stageId: number) =>
     rpc<StageScores>('get_stage_scores', { p_league: leagueId, p_stage: stageId }),
+  raceEntries: (leagueId: string, stageId: number) =>
+    rpc<RaceEntries>('get_race_entries', { p_league: leagueId, p_stage: stageId }),
   raceDetail: (leagueId: string, raceId: number) =>
     rpc<RaceDetail>('get_race_detail', { p_league: leagueId, p_race: raceId }),
   ranking: (leagueId: string, limit?: number) =>
@@ -55,7 +58,8 @@ export const api = {
   // mercado y plantilla
   placeBid: (listingId: number, amount: number) => rpc<void>('place_bid', { p_listing: listingId, p_amount: amount }),
   cancelBid: (listingId: number) => rpc<void>('cancel_bid', { p_listing: listingId }),
-  raiseClause: (ownershipId: number) => rpc<number>('raise_clause', { p_ownership: ownershipId }),
+  setClause: (ownershipId: number, level: number) =>
+    rpc<number>('set_clause', { p_ownership: ownershipId, p_level: level }),
   payClause: (ownershipId: number) => rpc<void>('pay_clause', { p_ownership: ownershipId }),
   setForSale: (ownershipId: number, forSale: boolean) =>
     rpc<void>('set_for_sale', { p_ownership: ownershipId, p_for_sale: forSale }),

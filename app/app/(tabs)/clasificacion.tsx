@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Bib } from '@/components/Bib';
+import { Flag } from '@/components/Flag';
 import { Segmented } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -40,9 +41,13 @@ export default function Clasificacion() {
               <Bib value={ordinal(r.rank)} size="s" />
               {r.avatar_url ? <Image source={{ uri: r.avatar_url }} style={styles.avatar} /> : <View style={[styles.avatar, styles.noAvatar]} />}
               <View style={{ flex: 1 }}>
-                <Txt variant="lead" numberOfLines={1} style={mine ? { textDecorationLine: 'underline' } : undefined}>
-                  {r.team_name}
-                </Txt>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+                  <Txt variant="lead" numberOfLines={1}
+                       style={[{ flexShrink: 1 }, mine ? { textDecorationLine: 'underline' } : null]}>
+                    {r.team_name}
+                  </Txt>
+                  <Flag code={r.country} />
+                </View>
                 <Txt variant="small" numberOfLines={1}>{r.display_name ?? ''} · plantilla {moneyShort(r.team_value)}</Txt>
               </View>
               <Txt variant="number">{points(r.shown)}</Txt>

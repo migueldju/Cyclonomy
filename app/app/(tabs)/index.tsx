@@ -117,6 +117,8 @@ function StageRow({ s, last }: { s: TodayRow; last: boolean }) {
   return (
     <Row last={last}>
       <View style={[styles.swatch, { backgroundColor: categoryColor[s.category] ?? colors.line }]} />
+      {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
+      <View style={styles.flagCol}><Flag code={s.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{s.race_name}</Txt>
         <Txt variant="small">{s.number === 0 ? 'Prólogo' : `Etapa ${s.number}`} · {label}</Txt>
@@ -130,6 +132,8 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
   return (
     <Row last={last}>
       <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+      {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
+      <View style={styles.flagCol}><Flag code={r.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
         <Txt variant="small">
@@ -146,4 +150,5 @@ const styles = StyleSheet.create({
   hero: { flexDirection: 'row', alignItems: 'center', gap: space.l, padding: space.l, paddingTop: space.xl },
   warning: { color: colors.red, paddingHorizontal: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
+  flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
 });

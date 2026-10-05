@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Button } from '@/components/Button';
+import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -19,6 +20,7 @@ export default function Ligas() {
   const { data, error, loading, reload } = useLoader(() => api.myLeagues());
   const [code, setCode] = useState('');
   const [team, setTeam] = useState('');
+  const [country, setCountry] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export default function Ligas() {
     setBusy(true);
     setJoinError(null);
     try {
-      const id = await api.joinLeague(code.trim(), team.trim());
+      const id = await api.joinLeague(code.trim(), team.trim(), country!);
       await open(id);
     } catch (e) {
       setJoinError((e as Error).message);
@@ -67,8 +69,10 @@ export default function Ligas() {
           <Input label="Código de invitación" value={code} onChangeText={(t) => setCode(t.toUpperCase())}
                  autoCapitalize="characters" maxLength={6} />
           <Input label="Nombre de tu equipo" value={team} onChangeText={setTeam} maxLength={40} />
+          <CountryPicker value={country} onChange={setCountry} />
           <ErrorText error={joinError} />
-          <Button label="Unirme" kind="secondary" onPress={join} busy={busy} disabled={code.length < 6 || !team.trim()} />
+          <Button label="Unirme" kind="secondary" onPress={join} busy={busy}
+                  disabled={code.length < 6 || !team.trim() || !country} />
         </View>
       </Section>
       <View style={{ padding: space.l }}>

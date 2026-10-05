@@ -11,6 +11,7 @@ const icon = (name: IconName) => ({ color, size }: { color: ColorValue; size: nu
 export default function TabsLayout() {
   return (
     <Tabs
+      backBehavior="history"
       screenOptions={{
         header: () => <TopBar />,
         tabBarActiveTintColor: colors.ink,
@@ -24,6 +25,9 @@ export default function TabsLayout() {
       <Tabs.Screen name="plantilla" options={{ title: 'Mi plantilla', tabBarIcon: icon('people-outline') }} />
       <Tabs.Screen name="clasificacion" options={{ title: 'Clasificación', tabBarIcon: icon('podium-outline') }} />
       <Tabs.Screen name="calendario" options={{ title: 'Calendario', tabBarIcon: icon('calendar-outline') }} />
+      {/* pantallas dentro de las pestañas (sin botón propio): conservan la barra inferior */}
+      <Tabs.Screen name="ranking" options={{ href: null, header: () => <TopBar back /> }} />
+      <Tabs.Screen name="ciclista/[riderId]" options={{ href: null, header: () => <TopBar back /> }} />
     </Tabs>
   );
 }

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '@/components/Button';
+import { Flag } from '@/components/Flag';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
@@ -95,6 +96,8 @@ function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boole
     <View style={styles.item}>
       <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.itemHead}>
         <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+        {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
+        <View style={styles.flagCol}><Flag code={r.country} /></View>
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
           <Txt variant="small">
@@ -130,38 +133,73 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
       {d ? (
         <>
           <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? 'Etapas' : 'Carrera'}</Txt>
-          {d.stages.map((s) => (
-            <Pressable key={s.stage_id} onPress={() => router.push(`/etapa/${s.stage_id}`)} style={styles.detailLine}
-                       accessibilityRole="button">
-              <Txt style={{ width: 92 }}>{r.is_stage_race ? (s.number === 0 ? 'Prólogo' : `Etapa ${s.number}`) : 'Resultado'}</Txt>
-              <Txt variant="small" style={{ width: 56 }}>{dayMonth(s.date)}</Txt>
-              <Txt variant="small" style={{ flex: 1 }} numberOfLines={1}>
-                {s.status === 'scored' ? (s.top_member ? `mejor: ${s.top_member.team_name}` : 'sin puntos en la liga') : 'pendiente'}
-              </Txt>
-              <Txt variant="number">{s.status === 'scored' ? points(s.my_points) : ''}</Txt>
-            </Pressable>
-          ))}
+          <View style={styles.table}>
+            <View style={[styles.tr, styles.th]}>
+              <Txt variant="label" style={{ width: 84 }}>{r.is_stage_race ? 'Etapa' : ''}</Txt>
+              <Txt variant="label" style={{ width: 52 }}>Fecha</Txt>
+              <Txt variant="label" style={{ flex: 1 }}>Mejor de la liga</Txt>
+              <Txt variant="label" style={styles.numCol}>Tus pts</Txt>
+            </View>
+            {d.stages.map((s, i) => (
+              <Pressable key={s.stage_id} onPress={() => router.push(`/etapa/${s.stage_id}`)} accessibilityRole="button"
+                         style={({ pressed }) => [styles.tr, i === d.stages.length - 1 && styles.trLast,
+                                                  pressed && { backgroundColor: colors.road }]}>
+                <Txt style={{ width: 84 }}>{r.is_stage_race ? (s.number === 0 ? 'Prólogo' : `Etapa ${s.number}`) : 'Resultado'}</Txt>
+                <Txt variant="small" style={{ width: 52 }}>{dayMonth(s.date)}</Txt>
+                <Txt variant="small" style={{ flex: 1 }} numberOfLines={1}>
+                  {s.status === 'scored' ? (s.top_member ? s.top_member.team_name : 'sin puntos') : 'pendiente'}
+                </Txt>
+                <Txt variant="number" style={styles.numCol}>{s.status === 'scored' ? points(s.my_points) : '—'}</Txt>
+              </Pressable>
+            ))}
+          </View>
+
           {d.league_total.length ? (
             <>
               <Txt variant="label" style={styles.subhead}>Puntos de la liga en la carrera</Txt>
-              {d.league_total.map((m, i) => (
-                <View key={m.member_id} style={styles.detailLine}>
-                  <Txt variant="number" style={{ width: 32 }}>{i + 1}.º</Txt>
-                  <Txt style={{ flex: 1 }} numberOfLines={1}>{m.team_name}</Txt>
-                  <Txt variant="number">{points(m.points)}</Txt>
+              <View style={styles.table}>
+                <View style={[styles.tr, styles.th]}>
+                  <Txt variant="label" style={styles.posCol}>Pos.</Txt>
+                  <View style={styles.flagCell} />
+                  <Txt variant="label" style={{ flex: 1 }}>Equipo</Txt>
+                  <Txt variant="label" style={styles.numCol}>Puntos</Txt>
                 </View>
-              ))}
+                {d.league_total.map((m, i) => (
+                  <View key={m.member_id} style={[styles.tr, i === d.league_total.length - 1 && styles.trLast]}>
+                    <Txt variant="number" style={styles.posCol}>{i + 1}.º</Txt>
+                    <View style={styles.flagCell}><Flag code={m.country} /></View>
+                    <Txt style={{ flex: 1 }} numberOfLines={1}>{m.team_name}</Txt>
+                    <Txt variant="number" style={styles.numCol}>{points(m.points)}</Txt>
+                  </View>
+                ))}
+              </View>
             </>
           ) : null}
+
           {d.gc.length ? (
             <>
               <Txt variant="label" style={styles.subhead}>{r.is_stage_race ? 'General' : 'Clasificación'}</Txt>
-              {d.gc.map((g) => (
-                <View key={g.rider_id} style={styles.detailLine}>
-                  <Txt variant="number" style={{ width: 32 }}>{g.position}.º</Txt>
-                  <Txt style={{ flex: 1 }}>{g.name}</Txt>
+              {/* tabla: posición · bandera (columna fija, todas alineadas) · ciclista · equipo de la liga que puntuó */}
+              <View style={styles.table}>
+                <View style={[styles.tr, styles.th]}>
+                  <Txt variant="label" style={styles.posCol}>Pos.</Txt>
+                  <View style={styles.flagCell} />
+                  <Txt variant="label" style={{ flex: 1 }}>Ciclista</Txt>
+                  <Txt variant="label" style={styles.teamCol}>Puntúa para</Txt>
                 </View>
-              ))}
+                {d.gc.map((g, i) => (
+                  <Pressable key={g.rider_id} onPress={() => router.push(`/ciclista/${g.rider_id}`)} accessibilityRole="button"
+                             style={({ pressed }) => [styles.tr, i === d.gc.length - 1 && styles.trLast,
+                                                      pressed && { backgroundColor: colors.road }]}>
+                    <Txt variant="number" style={styles.posCol}>{g.position}.º</Txt>
+                    <View style={styles.flagCell}><Flag code={g.nationality} /></View>
+                    <Txt numberOfLines={1} style={{ flex: 1 }}>{g.name}</Txt>
+                    <Txt variant="small" numberOfLines={1} style={[styles.teamCol, g.scored_for.length ? styles.scoredFor : null]}>
+                      {g.scored_for.length ? g.scored_for.join(', ') : '—'}
+                    </Txt>
+                  </Pressable>
+                ))}
+              </View>
             </>
           ) : null}
         </>
@@ -186,7 +224,20 @@ const styles = StyleSheet.create({
   item: { backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
+  flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
   detail: { paddingHorizontal: space.l, paddingBottom: space.l, paddingLeft: space.l + 16 },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 6 },
   subhead: { marginTop: space.m, marginBottom: 2 },
+  scoredFor: { color: colors.green, fontFamily: fonts.bodyMedium },
+  // tablas del desplegable: borde y separadores finos, cabecera sobre el gris de fondo
+  table: { borderWidth: StyleSheet.hairlineWidth, borderColor: colors.line, borderRadius: 6, overflow: 'hidden',
+           backgroundColor: colors.paper },
+  tr: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.m, paddingVertical: 7,
+        borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  trLast: { borderBottomWidth: 0 },
+  th: { backgroundColor: colors.road, paddingVertical: 5 },
+  posCol: { width: 34 },
+  flagCell: { width: 18, alignItems: 'center' },
+  numCol: { width: 64, textAlign: 'right' },
+  teamCol: { width: 104, textAlign: 'right' },
 });

@@ -45,6 +45,7 @@ export default function Login() {
              autoComplete="email" textContentType="emailAddress" />
       <Input label="Contraseña" value={password} onChangeText={setPassword} secureTextEntry
              autoComplete="password" textContentType="password" />
+      <Link href="/recuperar" style={styles.forgot}><Txt variant="small" style={styles.link}>¿Has olvidado la contraseña?</Txt></Link>
       <ErrorText error={error} />
       <Button label="Entrar" onPress={withEmail} busy={busy === 'email'} disabled={!email || !password} />
       <Button label="Continuar con Google" kind="secondary" onPress={withGoogle} busy={busy === 'google'}
@@ -62,4 +63,5 @@ const styles = StyleSheet.create({
   title: { marginTop: space.s },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: space.xl },
   link: { color: colors.ink, textDecorationLine: 'underline' },
+  forgot: { alignSelf: 'flex-end', marginTop: -space.s, marginBottom: space.m },
 });

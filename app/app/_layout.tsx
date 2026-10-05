@@ -13,7 +13,7 @@ import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
-const AUTH_SCREENS = ['login', 'registro', 'auth'];
+const AUTH_SCREENS = ['login', 'registro', 'recuperar', 'auth'];
 const NO_LEAGUE_SCREENS = ['ligas', 'liga', 'unirse', 'perfil', 'admin'];
 
 export default function RootLayout() {
@@ -41,12 +41,14 @@ function Gate() {
   const { leagueId, ready, pendingInvite, setPendingInvite } = useLeague();
   const segments = useSegments();
   const first = segments[0] ?? '';
+  // tras el enlace de recuperación ya hay sesión, pero hay que dejar poner la contraseña nueva
+  const settingPassword = first === 'auth' && (segments as string[])[1] === 'nueva-contrasena';
 
   useEffect(() => {
     if (loading || !ready) return;
     if (!session) {
       if (!AUTH_SCREENS.includes(first) && first !== 'unirse') resetTo('/login');
-    } else if (AUTH_SCREENS.includes(first)) {
+    } else if (AUTH_SCREENS.includes(first) && !settingPassword) {
       if (pendingInvite) {
         resetTo(`/unirse/${pendingInvite}`);
         setPendingInvite(null);                // el código ya va en la URL
@@ -56,7 +58,7 @@ function Gate() {
     } else if (!leagueId && !NO_LEAGUE_SCREENS.includes(first)) {
       resetTo('/ligas');
     }
-  }, [session, loading, leagueId, ready, first, pendingInvite, setPendingInvite]);
+  }, [session, loading, leagueId, ready, first, settingPassword, pendingInvite, setPendingInvite]);
 
   const withBar = { headerShown: true, header: () => <TopBar back /> };
   return (
@@ -65,8 +67,6 @@ function Gate() {
       <Stack.Screen name="jugador/[memberId]" options={withBar} />
       <Stack.Screen name="carrera/[raceId]" options={withBar} />
       <Stack.Screen name="etapa/[stageId]" options={withBar} />
-      <Stack.Screen name="ranking" options={withBar} />
-      <Stack.Screen name="ciclista/[riderId]" options={withBar} />
       <Stack.Screen name="normativa" options={withBar} />
       <Stack.Screen name="perfil" options={withBar} />
       <Stack.Screen name="admin" options={withBar} />

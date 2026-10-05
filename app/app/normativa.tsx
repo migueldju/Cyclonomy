@@ -18,10 +18,10 @@ const RULES = [
   'Puedes endeudarte hasta el 20 % del valor de tu plantilla. Si el lunes a las 00:00 tu saldo es negativo, no puntúas en toda la semana.',
   'Cada día salen ciclistas nuevos al mercado. La puja es a ciegas: gana la más alta y, si empatan, la que se hizo antes.',
   'Los fichajes llegan con punto naranja: se pueden inscribir a partir del lunes siguiente.',
-  'Al fichar, la cláusula es el 150 % del precio. Puedes subirla un 50 % cada vez, pagando la mitad de la subida, hasta el 300 % del precio.',
+  'Al fichar, la cláusula es el 150 % del precio. Puedes cambiarla en escalones de 50 puntos entre el 150 % y el 500 % del precio: subirla cuesta la mitad de lo que sube y bajarla te devuelve un cuarto de lo que baja.',
   'Un clausulazo se paga al dueño del ciclista. El ciclista se queda con él (punto rojo) hasta el lunes y sigue puntuando para él en las carreras donde ya estaba inscrito.',
   'Los clausulazos están bloqueados los domingos de 21:00 a 24:00.',
-  'Si pones un ciclista a la venta, el juego te ofrece su valor ±10 % en la siguiente actualización del mercado.',
+  'Si pones un ciclista a la venta, sale al mercado durante 48 horas y los demás pueden pujar a ciegas (mínimo, su valor). 12 horas antes del cierre el juego te ofrece su valor ±10 %, que puedes aceptar hasta el cierre. Si hay pujas, gana la más alta y el ciclista cambia de dueño el lunes; si no, sigue siendo tuyo.',
   'Cada carrera tiene su inscripción, que cierra al empezar la 1.ª etapa. Si no te inscribes, el sistema elige por ti entre tus ciclistas de la lista de salida.',
 ];
 

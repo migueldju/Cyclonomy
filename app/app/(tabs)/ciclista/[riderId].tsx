@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
+import { ClauseSheet } from '@/components/ClauseSheet';
 import { ActionSheet } from '@/components/Modal';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
@@ -25,6 +26,7 @@ const PAGE = 5;
 interface RaceGroup {
   key: string;
   name: string;
+  country: string | null;
   category: string;
   isStageRace: boolean;
   start: string;
@@ -39,7 +41,7 @@ interface RaceGroup {
 /** Ficha de un ciclista: datos, dueño en la liga, evolución del valor y resultados por carrera */
 export default function Ciclista() {
   const { riderId } = useLocalSearchParams<{ riderId: string }>();
-  const { leagueId, refresh } = useLeague();
+  const { leagueId, me, refresh } = useLeague();
   const id = leagueId ?? '';
   const detail = useLoader(() => api.rider(id, Number(riderId)), [id, riderId], !!leagueId);
   const mine = !!detail.data?.owner?.is_mine;
@@ -48,6 +50,7 @@ export default function Ciclista() {
   const [shown, setShown] = useState(PAGE);
   const [open, setOpen] = useState<string | null>(null);
   const [managing, setManaging] = useState(false);
+  const [raising, setRaising] = useState(false);
 
   const d = detail.data;
   const rosterRow = mine ? roster.data?.find((r) => r.rider_id === Number(riderId)) : undefined;
@@ -145,10 +148,12 @@ export default function Ciclista() {
           onClose={() => setManaging(false)}
           title={r.name}
           subtitle={`Valor ${money(rosterRow.market_value)} · pagaste ${money(rosterRow.price_paid)} · cláusula ${money(rosterRow.clause)}`}
-          actions={actionsFor(rosterRow)}
+          actions={actionsFor(rosterRow, { onChangeClause: () => { setTimeout(() => setRaising(true), 350); } })}
           onDone={() => { detail.reload(); roster.reload(); refresh(); }}
         />
       ) : null}
+      <ClauseSheet row={rosterRow ?? null} available={me?.available} visible={raising} onClose={() => setRaising(false)}
+                   onDone={() => { detail.reload(); roster.reload(); refresh(); }} />
     </Screen>
   );
 }
@@ -159,7 +164,7 @@ function groupByRace(results: RiderResult[]): RaceGroup[] {
   for (const x of results) {
     let g = map.get(x.race_key);
     if (!g) {
-      g = { key: x.race_key, name: x.race_name, category: x.category, isStageRace: x.is_stage_race,
+      g = { key: x.race_key, name: x.race_name, country: x.country, category: x.category, isStageRace: x.is_stage_race,
             start: x.race_start, end: x.race_end, points: 0, final: null, live: false, best: 999, rows: [] };
       map.set(x.race_key, g);
     }
@@ -194,7 +199,10 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
                  style={({ pressed }) => [styles.raceHead, pressed && { backgroundColor: colors.road }]}>
         <View style={[styles.swatch, { backgroundColor: categoryColor[g.category] ?? colors.line }]} />
         <View style={{ flex: 1 }}>
-          <Txt variant="lead" numberOfLines={1}>{g.name}</Txt>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+            <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{g.name}</Txt>
+            <Flag code={g.country} />
+          </View>
           <Txt variant="small">{dateRange(g.start, g.end)}{year}{g.points ? ` · ${points(g.points)}` : ''}</Txt>
         </View>
         <Txt variant={g.final != null ? 'number' : 'label'} style={g.live ? { color: colors.green } : undefined}>{status}</Txt>
