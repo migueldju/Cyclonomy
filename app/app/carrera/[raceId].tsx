@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/Button';
+import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { StatusDot } from '@/components/StatusDot';
@@ -69,7 +70,10 @@ export default function Inscripcion() {
   return (
     <Screen onRefresh={reload} refreshing={loading}>
       <View style={{ padding: space.l, paddingTop: space.xl, gap: 4 }}>
-        <Txt variant="hero">{data.race.name}</Txt>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+          <Txt variant="hero" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
+          <Flag code={data.race.country} height={16} />
+        </View>
         <Txt variant="small">{data.race.category_name} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
         <Txt>
           {data.open ? `Puedes inscribir hasta ${max} ciclistas hasta el ${dateTime(data.race.entries_close_at)}.`

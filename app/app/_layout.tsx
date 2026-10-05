@@ -65,8 +65,6 @@ function Gate() {
       <Stack.Screen name="jugador/[memberId]" options={withBar} />
       <Stack.Screen name="carrera/[raceId]" options={withBar} />
       <Stack.Screen name="etapa/[stageId]" options={withBar} />
-      <Stack.Screen name="ranking" options={withBar} />
-      <Stack.Screen name="ciclista/[riderId]" options={withBar} />
       <Stack.Screen name="normativa" options={withBar} />
       <Stack.Screen name="perfil" options={withBar} />
       <Stack.Screen name="admin" options={withBar} />

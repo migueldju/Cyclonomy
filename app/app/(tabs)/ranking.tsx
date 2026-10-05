@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { Flag } from '@/components/Flag';
+import { RangeSlider } from '@/components/RangeSlider';
 import { RiderAvatar } from '@/components/RiderAvatar';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
@@ -15,13 +16,15 @@ import { colors, fonts, space, type } from '@/theme';
 // Propietario: todos, libres, míos o los de un jugador concreto (member_id)
 type Owner = 'all' | 'free' | 'mine' | string;
 
-const VALUE_RANGES: { key: string; label: string; min: number; max: number }[] = [
-  { key: 'all', label: 'Cualquier valor', min: 0, max: Infinity },
-  { key: 'v1', label: 'Hasta 250.000 €', min: 0, max: 250_000 },
-  { key: 'v2', label: '250.000 € – 1 M €', min: 250_000, max: 1_000_000 },
-  { key: 'v3', label: '1 – 3 M €', min: 1_000_000, max: 3_000_000 },
-  { key: 'v4', label: 'Más de 3 M €', min: 3_000_000, max: Infinity },
+// Escalones de la barra de valor: más finos en la zona barata, donde están la mayoría de los ciclistas.
+// El último es "sin límite".
+const VALUE_STEPS = [
+  0, 30_000, 40_000, 50_000, 60_000, 80_000, 100_000, 120_000, 140_000, 160_000, 180_000, 200_000, 220_000,
+  240_000, 260_000, 280_000, 300_000, 350_000, 400_000, 450_000, 500_000, 550_000, 600_000, 650_000, 700_000, 750_000, 875_000,
+  1_000_000, 1_250_000, 1_500_000, 1_750_000, 2_000_000, 2_500_000, 3_000_000, 3_500_000, 4_000_000, 5_000_000,
+  6_000_000, 7_000_000, 8_000_000, 9_000_000, Infinity,
 ];
+const LAST_STEP = VALUE_STEPS.length - 1;
 
 /** Todos los ciclistas por puntos de la temporada, con filtros de propietario y valor de mercado */
 export default function Ranking() {
@@ -30,7 +33,8 @@ export default function Ranking() {
   const { data, error, loading, reload } = useLoader(() => api.ranking(id), [id], !!leagueId);
   const [query, setQuery] = useState('');
   const [owner, setOwner] = useState<Owner>('all');
-  const [range, setRange] = useState('all');
+  const [low, setLow] = useState(0);
+  const [high, setHigh] = useState(LAST_STEP);
 
   // el puesto es el del ranking completo, aunque se filtre
   const ranked = useMemo(() => (data ?? []).map((r, i) => ({ ...r, rank: i + 1 })), [data]);
@@ -43,12 +47,13 @@ export default function Ranking() {
 
   const rows = useMemo(() => {
     const q = normalize(query);
-    const v = VALUE_RANGES.find((x) => x.key === range)!;
+    const min = VALUE_STEPS[low];
+    const max = VALUE_STEPS[high];
     return ranked.filter((r) =>
       (owner === 'all' || (owner === 'free' ? !r.owner_member_id : owner === 'mine' ? r.is_mine : r.owner_member_id === owner))
-      && r.market_value >= v.min && r.market_value < v.max
+      && r.market_value >= min && r.market_value <= max
       && (!q || normalize(r.name).includes(q) || normalize(r.pro_team ?? '').includes(q)));
-  }, [ranked, query, owner, range]);
+  }, [ranked, query, owner, low, high]);
 
   const ownerChips: [Owner, string][] = [['all', 'Todos'], ['free', 'Libres'], ['mine', 'Míos'], ...owners];
 
@@ -67,8 +72,19 @@ export default function Ranking() {
             <TextInput value={query} onChangeText={setQuery} placeholder="Buscar ciclista o equipo"
                        placeholderTextColor={colors.inkSoft} style={styles.search} accessibilityLabel="Buscar ciclista o equipo" />
             <Chips label="Propietario" items={ownerChips} value={owner} onChange={setOwner} />
-            <Chips label="Valor de mercado" items={VALUE_RANGES.map((x) => [x.key, x.label] as [string, string])}
-                   value={range} onChange={setRange} />
+            <View style={{ gap: space.xs }}>
+              <View style={styles.valueHead}>
+                <Txt variant="label">Valor de mercado</Txt>
+                <Txt variant="label" style={{ color: colors.ink }}>
+                  {low === 0 && high === LAST_STEP ? 'Cualquier valor'
+                    : high === LAST_STEP ? `Desde ${moneyShort(VALUE_STEPS[low])}`
+                    : low === 0 ? `Hasta ${moneyShort(VALUE_STEPS[high])}`
+                    : `${moneyShort(VALUE_STEPS[low])} – ${moneyShort(VALUE_STEPS[high])}`}
+                </Txt>
+              </View>
+              <RangeSlider steps={VALUE_STEPS.length} low={low} high={high} label="Valor de mercado"
+                           onChange={(l, h) => { setLow(l); setHigh(h); }} />
+            </View>
           </View>
         }
         ListFooterComponent={<ErrorText error={error} />}
@@ -152,5 +168,6 @@ const styles = StyleSheet.create({
   },
   rank: { width: 32, color: colors.inkSoft },
   nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s },
+  valueHead: { flexDirection: 'row', justifyContent: 'space-between' },
   mine: { color: colors.green, fontFamily: fonts.bodyBold },
 });

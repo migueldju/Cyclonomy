@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { Button } from '@/components/Button';
+import { Flag } from '@/components/Flag';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
@@ -96,7 +97,10 @@ function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boole
       <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.itemHead}>
         <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
         <View style={{ flex: 1 }}>
-          <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+            <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{r.name}</Txt>
+            <Flag code={r.country} />
+          </View>
           <Txt variant="small">
             {dateRange(r.start_date, r.end_date)} · {r.category_name}
             {r.is_stage_race ? ` · ${r.n_stages} etapas` : ''} · {STATUS[r.status]}

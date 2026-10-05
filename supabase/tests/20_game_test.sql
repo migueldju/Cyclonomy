@@ -133,12 +133,17 @@ declare o ownership; b0 bigint; c1 bigint; c2 bigint;
 begin
   select * into o from ownership where id = pg_temp.c('star_own')::bigint;
   b0 := (select balance from league_member where id = pg_temp.member('a'));
-  c1 := public.raise_clause(o.id);
-  assert c1 = round(o.clause * 1.5), 'primera subida: +50 %';
+  c1 := public.set_clause(o.id, 3);
+  assert c1 = round(o.price_paid * 3), 'escalón 3: 300 % del precio';
   assert (select balance from league_member where id = pg_temp.member('a')) = b0 - ceil((c1 - o.clause) / 2.0), 'paga la mitad';
-  c2 := public.raise_clause(o.id);
-  assert c2 = o.price_paid * 3, 'segunda subida: tope del 300 %';
-  perform pg_temp.expect_error(format('select public.raise_clause(%s)', o.id), '%máximo%');
+  b0 := (select balance from league_member where id = pg_temp.member('a'));
+  c2 := public.set_clause(o.id, 1);
+  assert c2 = round(o.price_paid * 2), 'escalón 1: 200 %';
+  assert (select balance from league_member where id = pg_temp.member('a')) = b0 + floor((c1 - c2) / 4.0), 'bajar: cobra un cuarto';
+  c2 := public.set_clause(o.id, 7);
+  assert c2 = o.price_paid * 5, 'escalón 7: 500 %';
+  perform pg_temp.expect_error(format('select public.set_clause(%s, 7)', o.id), '%ya está en ese escalón%');
+  perform pg_temp.expect_error(format('select public.set_clause(%s, 8)', o.id), '%va de 0%');
 end $$;
 
 -- ============================================================ 6. Clausulazo (Carla roba la estrella de Ana)
@@ -148,7 +153,7 @@ declare ana0 bigint := (select balance from league_member where id = pg_temp.mem
         carla0 bigint := (select balance from league_member where id = pg_temp.member('c'));
         cl bigint := (select clause from ownership where id = pg_temp.c('star_own')::bigint);
 begin
-  -- la cláusula (3 × precio) puede superar lo que Carla puede gastar; si es así le damos dinero para el test
+  -- la cláusula (5 × precio) puede superar lo que Carla puede gastar; si es así le damos dinero para el test
   if not public.can_spend(pg_temp.member('c'), cl) then
     perform public.post_ledger(pg_temp.member('c'), cl, 'adjustment', null, 'test');
     carla0 := carla0 + cl;
@@ -187,17 +192,28 @@ do $$ begin
   assert (select status from transfer_offer where id = pg_temp.c('offer')::bigint) = 'accepted';
 end $$;
 
--- Ana pone a la venta su ciclista más barato; el juego ofrece al día siguiente
+-- Ana pone a la venta su ciclista más barato: sale al mercado 48 horas y el juego oferta 12 horas antes del cierre
 select pg_temp.put('cheap_own', (select o.id from ownership o join rider r on r.id = o.rider_id
    where o.member_id = pg_temp.member('a') and o.pending_member_id is null order by r.market_value limit 1)::text);
 select public.set_for_sale(pg_temp.c('cheap_own')::bigint, true);
-set app.now = '2027-03-04 08:00:10 Europe/Madrid';
+do $$ begin
+  assert (select closes_at from market_listing where seller_ownership_id = pg_temp.c('cheap_own')::bigint and not resolved)
+         = public.app_now() + interval '48 hours', 'en el mercado durante 48 horas';
+end $$;
+set app.now = '2027-03-04 09:00:00 Europe/Madrid';   -- a 24 h del cierre: aún sin oferta del juego
+select public.run_due_jobs();
+do $$ begin
+  assert not exists (select 1 from game_offer where ownership_id = pg_temp.c('cheap_own')::bigint), 'oferta aún no';
+end $$;
+set app.now = '2027-03-04 21:00:10 Europe/Madrid';   -- a 12 h del cierre
 select public.run_due_jobs();
 do $$
 declare g game_offer; v bigint; b0 bigint;
 begin
   select * into g from game_offer where ownership_id = pg_temp.c('cheap_own')::bigint and status = 'open';
-  assert found, 'el juego hace una oferta';
+  assert found, 'el juego hace una oferta 12 horas antes del cierre';
+  assert g.expires_at = (select closes_at from market_listing where seller_ownership_id = pg_temp.c('cheap_own')::bigint),
+         'la oferta vale hasta el cierre';
   v := (select r.market_value from rider r join ownership o on o.rider_id = r.id where o.id = pg_temp.c('cheap_own')::bigint);
   assert g.amount between round(v * 0.9 / 1000) * 1000 and round(v * 1.1 / 1000) * 1000, 'oferta ±10 %';
   perform pg_temp.as_user('a');
@@ -205,6 +221,8 @@ begin
   perform public.accept_game_offer(g.id);
   assert (select balance from league_member where id = pg_temp.member('a')) = b0 + g.amount;
   assert not exists (select 1 from ownership where id = pg_temp.c('cheap_own')::bigint), 'el ciclista queda libre';
+  assert not exists (select 1 from market_listing where seller_ownership_id = pg_temp.c('cheap_own')::bigint),
+         'y su venta sale del mercado';
 end $$;
 
 -- ============================================================ 8. Domingo noche: clausulazos bloqueados

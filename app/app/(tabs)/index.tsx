@@ -118,7 +118,10 @@ function StageRow({ s, last }: { s: TodayRow; last: boolean }) {
     <Row last={last}>
       <View style={[styles.swatch, { backgroundColor: categoryColor[s.category] ?? colors.line }]} />
       <View style={{ flex: 1 }}>
-        <Txt variant="lead" numberOfLines={1}>{s.race_name}</Txt>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+          <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{s.race_name}</Txt>
+          <Flag code={s.country} />
+        </View>
         <Txt variant="small">{s.number === 0 ? 'Prólogo' : `Etapa ${s.number}`} · {label}</Txt>
       </View>
       <Button small kind="secondary" label="Puntuaciones" onPress={() => router.push(`/etapa/${s.stage_id}`)} />
@@ -131,7 +134,10 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
     <Row last={last}>
       <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
       <View style={{ flex: 1 }}>
-        <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
+          <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{r.name}</Txt>
+          <Flag code={r.country} />
+        </View>
         <Txt variant="small">
           {dateRange(r.start_date, r.end_date)} · {categoryLabel(r.category, r.is_stage_race, r.category_name)} ·{' '}
           {r.my_entry_count ? `${r.my_entry_count}/${r.max_entries} inscritos` : 'sin inscripción'}

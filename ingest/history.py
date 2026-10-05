@@ -70,14 +70,15 @@ def load_history(db, season: int) -> dict:
             seen.add(key)
             date = x.get("date") or (race["end_date"] if kind != "stage" else race["start_date"])
             rows.append((rider_id, season, race_slug, race["name"], race["uci_class"], cat, race["is_stage_race"],
-                         number, date, kind, pos))
+                         number, date, kind, pos, race.get("country") or None))
 
     with db.conn.transaction():
         db.execute("delete from public.rider_history_result where season = %s", (season,))
         with db.conn.cursor() as cur:
             cur.executemany(
                 "insert into public.rider_history_result (rider_id, season, race_slug, race_name, uci_class, category, "
-                "  is_stage_race, number, date, kind, position) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                "  is_stage_race, number, date, kind, position, country) "
+                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 rows)
     summary = dict(riders=len(riders), without_results=empty, results=len(rows),
                    races=len({r[2] for r in rows}))

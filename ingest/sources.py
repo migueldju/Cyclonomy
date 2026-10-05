@@ -40,8 +40,12 @@ def listing_path(year: int, circuit: str = "", cls: str = "") -> str:
     return f"races.php?year={year}&circuit={circuit}&class={cls}&filter=Filter"
 
 
-def fetch_calendar(year: int, with_stages: bool = True) -> list[dict]:
-    """Carreras masculinas WT, .Pro, .1 y campeonatos del año, con sus etapas."""
+def fetch_calendar(year: int, with_stages: bool = True, from_date: dt.date | None = None) -> list[dict]:
+    """Carreras masculinas WT, .Pro, .1 y campeonatos del año, con sus etapas.
+
+    from_date: solo las que terminan ese día o después (p. ej. lo que queda de temporada); se filtra antes de
+    descargar las etapas.
+    """
     first = get_html(listing_path(year), max_age_h=24)
     circuits = [(v, t) for v, t in parsers.select_options(first or "", "circuit")
                 if v and not parsers.EXCLUDE_CIRCUIT.search(t)]
@@ -50,6 +54,8 @@ def fetch_calendar(year: int, with_stages: bool = True) -> list[dict]:
     for html in pages:
         for r in parsers.parse_calendar_listing(html or "", year):
             if r["slug"] in seen or not parsers.keep_race(r):
+                continue
+            if from_date and r["end_date"] and r["end_date"] < from_date:
                 continue
             seen.add(r["slug"])
             races.append(r)
@@ -149,13 +155,31 @@ def fetch_stage_info(slug: str, year: int, number: int, is_stage_race: bool) -> 
 
 
 def fetch_startlist(slug: str, year: int) -> list[str]:
+    """Slugs de los corredores de la lista de salida."""
+    full = fetch_startlist_full(slug, year)
+    if full:
+        return [r["slug"] for r in full]
+    html = get_html(f"race/{slug}/{year}/startlist", max_age_h=1)
+    return parsers.parse_startlist(html or "")
+
+
+def fetch_startlist_full(slug: str, year: int) -> list[dict]:
+    """Lista de salida completa: [{slug, name, nationality, bib, team}] (vía la librería procyclingstats)."""
     path = f"race/{slug}/{year}/startlist"
     html = get_html(path, max_age_h=0)
     if not html:
         return []
-    lib = _library("RaceStartlist", path, html, "startlist") or []
-    slugs = [s for s in (_slug(d.get("rider_url")) for d in lib) if s]
-    return slugs or parsers.parse_startlist(html)
+    out = []
+    for d in _library("RaceStartlist", path, html, "startlist") or []:
+        s = _slug(d.get("rider_url"))
+        if not s:
+            continue
+        team = re.sub(r"\s*\((WT|PRT|CT|NAT|CLUB)\)\s*$", "", d.get("team_name") or "").strip()
+        out.append(dict(slug=s, name=parsers.display_name(d.get("rider_name") or ""),
+                        nationality=(d.get("nationality") or "").lower() or None,
+                        bib=d.get("rider_number") if isinstance(d.get("rider_number"), int) else None,
+                        team=team or "Sin equipo"))
+    return out
 
 
 def fetch_results(slug: str, year: int, number: int, is_stage_race: bool) -> dict[str, list[tuple[str, int]]]:

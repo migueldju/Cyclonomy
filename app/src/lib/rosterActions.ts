@@ -1,10 +1,10 @@
 import type { SheetAction } from '../components/Modal';
 import { api } from './api';
-import { dateTime, money, moneyShort } from './format';
+import { dateTime, moneyShort } from './format';
 import type { RosterRow } from './types';
 
 /** Acciones sobre un ciclista de mi plantilla: vender al juego, subir la cláusula, poner o quitar de la venta */
-export function actionsFor(r: RosterRow): SheetAction[] {
+export function actionsFor(r: RosterRow, opts: { onChangeClause?: () => void } = {}): SheetAction[] {
   if (!r.transferable) return [];               // le llega o se va el lunes: no se puede tocar
   const out: SheetAction[] = [];
   if (r.game_offer_id && r.game_offer_amount) {
@@ -14,16 +14,43 @@ export function actionsFor(r: RosterRow): SheetAction[] {
       onPress: () => api.acceptGameOffer(r.game_offer_id!),
     });
   }
-  if (r.next_clause > r.clause) {
+  if (opts.onChangeClause) {
     out.push({
-      label: `Subir la cláusula a ${moneyShort(r.next_clause)}`,
-      hint: `Cuesta ${money(r.next_clause_cost)}. Tope: el 300 % de lo que pagaste (${money(r.price_paid * 3)}).`,
-      onPress: () => api.raiseClause(r.ownership_id),
+      label: 'Cambiar la cláusula',
+      hint: `Del 150 % al 500 % de lo que pagaste (${moneyShort(clauseLevelValue(r.price_paid, 0))} a `
+        + `${moneyShort(clauseLevelValue(r.price_paid, CLAUSE_LEVELS - 1))}). Subir cuesta la mitad de la subida; `
+        + 'bajar te devuelve un cuarto de la bajada.',
+      onPress: opts.onChangeClause,
     });
   }
   out.push(r.for_sale
-    ? { label: 'Quitar de la venta', onPress: () => api.setForSale(r.ownership_id, false) }
-    : { label: 'Poner a la venta', hint: 'En la próxima actualización del mercado el juego te ofrecerá su valor ±10 %.',
+    ? { label: 'Quitar de la venta', hint: 'Sale del mercado y se anulan las pujas.',
+        onPress: () => api.setForSale(r.ownership_id, false) }
+    : { label: 'Poner a la venta',
+        hint: 'Sale al mercado durante 48 horas y los demás pueden pujar. 12 horas antes del cierre el juego te '
+          + 'ofrecerá su valor ±10 %.',
         onPress: () => api.setForSale(r.ownership_id, true) });
   return out;
+}
+
+/**
+ * Escalones de la cláusula (las mismas cuentas que set_clause en la base de datos): del 150 % al 500 % de lo que
+ * pagaste, de 50 en 50 puntos (niveles 0 a 7). Subir cuesta la mitad de lo que sube; bajar devuelve un cuarto.
+ */
+export const CLAUSE_LEVELS = 8;
+
+export function clauseLevelValue(pricePaid: number, level: number): number {
+  return Math.round(pricePaid * (1.5 + 0.5 * level));
+}
+
+/** Nivel más cercano a la cláusula actual */
+export function clauseLevel(clause: number, pricePaid: number): number {
+  if (!pricePaid) return 0;
+  return Math.min(CLAUSE_LEVELS - 1, Math.max(0, Math.round((clause / pricePaid - 1.5) / 0.5)));
+}
+
+/** Lo que cuesta (positivo) o devuelve (negativo) pasar de la cláusula actual a un nivel */
+export function clauseChange(clause: number, pricePaid: number, level: number): number {
+  const target = clauseLevelValue(pricePaid, level);
+  return target >= clause ? Math.ceil((target - clause) / 2) : -Math.floor((clause - target) / 4);
 }

@@ -40,6 +40,21 @@ def delete_stale_teams(db, season: int, kept_slugs: list[str]) -> int:
         (season, list(kept_slugs)))
 
 
+def value_new_riders(db) -> int:
+    """Valor inicial de los ciclistas que aún no tienen ninguno (sin historial de valor): a partir de sus puntos
+    PCS de la temporada base y su edad, como seed_initial_values pero sin tocar a los demás."""
+    return db.scalar(
+        "with nuevos as ("
+        "  update public.rider r set market_value = public.value_from_points(r.pcs_points_base, public.age_at(r.birthdate)),"
+        "         updated_at = now()"
+        "  where r.active and not exists (select 1 from public.rider_value_history h where h.rider_id = r.id)"
+        "  returning r.id, r.market_value),"
+        " hist as (insert into public.rider_value_history (rider_id, day, value)"
+        "  select id, (public.app_now() at time zone 'Europe/Madrid')::date, market_value from nuevos"
+        "  on conflict (rider_id, day) do update set value = excluded.value returning 1)"
+        "select count(*) from hist")
+
+
 def riders_without_birthdate(db) -> list[str]:
     return [r[0] for r in db.fetchall("select pcs_slug from public.rider where active and birthdate is null")]
 
@@ -132,6 +147,19 @@ def set_startlist(db, race_id: int, slugs: list[str]) -> int:
         "with ins as (insert into public.startlist (race_id, rider_id) "
         "             select %s, id from public.rider where pcs_slug = any (%s) on conflict do nothing returning 1) "
         "select count(*) from ins", (race_id, list(slugs)))
+
+
+def set_startlist_full(db, race_id: int, rows: list[dict]) -> int:
+    """Guarda la lista de salida completa (para enseñarla); rider_id solo si el corredor está en el juego."""
+    with db.conn.transaction():
+        db.execute("delete from public.startlist_rider where race_id = %s", (race_id,))
+        with db.conn.cursor() as cur:
+            cur.executemany(
+                "insert into public.startlist_rider (race_id, rider_slug, rider_name, nationality, bib, team_name, rider_id) "
+                "values (%s, %s, %s, %s, %s, %s, (select id from public.rider where pcs_slug = %s)) "
+                "on conflict do nothing",
+                [(race_id, r["slug"], r["name"], r["nationality"], r["bib"], r["team"], r["slug"]) for r in rows])
+    return len(rows)
 
 
 def stored_results(db, stage_id: int) -> dict[str, list[tuple[str, int]]]:
