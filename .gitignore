@@ -7,3 +7,4 @@ __pycache__/
 pcs_cache/
 debug/
 .venv/
+supabase/.temp/

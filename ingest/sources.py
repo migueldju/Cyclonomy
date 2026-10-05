@@ -97,24 +97,43 @@ def fetch_season_points(points_year: int, max_pages: int = 80) -> dict[str, floa
     return result
 
 
-def fetch_teams(year: int, list_url: str = "teams/worldtour") -> list[dict]:
-    """[{slug, name, level, riders:[{slug, name, nationality}]}] de WorldTeams y ProTeams."""
+# Equipos que PCS lista para la temporada pero que no van a existir (sin licencia, desaparecen…).
+# Se indican sin el año, como en el listado.
+EXCLUDED_TEAMS = {"equipo-kern-pharma"}
+
+
+def team_list_path(year: int) -> str:
+    return f"teams.php?year={year}&filter=Filter&s=worldtour"
+
+
+def fetch_teams(year: int, list_url: str | None = None) -> list[dict]:
+    """[{slug, name, level, riders:[{slug, name, nationality}]}] de WorldTeams y ProTeams del año.
+
+    Usa el listado de equipos de ese año: así entran los equipos que cambian de nombre (y de slug) y
+    quedan fuera los que desaparecen.
+    """
+    list_url = list_url or team_list_path(year)
     html = get_html(list_url, max_age_h=12)
     if not html:
         raise RuntimeError(f"No existe la página de listado '{list_url}'")
     teams = []
     for slug_base, _y, tier, listed_name in parsers.parse_team_list(html):
+        if slug_base in EXCLUDED_TEAMS:
+            log.info("Equipo excluido: %s", slug_base)
+            continue
         slug = f"{slug_base}-{year}"
         page = get_html(f"team/{slug}", max_age_h=12)
-        if not page:
+        parsed = parsers.parse_team(page, year) if page else None
+        # PCS responde 200 con una página "Page not found" cuando el equipo aún no existe ese año
+        if not parsed or parsed["name"].lower().startswith("page not found"):
             log.warning("Equipo sin página en %s: %s (¿cambió de nombre?)", year, slug)
             continue
         lib = _library("Team", f"team/{slug}", page, "riders") or []
         riders = [dict(slug=_slug(d.get("rider_url")), name=parsers.display_name(d.get("rider_name") or ""),
                        nationality=(d.get("nationality") or "").lower()) for d in lib if _slug(d.get("rider_url"))]
-        parsed = parsers.parse_team(page, year)
-        teams.append(dict(slug=slug, name=parsed["name"] or listed_name, level=tier,
-                          riders=riders or parsed["riders"]))
+        # sin patrocinador anunciado PCS pone "Equipo ??": vale el nombre del listado
+        name = parsed["name"] if parsed["name"] and "??" not in parsed["name"] else listed_name
+        teams.append(dict(slug=slug, name=name, level=tier, riders=riders or parsed["riders"]))
     return teams
 
 

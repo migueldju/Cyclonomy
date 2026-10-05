@@ -1,7 +1,7 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
-import { ActionSheet, SheetAction } from '@/components/Modal';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -11,7 +11,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { api } from '@/lib/api';
 import { dateTime, money, moneyShort, points } from '@/lib/format';
-import type { OfferRow, RosterRow } from '@/lib/types';
+import type { OfferRow } from '@/lib/types';
 import { colors, space } from '@/theme';
 
 export default function Plantilla() {
@@ -19,7 +19,6 @@ export default function Plantilla() {
   const id = leagueId ?? '';
   const roster = useLoader(() => api.roster(id), [id], !!leagueId);
   const offers = useLoader(() => api.offers(id), [id], !!leagueId);
-  const [picked, setPicked] = useState<RosterRow | null>(null);
   const [offerError, setOfferError] = useState<string | null>(null);
   const done = () => { roster.reload(); offers.reload(); refresh(); };
 
@@ -80,53 +79,21 @@ export default function Plantilla() {
             key={r.ownership_id}
             name={r.rider_name}
             team={r.pro_team}
+            photo={r.photo_url}
+            nationality={r.nationality}
             status={r.status}
             note={[riderStatusNote(r.status), r.for_sale ? 'en venta' : null,
                    r.game_offer_amount ? `el juego ofrece ${moneyShort(r.game_offer_amount)}` : null].filter(Boolean).join(' · ')}
             value={r.market_value}
             detail={`${points(r.league_points)} · cláusula ${moneyShort(r.clause)}`}
-            onPress={() => setPicked(r)}
+            onPress={() => router.push(`/ciclista/${r.rider_id}`)}
             last={i === rows.length - 1}
           />
         )) : <Empty text={roster.loading ? 'Cargando…' : 'Tu plantilla está vacía.'} />}
       </Section>
       <ErrorText error={roster.error} />
-
-      <ActionSheet
-        visible={!!picked}
-        onClose={() => setPicked(null)}
-        title={picked?.rider_name ?? ''}
-        subtitle={picked ? `Valor ${money(picked.market_value)} · pagaste ${money(picked.price_paid)} · cláusula ${money(picked.clause)}` +
-          `\n${points(picked.season_points)} esta temporada` : undefined}
-        actions={picked ? actionsFor(picked) : []}
-        onDone={done}
-      />
     </Screen>
   );
-}
-
-function actionsFor(r: RosterRow): SheetAction[] {
-  if (!r.transferable) return [];               // le llega o se va el lunes: no se puede tocar
-  const out: SheetAction[] = [];
-  if (r.game_offer_id && r.game_offer_amount) {
-    out.push({
-      label: `Vender al juego por ${moneyShort(r.game_offer_amount)}`, kind: 'primary',
-      hint: `La oferta caduca ${dateTime(r.game_offer_expires)}. El ciclista queda libre al momento.`,
-      onPress: () => api.acceptGameOffer(r.game_offer_id!),
-    });
-  }
-  if (r.next_clause > r.clause) {
-    out.push({
-      label: `Subir la cláusula a ${moneyShort(r.next_clause)}`,
-      hint: `Cuesta ${money(r.next_clause_cost)}. Tope: el 300 % de lo que pagaste (${money(r.price_paid * 3)}).`,
-      onPress: () => api.raiseClause(r.ownership_id),
-    });
-  }
-  out.push(r.for_sale
-    ? { label: 'Quitar de la venta', onPress: () => api.setForSale(r.ownership_id, false) }
-    : { label: 'Poner a la venta', hint: 'En la próxima actualización del mercado el juego te ofrecerá su valor ±10 %.',
-        onPress: () => api.setForSale(r.ownership_id, true) });
-  return out;
 }
 
 function Stat({ label, value, color }: { label: string; value: string; color?: string }) {

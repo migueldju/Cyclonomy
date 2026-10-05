@@ -31,6 +31,15 @@ def deactivate_missing(db, seen_slugs: list[str]) -> int:
         (list(seen_slugs),))
 
 
+def delete_stale_teams(db, season: int, kept_slugs: list[str]) -> int:
+    """Equipos de la temporada que ya no están en el listado (o están excluidos) y se han quedado sin ciclistas."""
+    return db.scalar(
+        "with d as (delete from public.team t where t.season = %s and not (t.pcs_slug = any (%s)) "
+        "           and not exists (select 1 from public.rider r where r.team_id = t.id and r.active) "
+        "           returning 1) select count(*) from d",
+        (season, list(kept_slugs)))
+
+
 def riders_without_birthdate(db) -> list[str]:
     return [r[0] for r in db.fetchall("select pcs_slug from public.rider where active and birthdate is null")]
 

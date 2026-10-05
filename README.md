@@ -9,6 +9,8 @@ app/          App Expo (React Native + TypeScript, expo-router)
 supabase/     Base de datos: esquema, lógica del juego (funciones SQL), seguridad, tareas programadas
   migrations/   0001 catálogo · 0002 juego · 0003 lógica interna · 0004 funciones de la app
                 0005 seguridad · 0006 Storage y pg_cron · 0007 cola de la ingesta
+                0008 ranking y ficha de ciclista · 0009 historial y fotos · 0010 fotos en las listas
+                0008 ranking y ficha de ciclista
   seed/         CSV editables: categorías y tabla de puntos
   seed.sql      generado desde los CSV (tools/build_seed.py)
   tests/        tests SQL que simulan una semana completa de liga
@@ -51,6 +53,8 @@ export DATABASE_URL="postgresql://postgres.<ref>:<clave>@aws-0-<región>.pooler.
 # inicio de temporada
 python -m ingest teams --season 2027 --points-year 2026 --birthdates --seed-values
 python -m ingest calendar --season 2027
+python -m ingest history --season 2026     # resultados de 2026 para las fichas
+python -m ingest photos                   # fotos de Wikimedia Commons con autor y licencia
 
 # después, de forma continua (o con .github/workflows/ingesta.yml)
 python -m ingest run

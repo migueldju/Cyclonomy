@@ -3,6 +3,8 @@
     export DATABASE_URL=postgresql://postgres:<clave>@db.<proyecto>.supabase.co:5432/postgres
     python -m ingest teams --season 2027 --points-year 2026 --birthdates --seed-values   # inicio de temporada
     python -m ingest calendar --season 2027
+    python -m ingest history --season 2026    # resultados de la temporada pasada para las fichas
+    python -m ingest photos                   # fotos de Wikimedia Commons (vía Wikidata)
     python -m ingest plan            # a las 00:00
     python -m ingest tick            # cada 5 minutos
     python -m ingest run             # proceso continuo que hace todo lo anterior a su hora
@@ -28,6 +30,9 @@ def main(argv=None):
     t.add_argument("--seed-values", action="store_true", help="recalcula los valores iniciales (solo al empezar)")
     c = sub.add_parser("calendar", help="carreras y etapas de la temporada")
     c.add_argument("--season", type=int, required=True)
+    h = sub.add_parser("history", help="resultados de una temporada pasada (para la ficha del ciclista)")
+    h.add_argument("--season", type=int, required=True)
+    sub.add_parser("photos", help="fotos de los ciclistas desde Wikimedia Commons, con autor y licencia")
     sub.add_parser("seed-values", help="valores de mercado iniciales a partir de los puntos PCS")
     sub.add_parser("plan", help="planifica hoy y mañana")
     sub.add_parser("tick", help="ejecuta las tareas pendientes")
@@ -53,6 +58,12 @@ def main(argv=None):
         print(jobs.load_teams(db, args.season, args.points_year, args.birthdates, args.seed_values))
     elif args.cmd == "calendar":
         print(jobs.load_calendar(db, args.season))
+    elif args.cmd == "history":
+        from .history import load_history
+        print(load_history(db, args.season))
+    elif args.cmd == "photos":
+        from .photos import load_photos
+        print(load_photos(db))
     elif args.cmd == "seed-values":
         print(db.scalar("select public.seed_initial_values()"), "ciclistas valorados")
     elif args.cmd == "plan":

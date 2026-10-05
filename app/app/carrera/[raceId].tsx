@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/Button';
@@ -27,6 +27,13 @@ export default function Inscripcion() {
   // solo los inscritos que siguen siendo míos y disponibles (un vendido no debe bloquear el guardado)
   useEffect(() => {
     if (data) setChosen(new Set(data.entered.filter((rid) => data.riders.some((r) => r.rider_id === rid && r.available))));
+  }, [data]);
+
+  // primero los inscritos (según lo guardado, para que la lista no salte al marcar), luego el resto
+  const riders = useMemo(() => {
+    if (!data) return [];
+    const entered = new Set(data.entered);
+    return [...data.riders].sort((a, b) => Number(entered.has(b.rider_id)) - Number(entered.has(a.rider_id)));
   }, [data]);
 
   if (!data) {
@@ -78,13 +85,13 @@ export default function Inscripcion() {
       </View>
 
       <Section title={`Tus ciclistas · ${chosen.size}/${max}`}>
-        {data.riders.length ? data.riders.map((r, i) => {
+        {riders.length ? riders.map((r, i) => {
           const on = chosen.has(r.rider_id);
           const disabled = !data.open || (!on && (!r.available || chosen.size >= max));
           return (
             <Pressable key={r.rider_id} onPress={() => toggle(r.rider_id)} disabled={disabled}
                        accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled }}
-                       style={[styles.row, i < data.riders.length - 1 && styles.line, disabled && !on && { opacity: 0.5 }]}>
+                       style={[styles.row, i < riders.length - 1 && styles.line, disabled && !on && { opacity: 0.5 }]}>
               <Ionicons name={on ? 'checkbox' : 'square-outline'} size={24} color={on ? colors.ink : colors.inkSoft} />
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>

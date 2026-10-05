@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type {
   CalendarRow, Category, EntryData, League, LeagueSettings, MarketRow, Me, MyLeague, OfferRow, RaceDetail,
-  RosterRow, ScoringRule, StageScores, StandingRow, TodayRow,
+  RankingRow, RiderDetail, RosterRow, ScoringRule, StageScores, StandingRow, TodayRow,
 } from './types';
 
 // Todas las escrituras pasan por funciones de Postgres que validan las reglas del juego.
@@ -45,6 +45,9 @@ export const api = {
     rpc<StageScores>('get_stage_scores', { p_league: leagueId, p_stage: stageId }),
   raceDetail: (leagueId: string, raceId: number) =>
     rpc<RaceDetail>('get_race_detail', { p_league: leagueId, p_race: raceId }),
+  ranking: (leagueId: string, limit?: number) =>
+    rpc<RankingRow[]>('get_ranking', limit ? { p_league: leagueId, p_limit: limit } : { p_league: leagueId }),
+  rider: (leagueId: string, riderId: number) => rpc<RiderDetail>('get_rider', { p_league: leagueId, p_rider: riderId }),
   entry: (leagueId: string, raceId: number) => rpc<EntryData>('get_entry', { p_league: leagueId, p_race: raceId }),
   categories: () => select<Category[]>(supabase.from('race_category').select('*').order('depth_level')),
   scoring: () => select<ScoringRule[]>(supabase.from('scoring_rule').select('*').order('position')),

@@ -37,6 +37,7 @@ export default function Jugador() {
       <Section>
         {rows.length ? rows.map((r, i) => (
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
+                    photo={r.photo_url} nationality={r.nationality}
                     note={riderStatusNote(r.status)} value={r.market_value}
                     detail={`cláusula ${moneyShort(r.clause)}`} onPress={() => setPicked(r)} last={i === rows.length - 1} />
         )) : <Empty text={roster.loading ? 'Cargando…' : 'Este jugador no tiene ciclistas.'} />}
