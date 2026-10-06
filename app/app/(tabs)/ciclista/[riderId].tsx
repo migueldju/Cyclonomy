@@ -13,6 +13,7 @@ import { Txt } from '@/components/Txt';
 import { ValueChart } from '@/components/ValueChart';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, money, moneyShort, ordinal, points, todayISO } from '@/lib/format';
 import { actionsFor } from '@/lib/rosterActions';
@@ -64,7 +65,7 @@ export default function Ciclista() {
   }, [d, filter]);
 
   if (!d) {
-    return <Screen><ErrorText error={detail.error} /><Empty text={detail.loading ? 'Cargando…' : 'No se pudo cargar el ciclista.'} /></Screen>;
+    return <Screen><ErrorText error={detail.error} /><Empty text={detail.loading ? t('common.loading') : t('rider.loadError')} /></Screen>;
   }
   const r = d.rider;
   const pickFilter = (f: Filter) => { setFilter(f); setShown(PAGE); setOpen(null); };
@@ -79,34 +80,34 @@ export default function Ciclista() {
             <Flag code={r.nationality} height={15} />
           </View>
           <Txt variant="small">
-            {[r.pro_team, r.age != null ? `${r.age} años` : null].filter(Boolean).join(' · ')}
+            {[r.pro_team, r.age != null ? t('rider.age', { n: r.age }) : null].filter(Boolean).join(' · ')}
           </Txt>
         </View>
       </View>
 
       <View style={styles.stats}>
-        <Stat label="Valor de mercado" value={moneyShort(r.market_value)} />
-        <Stat label="Puntos esta temporada" value={points(r.season_points)} />
-        <Stat label="Propietario" value={d.owner ? (d.owner.is_mine ? 'Tú' : d.owner.team_name) : 'Libre'} />
-        {d.owner ? <Stat label="Cláusula" value={moneyShort(d.owner.clause)} /> : null}
+        <Stat label={t('rider.marketValue')} value={moneyShort(r.market_value)} />
+        <Stat label={t('rider.seasonPoints')} value={points(r.season_points)} />
+        <Stat label={t('ranking.owner')} value={d.owner ? (d.owner.is_mine ? t('rider.you') : d.owner.team_name) : t('rider.freeCap')} />
+        {d.owner ? <Stat label={t('rider.clause')} value={moneyShort(d.owner.clause)} /> : null}
       </View>
 
       <View style={{ paddingHorizontal: space.l }}>
         {mine ? (
-          <Button kind="secondary" label="Gestionar ciclista" onPress={() => setManaging(true)} disabled={!rosterRow} />
+          <Button kind="secondary" label={t('rider.manage')} onPress={() => setManaging(true)} disabled={!rosterRow} />
         ) : d.owner ? (
-          <Button kind="secondary" label={`Ver la plantilla de ${d.owner.team_name}`}
+          <Button kind="secondary" label={t('rider.seeSquad', { team: d.owner.team_name })}
                   onPress={() => router.push(`/jugador/${d.owner!.member_id}`)} />
         ) : (
-          <Txt variant="small">Está libre: puede aparecer en el mercado de la liga.</Txt>
+          <Txt variant="small">{t('rider.freeHint')}</Txt>
         )}
       </View>
 
-      <Section title="Valor de mercado">
+      <Section title={t('rider.marketValue')}>
         <ValueChart points={d.values} />
       </Section>
 
-      <Section title="Resultados"
+      <Section title={t('admin.results')}
                action={
                  <View style={styles.segment} accessibilityRole="tablist">
                    {(['recent', 'top'] as Filter[]).map((f) => (
@@ -114,7 +115,7 @@ export default function Ciclista() {
                                 accessibilityState={{ selected: filter === f }}
                                 style={[styles.segBtn, filter === f && styles.segOn]}>
                        <Txt style={[styles.segText, filter === f && { color: colors.paper }]}>
-                         {f === 'recent' ? 'Recientes' : 'Destacados'}
+                         {f === 'recent' ? t('rider.recent') : t('rider.highlights')}
                        </Txt>
                      </Pressable>
                    ))}
@@ -128,14 +129,14 @@ export default function Ciclista() {
             ))}
             {groups.length > shown ? (
               <Pressable onPress={() => setShown(groups.length)} accessibilityRole="button" style={styles.more}>
-                <Txt variant="label" style={{ color: colors.ink }}>Ver más ({groups.length - shown})</Txt>
+                <Txt variant="label" style={{ color: colors.ink }}>{t('rider.seeMore', { n: groups.length - shown })}</Txt>
               </Pressable>
             ) : null}
           </>
         ) : (
           <Empty text={d.results.length
-            ? 'Todavía no tiene ningún top 10.'
-            : 'Todavía no tiene resultados. Aparecerán aquí cuando corra.'} />
+            ? t('rider.noTop10')
+            : t('rider.noResults')} />
         )}
       </Section>
       <ErrorText error={detail.error} />
@@ -147,7 +148,7 @@ export default function Ciclista() {
           visible={managing}
           onClose={() => setManaging(false)}
           title={r.name}
-          subtitle={`Valor ${money(rosterRow.market_value)} · pagaste ${money(rosterRow.price_paid)} · cláusula ${money(rosterRow.clause)}`}
+          subtitle={t('rider.manageSubtitle', { value: money(rosterRow.market_value), paid: money(rosterRow.price_paid), clause: money(rosterRow.clause) })}
           actions={actionsFor(rosterRow, { onChangeClause: () => { setTimeout(() => setRaising(true), 350); } })}
           onDone={() => { detail.reload(); roster.reload(); refresh(); }}
         />
@@ -183,11 +184,11 @@ function groupByRace(results: RiderResult[]): RaceGroup[] {
   return [...map.values()];
 }
 
-const KIND_LABEL = { gc: 'General', points: 'Puntos', kom: 'Montaña' };
+const kindLabel = (k: 'gc' | 'points' | 'kom') => t(`kind.${k}`);
 
 function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; last: boolean; onToggle: () => void }) {
   const year = g.start.slice(0, 4) !== todayISO().slice(0, 4) ? ` ${g.start.slice(0, 4)}` : '';
-  const status = g.final != null ? ordinal(g.final) : g.live ? 'En marcha' : g.isStageRace ? 'No terminó' : '—';
+  const status = g.final != null ? ordinal(g.final) : g.live ? t('rider.live') : g.isStageRace ? t('rider.dnf') : '—';
   // una clásica tiene un solo resultado: sin desplegable (si es del juego, abre la etapa)
   const oneDay = !g.isStageRace;
   const stageId = oneDay ? g.rows[0]?.stage_id : null;
@@ -213,8 +214,8 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
       {open && !oneDay ? (
         <View style={styles.detail}>
           {g.rows.map((x) => {
-            const what = x.kind !== 'stage' ? KIND_LABEL[x.kind]
-              : !x.is_stage_race ? 'Resultado' : x.number === 0 ? 'Prólogo' : `Etapa ${x.number}`;
+            const what = x.kind !== 'stage' ? kindLabel(x.kind)
+              : !x.is_stage_race ? t('calendar.result') : x.number === 0 ? t('race.prologue') : t('race.stageN', { n: x.number });
             return (
               <Pressable key={`${x.kind}-${x.number}`} disabled={!x.stage_id}
                          onPress={() => x.stage_id && router.push(`/etapa/${x.stage_id}`)} style={styles.detailLine}>
@@ -235,7 +236,7 @@ function Credit({ photo }: { photo: RiderPhoto }) {
   const open = (url: string | null) => () => { if (url) Linking.openURL(url); };
   return (
     <Txt variant="small" style={styles.credit}>
-      Foto: <Txt variant="small" style={styles.link} onPress={open(photo.page_url)}>{photo.author}</Txt>
+      {t('rider.photoBy')} <Txt variant="small" style={styles.link} onPress={open(photo.page_url)}>{photo.author}</Txt>
       {' · '}
       <Txt variant="small" style={styles.link} onPress={open(photo.license_url ?? photo.page_url)}>{photo.license}</Txt>
       {' · Wikimedia Commons'}

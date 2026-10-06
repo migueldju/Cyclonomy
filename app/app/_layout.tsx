@@ -1,5 +1,10 @@
-import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, useFonts } from '@expo-google-fonts/barlow';
-import { BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed';
+// Fira Sans: la «l» lleva cola y no se confunde con la «i». Solo se importan los pesos que se usan.
+import { FiraSans_400Regular } from '@expo-google-fonts/fira-sans/400Regular';
+import { FiraSans_500Medium } from '@expo-google-fonts/fira-sans/500Medium';
+import { FiraSans_600SemiBold } from '@expo-google-fonts/fira-sans/600SemiBold';
+import { FiraSansCondensed_600SemiBold } from '@expo-google-fonts/fira-sans-condensed/600SemiBold';
+import { FiraSansCondensed_700Bold } from '@expo-google-fonts/fira-sans-condensed/700Bold';
+import { useFonts } from 'expo-font';
 import { Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -8,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TopBar } from '@/components/TopBar';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LeagueProvider, useLeague } from '@/context/LeagueContext';
+import { I18nProvider } from '@/i18n';
 import { resetTo } from '@/lib/nav';
 import { colors } from '@/theme';
 
@@ -18,19 +24,23 @@ const NO_LEAGUE_SCREENS = ['ligas', 'liga', 'unirse', 'perfil', 'admin'];
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold,
+    FiraSans_400Regular, FiraSans_500Medium, FiraSans_600SemiBold, FiraSansCondensed_600SemiBold, FiraSansCondensed_700Bold,
   });
   useEffect(() => { if (fontsLoaded) SplashScreen.hideAsync(); }, [fontsLoaded]);
   if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <LeagueProvider>
-          <StatusBar style="light" />
-          <Gate />
-        </LeagueProvider>
-      </AuthProvider>
+      <I18nProvider>
+        {(lang) => (
+          <AuthProvider>
+            <LeagueProvider>
+              <StatusBar style="light" />
+              <Gate key={lang} />
+            </LeagueProvider>
+          </AuthProvider>
+        )}
+      </I18nProvider>
     </SafeAreaProvider>
   );
 }

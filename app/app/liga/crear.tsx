@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSetting
 import { Screen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
 import { space } from '@/theme';
@@ -19,23 +20,23 @@ export default function CrearLiga() {
 
   return (
     <Screen padded>
-      <Txt variant="hero" style={{ marginTop: insets.top + space.l }}>Nueva liga</Txt>
+      <Txt variant="hero" style={{ marginTop: insets.top + space.l }}>{t('create.title')}</Txt>
       <Txt variant="small" style={{ marginBottom: space.xl }}>
-        Podrás cambiar todos los parámetros más adelante desde la normativa de la liga.
+        {t('create.note')}
       </Txt>
       <LeagueSettingsForm
         initial={DEFAULT_SETTINGS}
         initialName=""
-        submitLabel="Crear liga"
+        submitLabel={t('create.submit')}
         onSubmit={async (name, s) => {
-          if (!team.trim()) throw new Error('Ponle nombre a tu equipo.');
-          if (!country) throw new Error('Elige el país de tu equipo.');
+          if (!team.trim()) throw new Error(t('team.nameRequired'));
+          if (!country) throw new Error(t('team.countryRequired'));
           const id = await api.createLeague(name, team.trim(), s, country);
           await selectLeague(id);
           resetTo('/');
         }}>
         <View>
-          <Input label="Nombre de tu equipo" value={team} onChangeText={setTeam} maxLength={40} />
+          <Input label={t('team.yourTeamName')} value={team} onChangeText={setTeam} maxLength={40} />
           <CountryPicker value={country} onChange={setCountry} />
         </View>
       </LeagueSettingsForm>

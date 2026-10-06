@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { t } from '../i18n';
 import { COUNTRIES, countryName } from '../lib/countries';
 import { colors, fonts, space, type } from '../theme';
 import { Flag } from './Flag';
@@ -9,9 +10,10 @@ import { Txt } from './Txt';
 const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /** Campo para elegir el país del equipo: abre una lista con buscador y banderas */
-export function CountryPicker({ value, onChange, label = 'País de tu equipo' }: {
+export function CountryPicker({ value, onChange, label }: {
   value: string | null; onChange: (code: string) => void; label?: string;
 }) {
+  label = label ?? t('country.label');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const list = useMemo(() => {
@@ -24,14 +26,14 @@ export function CountryPicker({ value, onChange, label = 'País de tu equipo' }:
       <Txt variant="label" style={{ marginBottom: space.xs }}>{label}</Txt>
       <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={label} style={styles.field}>
         {value ? <Flag code={value} height={14} /> : null}
-        <Txt style={{ flex: 1, color: value ? colors.ink : colors.inkSoft }}>{countryName(value) ?? 'Elige un país'}</Txt>
-        <Txt variant="small">Cambiar</Txt>
+        <Txt style={{ flex: 1, color: value ? colors.ink : colors.inkSoft }}>{countryName(value) ?? t('country.choose')}</Txt>
+        <Txt variant="small">{t('common.change')}</Txt>
       </Pressable>
-      <Txt variant="small" style={{ marginTop: space.xs }}>No se puede cambiar más adelante.</Txt>
+      <Txt variant="small" style={{ marginTop: space.xs }}>{t('country.permanent')}</Txt>
 
-      <Sheet visible={open} onClose={() => setOpen(false)} title="País de tu equipo">
-        <TextInput value={query} onChangeText={setQuery} placeholder="Buscar país" placeholderTextColor={colors.inkSoft}
-                   style={styles.search} accessibilityLabel="Buscar país" autoCorrect={false} />
+      <Sheet visible={open} onClose={() => setOpen(false)} title={t('country.label')}>
+        <TextInput value={query} onChangeText={setQuery} placeholder={t('country.search')} placeholderTextColor={colors.inkSoft}
+                   style={styles.search} accessibilityLabel={t('country.search')} autoCorrect={false} />
         <FlatList
           data={list}
           keyExtractor={([code]) => code}

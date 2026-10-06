@@ -4,6 +4,7 @@ import { Button } from '@/components/Button';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/theme';
 
@@ -27,9 +28,9 @@ export default function AuthCallback() {
 
   return (
     <Screen padded>
-      <Txt style={{ marginTop: space.xxl * 2 }}>{error ? 'No se pudo completar el acceso con Google.' : 'Entrando…'}</Txt>
+      <Txt style={{ marginTop: space.xxl * 2 }}>{error ? t('callback.failed') : t('callback.entering')}</Txt>
       <ErrorText error={error} />
-      {error ? <Button label="Volver a entrar" onPress={() => router.replace('/login')} /> : null}
+      {error ? <Button label={t('auth.backToLogin')} onPress={() => router.replace('/login')} /> : null}
     </Screen>
   );
 }

@@ -30,6 +30,7 @@ log = logging.getLogger("ingest.jobs")
 AVG_SPEED_KMH = 42
 FINISH_MARGIN = dt.timedelta(minutes=15)
 RESULTS_DELAY = dt.timedelta(minutes=30)
+STARTLIST_EARLY = dt.timedelta(minutes=90)  # la lista de salida se carga antes del cierre, para verla al inscribirse
 DEFAULT_START = dt.time(12, 0)
 DEFAULT_DISTANCE = 170.0
 
@@ -152,8 +153,11 @@ def plan_day(db, now: dt.datetime | None = None) -> int:
         store.update_stage_times(db, stage_id, start, finish, distance)
         if number == first:
             store.set_entries_close(db, race_id, start)
-            store.create_task(db, "startlist", race_id, None, start, 8, dt.timedelta(minutes=15))
-        store.create_task(db, "results", race_id, stage_id, finish + RESULTS_DELAY, 6, dt.timedelta(minutes=30))
+            store.create_task(db, "startlist", race_id, None, max(now, start - STARTLIST_EARLY), 12,
+                              dt.timedelta(minutes=30))
+            # al cerrar la inscripción: lista de salida al día y alineaciones de quien no se inscribió
+            store.create_task(db, "lineup", race_id, None, start, 12, dt.timedelta(minutes=10))
+        store.create_task(db, "results", race_id, stage_id, finish + RESULTS_DELAY, 10, dt.timedelta(minutes=30))
         planned += 1
 
     # relectura de ayer (correcciones, descalificaciones)
@@ -169,18 +173,24 @@ def plan_day(db, now: dt.datetime | None = None) -> int:
 def run_task(db, task: dict) -> str:
     slug, season = task["slug"], task["season"]
     if task["kind"] == "startlist":
-        full = sources.fetch_startlist_full(slug, season)
-        slugs = [r["slug"] for r in full] or sources.fetch_startlist(slug, season)
-        if not slugs:
-            raise NotReady("lista de salida vacía")
-        n = store.set_startlist(db, task["race_id"], slugs)
-        if full:
-            store.set_startlist_full(db, task["race_id"], full)
-        db.execute("select public.auto_lineup(%s)", (task["race_id"],))
-        return f"lista de salida: {len(slugs)} ciclistas ({n} del juego); alineaciones automáticas hechas"
+        total, ours = load_startlist(db, task["race_id"], slug, season)
+        return f"lista de salida: {total} ciclistas ({ours} del juego)"
+
+    if task["kind"] == "lineup":
+        try:
+            total, ours = load_startlist(db, task["race_id"], slug, season)
+        except NotReady:
+            # PCS no responde: vale la que ya se cargó por la mañana; si no hay ninguna, se reintenta
+            if not db.scalar("select exists (select 1 from public.startlist where race_id = %s)", (task["race_id"],)):
+                raise
+            total = ours = db.scalar("select count(*) from public.startlist where race_id = %s", (task["race_id"],))
+        n = db.scalar("select public.auto_lineup(%s)", (task["race_id"],))
+        return f"lista de salida: {total} ciclistas ({ours} del juego); alineaciones automáticas: {n} equipos"
 
     res = sources.fetch_results(slug, season, task["number"], task["is_stage_race"])
     if task["kind"] == "results":
+        if not db.scalar("select auto_lineup_done from public.race where id = %s", (task["race_id"],)):
+            raise NotReady("faltan las alineaciones automáticas")
         if not sources.results_complete(res, task["is_stage_race"]):
             raise NotReady("resultados aún incompletos")
         n = store.set_results(db, task["stage_id"], res, task["is_stage_race"])
@@ -197,6 +207,18 @@ def run_task(db, task: dict) -> str:
         db.execute("select public.score_stage(%s)", (task["stage_id"],))
         return "resultados corregidos: puntos recalculados"
     return "sin cambios"
+
+
+def load_startlist(db, race_id: int, slug: str, season: int) -> tuple[int, int]:
+    """Lee la lista de salida de PCS y la guarda (la del juego y la completa). Devuelve (total, del juego)."""
+    full = sources.fetch_startlist_full(slug, season)
+    slugs = [r["slug"] for r in full] or sources.fetch_startlist(slug, season)
+    if not slugs:
+        raise NotReady("lista de salida vacía")
+    ours = store.set_startlist(db, race_id, slugs)
+    if full:
+        store.set_startlist_full(db, race_id, full)
+    return len(slugs), ours
 
 
 def tick(db, now: dt.datetime | None = None) -> list[str]:

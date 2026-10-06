@@ -9,6 +9,7 @@ import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, ordinal, points } from '@/lib/format';
 import { colors, space } from '@/theme';
@@ -29,8 +30,8 @@ export default function Clasificacion() {
   return (
     <Screen onRefresh={reload} refreshing={loading}>
       <View style={{ padding: space.l, paddingTop: space.xl, paddingBottom: 0 }}>
-        <Segmented label="Clasificación" value={mode} onChange={setMode}
-                   options={[{ value: 'total', label: 'General' }, { value: 'week', label: 'Esta semana' }]} />
+        <Segmented label={t('admin.classification')} value={mode} onChange={setMode}
+                   options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />
       </View>
       <Section style={{ marginTop: 0 }}>
         {rows.length ? rows.map((r, i) => {
@@ -48,16 +49,16 @@ export default function Clasificacion() {
                   </Txt>
                   <Flag code={r.country} />
                 </View>
-                <Txt variant="small" numberOfLines={1}>{r.display_name ?? ''} · plantilla {moneyShort(r.team_value)}</Txt>
+                <Txt variant="small" numberOfLines={1}>{r.display_name ?? ''} · {t('standings.squadValue', { amount: moneyShort(r.team_value) })}</Txt>
               </View>
               <Txt variant="number">{points(r.shown)}</Txt>
             </Row>
           );
-        }) : <Empty text={loading ? 'Cargando…' : 'Aún no hay jugadores.'} />}
+        }) : <Empty text={loading ? t('common.loading') : t('standings.empty')} />}
       </Section>
       <ErrorText error={error} />
       <Txt variant="small" style={{ padding: space.l }}>
-        Toca un equipo para ver su plantilla, hacer ofertas o pagar cláusulas.
+        {t('standings.hint')}
       </Txt>
     </Screen>
   );

@@ -208,7 +208,7 @@ export interface RaceDetail {
     top_member: { team_name: string; points: number } | null;
   }[];
   league_total: { member_id: string; team_name: string; points: number; country: string | null }[];
-  gc: { position: number; rider_id: number; name: string; nationality: string | null; scored_for: string[] }[];
+  gc: { position: number; rider_id: number | null; name: string; nationality: string | null; in_game?: boolean; scored_for: string[] }[];
 }
 
 export interface EntryData {

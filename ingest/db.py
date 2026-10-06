@@ -11,8 +11,17 @@ import os
 
 class Database:
     def __init__(self, dsn: str | None = None):
+        self.dsn = dsn or os.environ["DATABASE_URL"]
+        self._conn = None
+
+    @property
+    def conn(self):
+        """Conexión abierta. Si el pooler la ha cerrado (pasa tras horas de inactividad o un corte), abre otra:
+        la consulta que falló no se repite, pero la siguiente ya funciona y el bucle de la ingesta se recupera."""
         import psycopg  # pip install "psycopg[binary]"
-        self.conn = psycopg.connect(dsn or os.environ["DATABASE_URL"], autocommit=True)
+        if self._conn is None or self._conn.closed or self._conn.broken:
+            self._conn = psycopg.connect(self.dsn, autocommit=True)
+        return self._conn
 
     def execute(self, sql: str, params: tuple | list = ()) -> None:
         with self.conn.cursor() as cur:

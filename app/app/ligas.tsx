@@ -9,6 +9,7 @@ import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
 import { space } from '@/theme';
@@ -44,39 +45,40 @@ export default function Ligas() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <Txt variant="hero" style={{ marginTop: insets.top + space.xl, paddingHorizontal: space.l }}>Mis ligas</Txt>
+      <Txt variant="hero" style={{ marginTop: insets.top + space.xl, paddingHorizontal: space.l }}>{t('leagues.title')}</Txt>
       <Section>
         {data?.length ? data.map((l, i) => (
           <Row key={l.league_id} onPress={() => open(l.league_id)} last={i === data.length - 1}>
             <View style={{ flex: 1 }}>
               <Txt variant="lead">{l.name}</Txt>
               <Txt variant="small">
-                {l.team_name} · {l.members} {l.members === 1 ? 'jugador' : 'jugadores'}{l.is_admin ? ' · administras esta liga' : ''}
+                {l.team_name} · {t(l.members === 1 ? 'leagues.players.one' : 'leagues.players.other', { n: l.members })}
+                {l.is_admin ? ` · ${t('leagues.admin')}` : ''}
               </Txt>
             </View>
-            {l.league_id === leagueId ? <Txt variant="label">Abierta</Txt> : null}
+            {l.league_id === leagueId ? <Txt variant="label">{t('leagues.open')}</Txt> : null}
           </Row>
-        )) : <Empty text={loading ? 'Cargando…' : 'Todavía no estás en ninguna liga. Crea una o únete con un código.'} />}
+        )) : <Empty text={loading ? t('common.loading') : t('leagues.empty')} />}
       </Section>
       <ErrorText error={error} />
 
       <View style={{ padding: space.l }}>
-        <Button label="Crear una liga" onPress={() => router.push('/liga/crear')} />
+        <Button label={t('leagues.create')} onPress={() => router.push('/liga/crear')} />
       </View>
 
-      <Section title="Unirme con un código">
+      <Section title={t('leagues.joinWithCode')}>
         <View style={{ padding: space.l }}>
-          <Input label="Código de invitación" value={code} onChangeText={(t) => setCode(t.toUpperCase())}
+          <Input label={t('leagues.inviteCode')} value={code} onChangeText={(t) => setCode(t.toUpperCase())}
                  autoCapitalize="characters" maxLength={6} />
-          <Input label="Nombre de tu equipo" value={team} onChangeText={setTeam} maxLength={40} />
+          <Input label={t('team.yourTeamName')} value={team} onChangeText={setTeam} maxLength={40} />
           <CountryPicker value={country} onChange={setCountry} />
           <ErrorText error={joinError} />
-          <Button label="Unirme" kind="secondary" onPress={join} busy={busy}
+          <Button label={t('leagues.join')} kind="secondary" onPress={join} busy={busy}
                   disabled={code.length < 6 || !team.trim() || !country} />
         </View>
       </Section>
       <View style={{ padding: space.l }}>
-        <Button label="Mi perfil" kind="quiet" onPress={() => router.push('/perfil')} />
+        <Button label={t('topbar.profile')} kind="quiet" onPress={() => router.push('/perfil')} />
       </View>
     </Screen>
   );

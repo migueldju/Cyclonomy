@@ -8,6 +8,7 @@ import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, points } from '@/lib/format';
 import type { RankingRow } from '@/lib/types';
@@ -55,7 +56,7 @@ export default function Ranking() {
       && (!q || normalize(r.name).includes(q) || normalize(r.pro_team ?? '').includes(q)));
   }, [ranked, query, owner, low, high]);
 
-  const ownerChips: [Owner, string][] = [['all', 'Todos'], ['free', 'Libres'], ['mine', 'Míos'], ...owners];
+  const ownerChips: [Owner, string][] = [['all', t('ranking.all')], ['free', t('ranking.free')], ['mine', t('ranking.mine')], ...owners];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.road }}>
@@ -68,28 +69,28 @@ export default function Ranking() {
         // los filtros se desplazan con la lista: en pantallas bajas no tapan los ciclistas
         ListHeaderComponent={
           <View style={styles.filters}>
-            <Txt variant="hero">Ranking</Txt>
-            <TextInput value={query} onChangeText={setQuery} placeholder="Buscar ciclista o equipo"
-                       placeholderTextColor={colors.inkSoft} style={styles.search} accessibilityLabel="Buscar ciclista o equipo" />
-            <Chips label="Propietario" items={ownerChips} value={owner} onChange={setOwner} />
+            <Txt variant="hero">{t('ranking.title')}</Txt>
+            <TextInput value={query} onChangeText={setQuery} placeholder={t('ranking.search')}
+                       placeholderTextColor={colors.inkSoft} style={styles.search} accessibilityLabel={t('ranking.search')} />
+            <Chips label={t('ranking.owner')} items={ownerChips} value={owner} onChange={setOwner} />
             <View style={{ gap: space.xs }}>
               <View style={styles.valueHead}>
-                <Txt variant="label">Valor de mercado</Txt>
+                <Txt variant="label">{t('rider.marketValue')}</Txt>
                 <Txt variant="label" style={{ color: colors.ink }}>
-                  {low === 0 && high === LAST_STEP ? 'Cualquier valor'
-                    : high === LAST_STEP ? `Desde ${moneyShort(VALUE_STEPS[low])}`
-                    : low === 0 ? `Hasta ${moneyShort(VALUE_STEPS[high])}`
+                  {low === 0 && high === LAST_STEP ? t('ranking.anyValue')
+                    : high === LAST_STEP ? t('ranking.from', { amount: moneyShort(VALUE_STEPS[low]) })
+                    : low === 0 ? t('ranking.upTo', { amount: moneyShort(VALUE_STEPS[high]) })
                     : `${moneyShort(VALUE_STEPS[low])} – ${moneyShort(VALUE_STEPS[high])}`}
                 </Txt>
               </View>
-              <RangeSlider steps={VALUE_STEPS.length} low={low} high={high} label="Valor de mercado"
+              <RangeSlider steps={VALUE_STEPS.length} low={low} high={high} label={t('rider.marketValue')}
                            onChange={(l, h) => { setLow(l); setHigh(h); }} />
             </View>
           </View>
         }
         ListFooterComponent={<ErrorText error={error} />}
         ListEmptyComponent={<Txt variant="small" style={{ padding: space.l }}>
-          {loading ? 'Cargando…' : 'Ningún ciclista coincide con los filtros.'}
+          {loading ? t('common.loading') : t('ranking.noMatch')}
         </Txt>}
         renderItem={({ item }) => <RankRow r={item} />}
       />
@@ -98,7 +99,7 @@ export default function Ranking() {
 }
 
 function RankRow({ r }: { r: RankingRow & { rank: number } }) {
-  const owner = r.is_mine ? 'tuyo' : r.owner_team ?? 'libre';
+  const owner = r.is_mine ? t('rider.yours') : r.owner_team ?? t('rider.free');
   return (
     <Pressable onPress={() => router.push(`/ciclista/${r.rider_id}`)} accessibilityRole="button"
                style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.road }]}>
@@ -110,7 +111,7 @@ function RankRow({ r }: { r: RankingRow & { rank: number } }) {
           <Flag code={r.nationality} />
         </View>
         <Txt variant="small" numberOfLines={1}>
-          {r.pro_team ?? 'Sin equipo'} · <Txt variant="small" style={r.is_mine ? styles.mine : undefined}>{owner}</Txt>
+          {r.pro_team ?? t('rider.noTeam')} · <Txt variant="small" style={r.is_mine ? styles.mine : undefined}>{owner}</Txt>
         </Txt>
       </View>
       <View style={{ alignItems: 'flex-end' }}>

@@ -5,6 +5,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { t } from '@/i18n';
 import { resetRedirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { colors, space } from '@/theme';
@@ -27,30 +28,28 @@ export default function Recuperar() {
 
   return (
     <Screen padded>
-      <Txt variant="display" style={{ marginTop: space.xxl * 2 }}>Recuperar la contraseña</Txt>
+      <Txt variant="display" style={{ marginTop: space.xxl * 2 }}>{t('reset.title')}</Txt>
       {sent ? (
         <>
           <Txt style={{ marginVertical: space.l }}>
-            Si hay una cuenta con {email.trim()}, te hemos enviado un enlace para poner una contraseña nueva. Ábrelo
-            en este mismo dispositivo.
+            {t('reset.sent', { email: email.trim() })}
           </Txt>
           <Txt variant="small" style={{ marginBottom: space.l }}>
-            Si entraste siempre con Google, no tienes contraseña: puedes seguir entrando con «Continuar con Google»,
-            o usar el enlace para crear una.
+            {t('reset.googleNote')}
           </Txt>
         </>
       ) : (
         <>
           <Txt style={{ marginVertical: space.l }}>
-            Escribe el email de tu cuenta y te mandaremos un enlace para poner una contraseña nueva.
+            {t('reset.intro')}
           </Txt>
-          <Input label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
+          <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
                  autoComplete="email" textContentType="emailAddress" />
           <ErrorText error={error} />
-          <Button label="Enviar el enlace" onPress={send} busy={busy} disabled={!email.includes('@')} />
+          <Button label={t('reset.send')} onPress={send} busy={busy} disabled={!email.includes('@')} />
         </>
       )}
-      <Button label="Volver a entrar" kind="quiet" onPress={() => router.replace('/login')}
+      <Button label={t('auth.backToLogin')} kind="quiet" onPress={() => router.replace('/login')}
               style={{ marginTop: space.m, borderColor: colors.line }} />
     </Screen>
   );

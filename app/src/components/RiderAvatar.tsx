@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Ellipse, G, Path } from 'react-native-svg';
+import { t } from '../i18n';
 import { teamKit } from '../lib/teamKits';
 import { colors } from '../theme';
 
@@ -18,7 +19,7 @@ export function RiderAvatar({ url, name, team, size = 40 }: {
 
   if (!url || failed) {
     return (
-      <View style={[styles.base, styles.figureBg, circle]} accessible accessibilityLabel={`${name}: sin foto`}>
+      <View style={[styles.base, styles.figureBg, circle]} accessible accessibilityLabel={t('avatar.noPhoto', { name })}>
         <Cyclist team={team} name={name} size={size} />
       </View>
     );
@@ -28,7 +29,7 @@ export function RiderAvatar({ url, name, team, size = 40 }: {
   const imgH = tall ? size * ratio! : size;
   return (
     <View style={[styles.base, circle]}>
-      <Image source={{ uri: url }} accessibilityLabel={`Foto de ${name}`} resizeMode="cover" onError={() => setFailed(true)}
+      <Image source={{ uri: url }} accessibilityLabel={t('avatar.photo', { name })} resizeMode="cover" onError={() => setFailed(true)}
              style={{ width: size, height: imgH, top: tall ? -(imgH - size) * 0.15 : 0 }} />
     </View>
   );

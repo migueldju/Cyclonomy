@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { t } from '../i18n';
 import { moneyShort } from '../lib/format';
 import type { RiderStatus } from '../lib/types';
 import { colors, space } from '../theme';
@@ -49,4 +50,4 @@ const styles = StyleSheet.create({
 });
 
 export const riderStatusNote = (status: RiderStatus) =>
-  status === 'incoming' ? 'llega el lunes' : status === 'leaving' ? 'se va el lunes' : undefined;
+  status === 'incoming' ? t('status.incoming') : status === 'leaving' ? t('status.leaving') : undefined;

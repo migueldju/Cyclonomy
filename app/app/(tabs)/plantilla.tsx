@@ -9,6 +9,7 @@ import { StatusDot } from '@/components/StatusDot';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
+import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateTime, money, moneyShort, points } from '@/lib/format';
 import type { OfferRow } from '@/lib/types';
@@ -39,29 +40,30 @@ export default function Plantilla() {
   return (
     <Screen onRefresh={done} refreshing={roster.loading}>
       <View style={styles.summary}>
-        <Stat label="Valor de la plantilla" value={moneyShort(me?.team_value)} />
-        <Stat label="Puntos en la liga" value={points(totalPoints)} />
-        <Stat label="Ciclistas" value={me ? `${me.roster_count}/${me.max_riders}` : '—'} />
-        <Stat label="Saldo" value={moneyShort(me?.balance)} color={(me?.balance ?? 0) < 0 ? colors.red : colors.green} />
+        <Stat label={t('squad.value')} value={moneyShort(me?.team_value)} />
+        <Stat label={t('squad.points')} value={points(totalPoints)} />
+        <Stat label={t('admin.riders')} value={me ? `${me.roster_count}/${me.max_riders}` : '—'} />
+        <Stat label={t('squad.balance')} value={moneyShort(me?.balance)} color={(me?.balance ?? 0) < 0 ? colors.red : colors.green} />
       </View>
 
       {offers.data?.length ? (
-        <Section title="Ofertas">
+        <Section title={t('squad.offers')}>
           {offers.data.map((o, i) => (
             <Row key={o.offer_id} last={i === offers.data!.length - 1}>
               <View style={{ flex: 1 }}>
                 <Txt variant="lead">{o.rider_name}</Txt>
                 <Txt variant="small">
-                  {o.direction === 'received' ? `${o.other_team} te ofrece` : `Ofreces a ${o.other_team}`} {money(o.amount)} ·
-                  caduca {dateTime(o.expires_at)}
+                  {o.direction === 'received' ? t('squad.offerReceived', { team: o.other_team, amount: money(o.amount) })
+                    : t('squad.offerSent', { team: o.other_team, amount: money(o.amount) })}
+                  {' · '}{t('squad.expires', { when: dateTime(o.expires_at) })}
                 </Txt>
               </View>
               {o.direction === 'received' ? (
                 <View style={{ gap: space.xs }}>
-                  <Button small label="Aceptar" onPress={() => respond(o, true)} />
-                  <Button small kind="quiet" label="Rechazar" onPress={() => respond(o, false)} />
+                  <Button small label={t('squad.accept')} onPress={() => respond(o, true)} />
+                  <Button small kind="quiet" label={t('squad.reject')} onPress={() => respond(o, false)} />
                 </View>
-              ) : <Button small kind="secondary" label="Retirar" onPress={() => respond(o, false)} />}
+              ) : <Button small kind="secondary" label={t('squad.withdraw')} onPress={() => respond(o, false)} />}
             </Row>
           ))}
         </Section>
@@ -69,8 +71,8 @@ export default function Plantilla() {
       <ErrorText error={offerError} />
 
       <View style={styles.legend}>
-        <View style={styles.legendItem}><StatusDot status="incoming" /><Txt variant="small">Llega el lunes: aún no se puede inscribir</Txt></View>
-        <View style={styles.legendItem}><StatusDot status="leaving" /><Txt variant="small">Se va el lunes por un traspaso</Txt></View>
+        <View style={styles.legendItem}><StatusDot status="incoming" /><Txt variant="small">{t('squad.legendIncoming')}</Txt></View>
+        <View style={styles.legendItem}><StatusDot status="leaving" /><Txt variant="small">{t('squad.legendLeaving')}</Txt></View>
       </View>
 
       <Section>
@@ -82,14 +84,14 @@ export default function Plantilla() {
             photo={r.photo_url}
             nationality={r.nationality}
             status={r.status}
-            note={[riderStatusNote(r.status), r.for_sale ? 'en venta' : null,
-                   r.game_offer_amount ? `el juego ofrece ${moneyShort(r.game_offer_amount)}` : null].filter(Boolean).join(' · ')}
+            note={[riderStatusNote(r.status), r.for_sale ? t('squad.forSale') : null,
+                   r.game_offer_amount ? t('squad.gameOffers', { amount: moneyShort(r.game_offer_amount) }) : null].filter(Boolean).join(' · ')}
             value={r.market_value}
-            detail={`${points(r.league_points)} · cláusula ${moneyShort(r.clause)}`}
+            detail={`${points(r.league_points)} · ${t('squad.clause', { amount: moneyShort(r.clause) })}`}
             onPress={() => router.push(`/ciclista/${r.rider_id}`)}
             last={i === rows.length - 1}
           />
-        )) : <Empty text={roster.loading ? 'Cargando…' : 'Tu plantilla está vacía.'} />}
+        )) : <Empty text={roster.loading ? t('common.loading') : t('squad.empty')} />}
       </Section>
       <ErrorText error={roster.error} />
     </Screen>
