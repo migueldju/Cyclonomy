@@ -1,17 +1,21 @@
-# Ingesta programada en GitHub Actions (alternativa a `python -m ingest run` en un servidor).
-# Configura el secreto DATABASE_URL en el repositorio. Los horarios de GitHub van en UTC y pueden
+# Ingesta programada en GitHub Actions (sustituye a `python -m ingest run` en un ordenador encendido).
+# Necesita el secreto DATABASE_URL en el repositorio. Los horarios de GitHub van en UTC y pueden
 # retrasarse unos minutos; plan_day es idempotente, por eso se lanza a las 22:00 y 23:00 UTC
-# (00:00 de Madrid en verano y en invierno).
+# (00:00 de Madrid en verano y en invierno) y otra vez por la mañana por si GitHub se salta alguna.
 # AVISO: PCS suele bloquear IPs de servidores en la nube; si ves fallos 403, pide permiso a PCS
 # o usa la carga manual desde la app.
 name: ingesta
 on:
   schedule:
     - cron: "*/5 * * * *"      # tareas pendientes
-    - cron: "0 22,23 * * *"    # plan del día
+    - cron: "0 22,23,5 * * *"  # plan del día (y repaso por la mañana)
     - cron: "0 2 * * 1"        # equipos (lunes)
     - cron: "30 2 * * 1"       # calendario (lunes)
   workflow_dispatch:
+# una ejecución detrás de otra: nunca dos a la vez sobre las mismas tareas
+concurrency:
+  group: ingesta
+  cancel-in-progress: false
 jobs:
   ingest:
     runs-on: ubuntu-latest
@@ -29,8 +33,9 @@ jobs:
           ALERT_WEBHOOK: ${{ secrets.ALERT_WEBHOOK }}
         run: |
           case "${{ github.event.schedule }}" in
-            "0 22,23 * * *") python -m ingest plan && python -m ingest tick ;;
-            "0 2 * * 1")     python -m ingest teams --season $(date +%Y) ;;
-            "30 2 * * 1")    python -m ingest calendar --season $(date +%Y) ;;
+            "0 22,23,5 * * *") python -m ingest plan && python -m ingest tick ;;
+            # temporada por defecto: la del juego (la de los equipos cargados), no el año natural
+            "0 2 * * 1")     python -m ingest teams ;;
+            "30 2 * * 1")    python -m ingest calendar ;;
             *)               python -m ingest tick ;;
           esac
