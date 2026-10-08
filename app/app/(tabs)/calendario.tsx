@@ -1,15 +1,17 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
+import { BottomFill } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
-import { t } from '@/i18n';
+import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
-import { dateRange, dateTime, dayMonth, ordinal, points, todayISO } from '@/lib/format';
+import { dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
+import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
 import { categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
 
@@ -17,82 +19,151 @@ export default function Calendario() {
   const { leagueId } = useLeague();
   const id = leagueId ?? '';
   const { data, error, loading, reload } = useLoader(() => api.calendar(id), [id], !!leagueId);
-  const [query, setQuery] = useState('');
-  const [cat, setCat] = useState<string | null>(null);
   const [open, setOpen] = useState<number | null>(null);
-  const list = useRef<FlatList<CalendarRow>>(null);
-  const scrolled = useRef(false);
+  const [day, setDay] = useState(todayISO());
+  const { width } = useWindowDimensions();
+  const pager = useRef<FlatList<string>>(null);
 
-  const categories = useMemo(() => {
-    const seen = new Map<string, string>();
-    (data ?? []).forEach((r) => seen.set(r.category, categoryName(r.category)));
-    return [...seen.entries()].sort((a, b) => categoryRank(a[0]) - categoryRank(b[0]));
+  const rows = data ?? [];
+
+  // meses entre la primera y la última carrera (y siempre el actual)
+  const months = useMemo(() => {
+    const all = [todayISO(), ...(data ?? []).flatMap((r) => [r.start_date, r.end_date])].map((d) => d.slice(0, 7)).sort();
+    const out: string[] = [];
+    let [y, m] = all[0].split('-').map(Number);
+    const last = all[all.length - 1];
+    while (`${y}-${String(m).padStart(2, '0')}` <= last) {
+      out.push(`${y}-${String(m).padStart(2, '0')}`);
+      m += 1;
+      if (m > 12) { m = 1; y += 1; }
+    }
+    return out;
   }, [data]);
+  const startIndex = Math.max(0, months.indexOf(todayISO().slice(0, 7)));
 
-  const rows = useMemo(() => {
-    const q = normalize(query);
-    return (data ?? []).filter((r) => (!cat || r.category === cat) && (!q || normalize(r.name).includes(q)));
-  }, [data, query, cat]);
+  const dayRaces = rows.filter((r) => r.start_date <= day && day <= r.end_date)
+    .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
 
-  // Al abrir, el scroll se coloca en la carrera en curso o la siguiente
-  const nearest = Math.max(0, rows.findIndex((r) => r.end_date >= todayISO()));
-  useEffect(() => {
-    if (!rows.length || scrolled.current) return;
-    scrolled.current = true;
-    setTimeout(() => list.current?.scrollToIndex({ index: nearest, animated: false }), 50);
-  }, [rows.length, nearest]);
-
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.road }}>
-      <View style={styles.filters}>
-        <TextInput value={query} onChangeText={setQuery} placeholder={t('calendar.search')} placeholderTextColor={colors.inkSoft}
-                   style={styles.search} accessibilityLabel={t('calendar.search')} />
-        <FlatList
-          horizontal showsHorizontalScrollIndicator={false}
-          data={[[null, t('calendar.all')] as [string | null, string], ...categories]}
-          keyExtractor={(c) => String(c[0])}
-          contentContainerStyle={{ gap: space.s }}
-          renderItem={({ item: [code, name] }) => {
-            const on = cat === code;
-            return (
-              <Pressable onPress={() => { setCat(code); scrolled.current = false; }} accessibilityRole="button"
-                         accessibilityState={{ selected: on }} style={[styles.chip, on && styles.chipOn]}>
-                {code ? <View style={[styles.dot, { backgroundColor: categoryColor[code] ?? colors.line }]} /> : null}
-                <Txt style={[styles.chipText, on && { color: colors.paper }]}>{name}</Txt>
-              </Pressable>
-            );
-          }}
-        />
-      </View>
-      <ErrorText error={error} />
+  const header = (
+    <>
+      {/* un mes por página: se desliza a izquierda y derecha */}
       <FlatList
-        ref={list}
-        data={rows}
-        keyExtractor={(r) => String(r.race_id)}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
-        onScrollToIndexFailed={(info) => {
-          list.current?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: false });
-          setTimeout(() => list.current?.scrollToIndex({ index: info.index, animated: false }), 100);
-        }}
-        ListEmptyComponent={<Txt variant="small" style={{ padding: space.l }}>
-          {loading ? t('common.loading') : t('calendar.noMatch')}
-        </Txt>}
-        renderItem={({ item }) => (
-          <RaceItem r={item} open={open === item.race_id} leagueId={id}
-                    onToggle={() => setOpen(open === item.race_id ? null : item.race_id)} />
+        ref={pager}
+        key={months.length}
+        horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+        data={months}
+        keyExtractor={(m) => m}
+        initialScrollIndex={startIndex}
+        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+        renderItem={({ item, index }) => (
+          <MonthGrid month={item} width={width} races={rows} selected={day} onSelect={setDay}
+                     onPrev={index > 0 ? () => pager.current?.scrollToIndex({ index: index - 1 }) : undefined}
+                     onNext={index < months.length - 1 ? () => pager.current?.scrollToIndex({ index: index + 1 }) : undefined} />
         )}
       />
+      <Txt variant="label" style={styles.dayTitle}>{dayTitle(day)}</Txt>
+      <ErrorText error={error} />
+    </>
+  );
+
+  return (
+    <FlatList
+      style={{ flex: 1, backgroundColor: colors.road }}
+      data={dayRaces}
+      keyExtractor={(r) => String(r.race_id)}
+      ListHeaderComponent={header}
+      ListFooterComponent={<BottomFill />}
+      contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
+      ListEmptyComponent={<Txt variant="small" style={{ paddingHorizontal: space.l }}>
+        {loading ? t('common.loading') : t('calendar.noRacesDay')}
+      </Txt>}
+      renderItem={({ item }) => (
+        <RaceItem r={item} day={day} open={open === item.race_id} leagueId={id}
+                  onToggle={() => setOpen(open === item.race_id ? null : item.race_id)} />
+      )}
+    />
+  );
+}
+
+/** Título de un mes en el idioma de la app ("octubre de 2026"); sin Intl, el mes abreviado */
+function monthTitle(month: string): string {
+  const [y, m] = month.split('-').map(Number);
+  try {
+    return capitalize(new Intl.DateTimeFormat(getLang(), { month: 'long', year: 'numeric' }).format(new Date(y, m - 1, 15)));
+  } catch {
+    return `${t('fmt.months').split(',')[m - 1]} ${y}`;
+  }
+}
+
+function dayTitle(day: string): string {
+  const d = parseDay(day);
+  return capitalize(`${t('fmt.weekdays').split(',')[d.getDay()]} ${dayMonth(day)}`);
+}
+
+const capitalize = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
+
+const iso = (y: number, m: number, d: number) =>
+  `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+/** Cuadrícula de un mes (semanas de lunes a domingo); cada día, una rayita del color de la categoría por carrera */
+function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: {
+  month: string; width: number; races: CalendarRow[]; selected: string; onSelect: (d: string) => void;
+  onPrev?: () => void; onNext?: () => void;
+}) {
+  const [y, m] = month.split('-').map(Number);
+  const days = new Date(y, m, 0).getDate();
+  const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;            // huecos antes del día 1 (la semana empieza en lunes)
+  const cells: (number | null)[] = [...Array(lead).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
+  while (cells.length % 7) cells.push(null);
+  const wd = t('fmt.weekdays').split(',');
+  const weekdays = [...wd.slice(1), wd[0]];
+  const today = todayISO();
+  const cell = (width - space.l * 2) / 7;
+  return (
+    <View style={{ width, paddingHorizontal: space.l }}>
+      <View style={styles.monthHead}>
+        <Pressable onPress={onPrev} disabled={!onPrev} hitSlop={10} accessibilityRole="button">
+          <Txt variant="title" style={!onPrev && { opacity: 0.25 }}>‹</Txt>
+        </Pressable>
+        <Txt variant="title">{monthTitle(month)}</Txt>
+        <Pressable onPress={onNext} disabled={!onNext} hitSlop={10} accessibilityRole="button">
+          <Txt variant="title" style={!onNext && { opacity: 0.25 }}>›</Txt>
+        </Pressable>
+      </View>
+      <View style={styles.grid}>
+        {weekdays.map((w) => <Txt key={w} variant="label" style={[styles.weekday, { width: cell }]}>{w}</Txt>)}
+        {cells.map((d, i) => {
+          if (d == null) return <View key={`x${i}`} style={{ width: cell, height: 50 }} />;
+          const date = iso(y, m, d);
+          const here = races.filter((r) => r.start_date <= date && date <= r.end_date)
+            .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
+          const on = date === selected;
+          return (
+            <Pressable key={date} onPress={() => onSelect(date)} accessibilityRole="button" accessibilityState={{ selected: on }}
+                       style={[styles.day, { width: cell }, on && styles.dayOn, date === today && !on && styles.dayToday]}>
+              <Txt style={[styles.dayNum, on && { color: colors.paper }]}>{d}</Txt>
+              <View style={styles.bars}>
+                {here.slice(0, 3).map((r) => (
+                  <View key={r.race_id} style={[styles.bar, { backgroundColor: categoryColor[r.category] ?? colors.inkSoft }]} />
+                ))}
+                {here.length > 3 ? <Txt style={[styles.more, on && { color: colors.paper }]}>+{here.length - 3}</Txt> : null}
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
-function normalize(s: string) {
-  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-}
-
 const status = (s: 'upcoming' | 'live' | 'finished') => t(`calendar.status.${s}`);
 
-function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boolean; onToggle: () => void; leagueId: string }) {
+function RaceItem({ r, day, open, onToggle, leagueId }: {
+  r: CalendarRow; day: string; open: boolean; onToggle: () => void; leagueId: string;
+}) {
+  const stage = r.stages.find((x) => x.date === day);
+  const last = Math.max(0, ...r.stages.map((x) => x.number));
   return (
     <View style={styles.item}>
       <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.itemHead}>
@@ -101,9 +172,8 @@ function RaceItem({ r, open, onToggle, leagueId }: { r: CalendarRow; open: boole
         <View style={styles.flagCol}><Flag code={r.country} /></View>
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
-          <Txt variant="small">
-            {dateRange(r.start_date, r.end_date)} · {categoryName(r.category)}
-            {r.is_stage_race ? ` · ${t('calendar.stages', { n: r.n_stages })}` : ''} · {status(r.status)}
+          <Txt variant="small" numberOfLines={1}>
+            {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryName(r.category)} · {status(r.status)}
           </Txt>
         </View>
         <Txt variant="label">{open ? t('common.close') : t('common.see')}</Txt>
@@ -195,7 +265,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
                       <View style={styles.flagCell}><Flag code={g.nationality} /></View>
                       <Txt numberOfLines={1} style={[{ flex: 1 }, g.rider_id == null && { color: colors.inkSoft }]}>{g.name}</Txt>
                       <Txt variant="small" numberOfLines={1} style={[styles.teamCol, g.scored_for.length ? styles.scoredFor : null]}>
-                        {g.rider_id == null ? t('stage.notInGame') : g.scored_for.length ? g.scored_for.join(', ') : '—'}
+                        {g.rider_id == null ? '' : g.scored_for.length ? g.scored_for.join(', ') : '—'}
                       </Txt>
                     </>
                   );
@@ -220,18 +290,20 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
 }
 
 const styles = StyleSheet.create({
-  filters: { padding: space.l, gap: space.m, backgroundColor: colors.road },
-  search: {
-    backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 6, paddingHorizontal: space.m,
-    paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
+  monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: space.m, paddingBottom: space.xs },
+  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  weekday: { textAlign: 'center', paddingBottom: space.xs, textTransform: 'capitalize' },
+  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 8 },
+  dayOn: { backgroundColor: colors.ink },
+  dayToday: { borderWidth: 1.5, borderColor: colors.ink },
+  dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
+  bars: {
+    flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 2, marginTop: 4,
+    paddingHorizontal: 3,
   },
-  chip: {
-    flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: space.m, paddingVertical: 7,
-    borderRadius: 16, borderWidth: 1.5, borderColor: colors.line, backgroundColor: colors.paper,
-  },
-  chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
-  dot: { width: 8, height: 8, borderRadius: 4 },
+  bar: { width: 9, height: 4, borderRadius: 2 },
+  more: { fontFamily: fonts.bodyMedium, fontSize: 9, color: colors.inkSoft },
+  dayTitle: { paddingHorizontal: space.l, paddingTop: space.xs, paddingBottom: space.xs },
   item: { backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },

@@ -3260,6 +3260,124 @@ alter table public.ingest_task add constraint ingest_task_kind_check
   check (kind in ('startlist', 'lineup', 'results', 'recheck'));
 
 
+-- ============================================================ migrations/0023_league_moves.sql
+-- =====================================================================================
+-- 0023 · Movimientos de la liga (noticias del inicio e histórico del mercado), sacados del libro de cuentas:
+--        fichajes del mercado, compras a otros jugadores, clausulazos, ofertas aceptadas y ventas al juego
+-- =====================================================================================
+
+create or replace function public.get_league_moves(p_league uuid, p_member uuid default null,
+                                                   p_limit integer default 50, p_before timestamptz default null)
+returns table (id bigint, created_at timestamptz, kind text, amount bigint, rider_id bigint, rider_name text,
+               nationality text, pro_team text, buyer_id uuid, buyer_team text, seller_id uuid, seller_team text)
+language plpgsql stable security definer set search_path = public as $$
+#variable_conflict use_column
+declare me public.league_member := public.my_member(p_league);   -- solo para los miembros de la liga
+begin
+  return query
+  with moves as (
+    -- el lado que compra (o el que vende al juego) da el movimiento; la otra parte, el apunte gemelo
+    select l.id, l.created_at, l.rider_id, abs(l.amount)::bigint as amount,
+           case l.kind
+             when 'market_buy' then case when s.id is null then 'signing' else 'purchase' end
+             when 'clause_paid' then 'clause'
+             when 'offer_paid' then 'offer'
+             else 'sale_game' end as kind,
+           case when l.kind = 'sale_game' then null else l.member_id end as buyer_id,
+           case when l.kind = 'sale_game' then l.member_id else s.member_id end as seller_id
+    from public.ledger l
+    join public.league_member m on m.id = l.member_id and m.league_id = p_league
+    left join lateral (
+      select x.id, x.member_id from public.ledger x
+      join public.league_member xm on xm.id = x.member_id and xm.league_id = p_league
+      where x.rider_id = l.rider_id and x.created_at = l.created_at
+        and x.kind = case l.kind when 'market_buy' then 'market_sale' when 'clause_paid' then 'clause_received'
+                                 when 'offer_paid' then 'offer_received' end
+      limit 1) s on true
+    where l.kind in ('market_buy', 'clause_paid', 'offer_paid', 'sale_game')
+      and (p_before is null or l.created_at < p_before)
+  )
+  select mv.id, mv.created_at, mv.kind, mv.amount, mv.rider_id, r.name, r.nationality, t.name,
+         mv.buyer_id, b.team_name, mv.seller_id, sl.team_name
+  from moves mv
+  join public.rider r on r.id = mv.rider_id
+  left join public.team t on t.id = r.team_id
+  left join public.league_member b on b.id = mv.buyer_id
+  left join public.league_member sl on sl.id = mv.seller_id
+  where p_member is null or mv.buyer_id = p_member or mv.seller_id = p_member
+  order by mv.created_at desc, mv.id desc
+  limit least(greatest(p_limit, 1), 200);
+end $$;
+
+revoke all on function public.get_league_moves(uuid, uuid, integer, timestamptz) from public, anon;
+grant execute on function public.get_league_moves(uuid, uuid, integer, timestamptz) to authenticated;
+
+
+-- ============================================================ migrations/0024_stage_labels.sql
+-- =====================================================================================
+-- 0024 · Etapa del día: el calendario devuelve las etapas de cada carrera (número y fecha) y las carreras de hoy,
+--        si son por etapas y cuántas tienen, para mostrar «Etapa 2/21» o «Carrera de un día»
+-- =====================================================================================
+
+drop function if exists public.get_calendar(uuid, date);
+create function public.get_calendar(p_league uuid, p_from date default null)
+returns table (race_id bigint, name text, category text, category_name text, country text,
+               start_date date, end_date date, is_stage_race boolean, n_stages integer,
+               entries_close_at timestamptz, entries_open boolean, max_entries integer,
+               my_entry_count integer, status text, stages jsonb)
+language plpgsql stable security definer set search_path = public as $$
+declare
+  me public.league_member := public.my_member(p_league);
+  lg public.league;
+  v_today date := (public.app_now() at time zone 'Europe/Madrid')::date;
+begin
+  select * into lg from public.league where id = p_league;
+  return query
+  select rc.id, rc.name, rc.category, c.name, rc.country, rc.start_date, rc.end_date, rc.is_stage_race,
+         (select count(*)::int from public.stage s where s.race_id = rc.id),
+         rc.entries_close_at, public.app_now() < rc.entries_close_at, c.max_entries::int,
+         (select count(*)::int from public.race_entry e join public.race_entry_rider er on er.entry_id = e.id
+           where e.race_id = rc.id and e.member_id = me.id),
+         case when rc.end_date < v_today then 'finished'
+              when public.app_now() >= rc.entries_close_at then 'live'
+              else 'upcoming' end,
+         coalesce((select jsonb_agg(jsonb_build_object('number', s.number, 'date', s.date) order by s.number)
+                   from public.stage s where s.race_id = rc.id), '[]'::jsonb)
+  from public.race rc join public.race_category c on c.code = rc.category
+  where c.depth_level <= lg.calendar_depth
+    and rc.start_date >= coalesce(p_from, make_date(extract(year from v_today)::int, 1, 1))
+  order by rc.start_date, rc.name;
+end $$;
+revoke all on function public.get_calendar(uuid, date) from public, anon;
+grant execute on function public.get_calendar(uuid, date) to authenticated;
+
+drop function if exists public.get_today(uuid);
+create function public.get_today(p_league uuid)
+returns table (stage_id bigint, race_id bigint, race_name text, category text, number integer, start_at timestamptz,
+               est_finish_at timestamptz, distance_km numeric, status text, my_points integer, country text,
+               is_stage_race boolean, last_stage integer)
+language plpgsql stable security definer set search_path = public as $$
+declare
+  me public.league_member := public.my_member(p_league);
+  lg public.league;
+  v_today date := (public.app_now() at time zone 'Europe/Madrid')::date;
+begin
+  select * into lg from public.league where id = p_league;
+  return query
+  select s.id, rc.id, rc.name, rc.category, s.number::int, s.start_at, s.est_finish_at, s.distance_km, s.status,
+         (select coalesce(sum(ms.points), 0)::int from public.member_score ms
+           where ms.stage_id = s.id and ms.member_id = me.id),
+         rc.country, rc.is_stage_race,
+         (select max(x.number)::int from public.stage x where x.race_id = rc.id)
+  from public.stage s join public.race rc on rc.id = s.race_id
+  join public.race_category c on c.code = rc.category
+  where s.date = v_today and c.depth_level <= lg.calendar_depth
+  order by s.start_at nulls last, rc.name;
+end $$;
+revoke all on function public.get_today(uuid) from public, anon;
+grant execute on function public.get_today(uuid) to authenticated;
+
+
 -- ============================================================ seed.sql
 -- Generado por tools/build_seed.py. No editar a mano: edita los CSV de supabase/seed/.
 begin;

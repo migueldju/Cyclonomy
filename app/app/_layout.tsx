@@ -7,6 +7,7 @@ import { FiraSansCondensed_700Bold } from '@expo-google-fonts/fira-sans-condense
 import { useFonts } from 'expo-font';
 import { Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,6 +19,8 @@ import { resetTo } from '@/lib/nav';
 import { colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+// fondo de la vista raíz: es lo que se ve en la franja del sistema bajo la barra de pestañas (asfalto, como la barra)
+SystemUI.setBackgroundColorAsync(colors.asphalt).catch(() => {});
 
 const AUTH_SCREENS = ['login', 'registro', 'recuperar', 'auth'];
 const NO_LEAGUE_SCREENS = ['ligas', 'liga', 'unirse', 'perfil', 'admin'];

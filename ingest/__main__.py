@@ -92,6 +92,17 @@ def main(argv=None):
         run_forever(db, args.season)
 
 
+def keep_awake(log) -> None:
+    """En Windows, pide que el equipo no se suspenda mientras corre la ingesta (como un reproductor de vídeo).
+    No cambia la configuración de energía y deja de valer al cerrar el proceso. Cerrar la tapa sí lo suspende."""
+    if os.name != "nt":
+        return
+    import ctypes
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+    if ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED):
+        log.info("El equipo no se suspenderá mientras corra la ingesta")
+
+
 def run_forever(db, season: int | None = None):
     """Bucle: tick cada 5 min; plan a las 00:00; equipos y calendario los lunes de madrugada.
 
@@ -101,6 +112,7 @@ def run_forever(db, season: int | None = None):
     log = logging.getLogger("ingest.run")
     season = season or db.scalar("select max(season) from public.team") or jobs.madrid_now().year
     log.info("Temporada del juego: %s", season)
+    keep_awake(log)
     done = set()
     while True:
         now = jobs.madrid_now()

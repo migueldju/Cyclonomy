@@ -91,6 +91,22 @@ export interface RosterRow {
   photo_url: string | null;
 }
 
+/** Movimiento de la liga: fichaje del mercado, compra a otro jugador, clausulazo, oferta aceptada o venta al juego */
+export interface LeagueMove {
+  id: number;
+  created_at: string;
+  kind: 'signing' | 'purchase' | 'clause' | 'offer' | 'sale_game';
+  amount: number;
+  rider_id: number;
+  rider_name: string;
+  nationality: string | null;
+  pro_team: string | null;
+  buyer_id: string | null;
+  buyer_team: string | null;
+  seller_id: string | null;
+  seller_team: string | null;
+}
+
 export interface MarketRow {
   listing_id: number;
   rider_id: number;
@@ -140,6 +156,7 @@ export interface CalendarRow {
   max_entries: number;
   my_entry_count: number;
   status: 'upcoming' | 'live' | 'finished';
+  stages: { number: number; date: string }[];
 }
 
 export interface TodayRow {
@@ -154,6 +171,8 @@ export interface TodayRow {
   status: 'scheduled' | 'finished' | 'scored';
   my_points: number;
   country: string | null;
+  is_stage_race: boolean;
+  last_stage: number;
 }
 
 export interface StageScores {
