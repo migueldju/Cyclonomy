@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { Button } from '@/components/Button';
 import { ActionSheet, AmountSheet, SheetAction } from '@/components/Modal';
+import { OffersSection } from '@/components/OffersSection';
 import { RiderRow } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
@@ -64,7 +67,10 @@ export default function Mercado() {
         {t('market.note')}
       </Txt>
 
-      <Section title={t('market.daily')}>
+      <OffersSection />
+
+      <Section title={t('market.daily')}
+               action={<Button small kind="dark" label={t('moves.history')} onPress={() => router.push('/movimientos')} />}>
         {free.length ? free.map((r, i) => (
           <ListingRow key={r.listing_id} r={r} last={i === free.length - 1} onPress={() => open(r)} />
         )) : <Empty text={loading ? t('common.loading') : t('market.empty')} />}

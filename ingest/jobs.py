@@ -149,7 +149,10 @@ def plan_day(db, now: dt.datetime | None = None) -> int:
             log.warning("Sin información de %s etapa %s: %s", slug, number, exc)
             info = {}
         distance = info.get("distance_km") or (float(dist) if dist else None)
-        start, finish = estimate(date, info.get("start_time"), distance, race_tz(slug, country))
+        start_time = info.get("start_time")
+        if start_time == dt.time(0, 0):                # PCS pone 00:00 cuando aún no se sabe la hora: se usa la de por defecto
+            start_time = None
+        start, finish = estimate(date, start_time, distance, race_tz(slug, country))
         store.update_stage_times(db, stage_id, start, finish, distance)
         if number == first:
             store.set_entries_close(db, race_id, start)

@@ -6,8 +6,9 @@ import { t } from '@/i18n';
 import { colors, fonts } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
-const icon = (name: IconName) => ({ color, size }: { color: ColorValue; size: number }) =>
-  <Ionicons name={name} color={color} size={size} />;
+// la pestaña activa lleva el icono relleno; las demás, solo el contorno
+const icon = (name: IconName) => ({ color, size, focused }: { color: ColorValue; size: number; focused: boolean }) =>
+  <Ionicons name={(focused ? name.replace('-outline', '') : name) as IconName} color={color} size={size} />;
 
 export default function TabsLayout() {
   return (
@@ -15,9 +16,10 @@ export default function TabsLayout() {
       backBehavior="history"
       screenOptions={{
         header: () => <TopBar />,
-        tabBarActiveTintColor: colors.ink,
-        tabBarInactiveTintColor: colors.inkSoft,
-        tabBarStyle: { backgroundColor: colors.paper, borderTopColor: colors.line },
+        // a juego con la barra superior: asfalto, y la pestaña activa en amarillo maillot
+        tabBarActiveTintColor: colors.jersey,
+        tabBarInactiveTintColor: '#A9B4B9',
+        tabBarStyle: { backgroundColor: colors.asphalt, borderTopWidth: 0 },
         tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12, letterSpacing: 0.2 },
         sceneStyle: { backgroundColor: colors.road },
       }}>
@@ -28,6 +30,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="calendario" options={{ title: t('tabs.calendar'), tabBarIcon: icon('calendar-outline') }} />
       {/* pantallas dentro de las pestañas (sin botón propio): conservan la barra inferior */}
       <Tabs.Screen name="ranking" options={{ href: null, header: () => <TopBar back /> }} />
+      <Tabs.Screen name="movimientos" options={{ href: null, header: () => <TopBar back /> }} />
       <Tabs.Screen name="ciclista/[riderId]" options={{ href: null, header: () => <TopBar back /> }} />
     </Tabs>
   );

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { ClauseSheet } from '@/components/ClauseSheet';
 import { ActionSheet } from '@/components/Modal';
@@ -17,7 +17,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, money, moneyShort, ordinal, points, todayISO } from '@/lib/format';
 import { actionsFor } from '@/lib/rosterActions';
-import type { RiderPhoto, RiderResult } from '@/lib/types';
+import type { RiderResult } from '@/lib/types';
 import { categoryColor, colors, fonts, space, type } from '@/theme';
 
 type Filter = 'recent' | 'top';
@@ -141,8 +141,6 @@ export default function Ciclista() {
       </Section>
       <ErrorText error={detail.error} />
 
-      {r.photo ? <Credit photo={r.photo} /> : null}
-
       {rosterRow ? (
         <ActionSheet
           visible={managing}
@@ -231,18 +229,6 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
   );
 }
 
-/** Atribución que exigen las licencias de Commons: autor, licencia y enlace al archivo */
-function Credit({ photo }: { photo: RiderPhoto }) {
-  const open = (url: string | null) => () => { if (url) Linking.openURL(url); };
-  return (
-    <Txt variant="small" style={styles.credit}>
-      {t('rider.photoBy')} <Txt variant="small" style={styles.link} onPress={open(photo.page_url)}>{photo.author}</Txt>
-      {' · '}
-      <Txt variant="small" style={styles.link} onPress={open(photo.license_url ?? photo.page_url)}>{photo.license}</Txt>
-      {' · Wikimedia Commons'}
-    </Txt>
-  );
-}
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -267,6 +253,4 @@ const styles = StyleSheet.create({
   segBtn: { paddingHorizontal: space.m, paddingVertical: 5, backgroundColor: colors.paper },
   segOn: { backgroundColor: colors.ink },
   segText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
-  credit: { paddingHorizontal: space.l, paddingTop: space.l, fontSize: 11, lineHeight: 15 },
-  link: { fontSize: 11, lineHeight: 15, textDecorationLine: 'underline' },
 });

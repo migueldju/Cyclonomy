@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { Bib } from '@/components/Bib';
+import { PositionJersey } from '@/components/PositionJersey';
 import { Flag } from '@/components/Flag';
 import { Segmented } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
@@ -11,7 +11,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
-import { moneyShort, ordinal, points } from '@/lib/format';
+import { moneyShort, points } from '@/lib/format';
 import { colors, space } from '@/theme';
 
 export default function Clasificacion() {
@@ -39,7 +39,7 @@ export default function Clasificacion() {
           return (
             <Row key={r.member_id} last={i === rows.length - 1}
                  onPress={() => (mine ? router.navigate('/plantilla') : router.push(`/jugador/${r.member_id}`))}>
-              <Bib value={ordinal(r.rank)} size="s" />
+              <PositionJersey position={r.rank} />
               {r.avatar_url ? <Image source={{ uri: r.avatar_url }} style={styles.avatar} /> : <View style={[styles.avatar, styles.noAvatar]} />}
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>

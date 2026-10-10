@@ -12,7 +12,11 @@
     },
     "android": {
       "package": "com.tuempresa.cyclonomy",
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "navigationBar": {
+        "backgroundColor": "#1E272C",
+        "barStyle": "light-content"
+      }
     },
     "plugins": [
       "expo-router",
@@ -26,7 +30,9 @@
       "expo-splash-screen",
       "expo-status-bar",
       "expo-web-browser",
-      "expo-localization"
-    ]
+      "expo-localization",
+      "expo-system-ui"
+    ],
+    "backgroundColor": "#1E272C"
   }
 }

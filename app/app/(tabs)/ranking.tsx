@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
+import { Chips } from '@/components/Chips';
 import { Flag } from '@/components/Flag';
 import { RangeSlider } from '@/components/RangeSlider';
 import { RiderAvatar } from '@/components/RiderAvatar';
+import { BottomFill } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
@@ -66,6 +68,7 @@ export default function Ranking() {
         refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
         initialNumToRender={20}
         keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flexGrow: 1 }}
         // los filtros se desplazan con la lista: en pantallas bajas no tapan los ciclistas
         ListHeaderComponent={
           <View style={styles.filters}>
@@ -88,7 +91,7 @@ export default function Ranking() {
             </View>
           </View>
         }
-        ListFooterComponent={<ErrorText error={error} />}
+        ListFooterComponent={<><ErrorText error={error} /><BottomFill /></>}
         ListEmptyComponent={<Txt variant="small" style={{ padding: space.l }}>
           {loading ? t('common.loading') : t('ranking.noMatch')}
         </Txt>}
@@ -122,31 +125,6 @@ function RankRow({ r }: { r: RankingRow & { rank: number } }) {
   );
 }
 
-function Chips<T extends string>({ label, items, value, onChange }: {
-  label: string; items: [T, string][]; value: T; onChange: (v: T) => void;
-}) {
-  return (
-    <View style={{ gap: space.xs }}>
-      <Txt variant="label">{label}</Txt>
-      <FlatList
-        horizontal showsHorizontalScrollIndicator={false}
-        data={items}
-        keyExtractor={(c) => c[0]}
-        contentContainerStyle={{ gap: space.s }}
-        renderItem={({ item: [code, name] }) => {
-          const on = value === code;
-          return (
-            <Pressable onPress={() => onChange(code)} accessibilityRole="button" accessibilityState={{ selected: on }}
-                       style={[styles.chip, on && styles.chipOn]}>
-              <Txt style={[styles.chipText, on && { color: colors.paper }]}>{name}</Txt>
-            </Pressable>
-          );
-        }}
-      />
-    </View>
-  );
-}
-
 function normalize(s: string) {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
@@ -157,12 +135,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 6, paddingHorizontal: space.m,
     paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
   },
-  chip: {
-    paddingHorizontal: space.m, paddingVertical: 7, borderRadius: 16, borderWidth: 1.5,
-    borderColor: colors.line, backgroundColor: colors.paper,
-  },
-  chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
-  chipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
   row: {
     flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m,
     backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line,

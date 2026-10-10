@@ -1,8 +1,5 @@
 import { supabase } from './supabase';
-import type {
-  CalendarRow, Category, EntryData, League, LeagueSettings, MarketRow, Me, MyLeague, OfferRow, RaceDetail,
-  RaceEntries, RankingRow, RiderDetail, RosterRow, ScoringRule, StageScores, StandingRow, TodayRow,
-} from './types';
+import type { CalendarRow, Category, EntryData, League, LeagueMove, LeagueSettings, MarketRow, Me, MyLeague, OfferRow, RaceDetail, RaceEntries, RankingRow, RiderDetail, RosterRow, ScoringRule, StageScores, StandingRow, TodayRow } from './types';
 
 // Todas las escrituras pasan por funciones de Postgres que validan las reglas del juego.
 // Si una regla no se cumple, la función lanza un error con un mensaje para el jugador.
@@ -39,6 +36,8 @@ export const api = {
   roster: (leagueId: string, memberId?: string) =>
     rpc<RosterRow[]>('get_roster', memberId ? { p_league: leagueId, p_member: memberId } : { p_league: leagueId }),
   market: (leagueId: string) => rpc<MarketRow[]>('get_market', { p_league: leagueId }),
+  moves: (leagueId: string, memberId?: string | null, limit = 50) =>
+    rpc<LeagueMove[]>('get_league_moves', { p_league: leagueId, p_member: memberId ?? null, p_limit: limit }),
   offers: (leagueId: string) => rpc<OfferRow[]>('get_offers', { p_league: leagueId }),
   calendar: (leagueId: string) => rpc<CalendarRow[]>('get_calendar', { p_league: leagueId }),
   today: (leagueId: string) => rpc<TodayRow[]>('get_today', { p_league: leagueId }),

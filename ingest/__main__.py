@@ -37,12 +37,12 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m ingest")
     sub = ap.add_subparsers(dest="cmd", required=True)
     t = sub.add_parser("teams", help="equipos, ciclistas y puntos PCS")
-    t.add_argument("--season", type=int, required=True)
+    t.add_argument("--season", type=int, help="por defecto, la temporada del juego (la de los equipos cargados)")
     t.add_argument("--points-year", type=int)
     t.add_argument("--birthdates", action="store_true", help="lee la fecha de nacimiento de cada ciclista nuevo")
     t.add_argument("--seed-values", action="store_true", help="recalcula los valores iniciales (solo al empezar)")
     c = sub.add_parser("calendar", help="carreras y etapas de la temporada")
-    c.add_argument("--season", type=int, required=True)
+    c.add_argument("--season", type=int, help="por defecto, la temporada del juego (la de los equipos cargados)")
     c.add_argument("--from", dest="from_date", type=dt.date.fromisoformat,
                    help="solo las carreras que terminan desde esta fecha (AAAA-MM-DD)")
     h = sub.add_parser("history", help="resultados de una temporada pasada (para la ficha del ciclista)")
@@ -73,9 +73,9 @@ def main(argv=None):
     from .db import Database
     db = Database()
     if args.cmd == "teams":
-        print(jobs.load_teams(db, args.season, args.points_year, args.birthdates, args.seed_values))
+        print(jobs.load_teams(db, args.season or game_season(db), args.points_year, args.birthdates, args.seed_values))
     elif args.cmd == "calendar":
-        print(jobs.load_calendar(db, args.season, args.from_date))
+        print(jobs.load_calendar(db, args.season or game_season(db), args.from_date))
     elif args.cmd == "history":
         from .history import load_history
         print(load_history(db, args.season))
@@ -92,6 +92,22 @@ def main(argv=None):
         run_forever(db, args.season)
 
 
+def keep_awake(log) -> None:
+    """En Windows, pide que el equipo no se suspenda mientras corre la ingesta (como un reproductor de vídeo).
+    No cambia la configuración de energía y deja de valer al cerrar el proceso. Cerrar la tapa sí lo suspende."""
+    if os.name != "nt":
+        return
+    import ctypes
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+    if ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED):
+        log.info("El equipo no se suspenderá mientras corra la ingesta")
+
+
+def game_season(db) -> int:
+    """Temporada del juego: la de los equipos cargados (en otoño ya se juega la siguiente), o el año en curso."""
+    return db.scalar("select max(season) from public.team") or jobs.madrid_now().year
+
+
 def run_forever(db, season: int | None = None):
     """Bucle: tick cada 5 min; plan a las 00:00; equipos y calendario los lunes de madrugada.
 
@@ -99,8 +115,9 @@ def run_forever(db, season: int | None = None):
     se juega la siguiente. Por defecto, la de los equipos cargados.
     """
     log = logging.getLogger("ingest.run")
-    season = season or db.scalar("select max(season) from public.team") or jobs.madrid_now().year
+    season = season or game_season(db)
     log.info("Temporada del juego: %s", season)
+    keep_awake(log)
     done = set()
     while True:
         now = jobs.madrid_now()
