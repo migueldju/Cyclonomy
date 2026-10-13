@@ -31,6 +31,9 @@ AVG_SPEED_KMH = 42                         # perfil desconocido
 # media del ganador según el tipo de recorrido de PCS: 1 llano, 2 media montaña, 3 media montaña con final en alto,
 # 4 montaña, 5 montaña con final en alto
 SPEED_BY_PROFILE = {1: 44.0, 2: 42.0, 3: 41.0, 4: 38.5, 5: 37.0}
+# etapas con poco desnivel (menos de 15 m por km) van más rápido, sea cual sea su tipo de recorrido
+LOW_CLIMB_M_PER_KM = 15
+LOW_CLIMB_SPEED_KMH = 46.0
 FINISH_MARGIN = dt.timedelta(minutes=15)
 RESULTS_DELAY = dt.timedelta(minutes=30)
 LINEUP_GIVE_UP = dt.timedelta(minutes=90)  # sin lista de salida a la hora y media del cierre: alineaciones igualmente
@@ -131,10 +134,16 @@ def madrid_now(now: dt.datetime | None = None) -> dt.datetime:
 
 
 def estimate(stage_date: dt.date, start_local: dt.time | None, distance_km: float | None, tz,
-             profile: int | None = None) -> tuple:
-    """Salida y llegada estimada: la distancia a la media típica de su tipo de recorrido, más un margen."""
+             profile: int | None = None, vertical_m: int | None = None) -> tuple:
+    """Salida y llegada estimada: la distancia a 46 km/h si sube menos de 15 m por km; si no, a la media típica de su
+    tipo de recorrido. Más un margen."""
     start = dt.datetime.combine(stage_date, start_local or DEFAULT_START, tzinfo=tz).astimezone(MADRID)
-    hours = (distance_km or DEFAULT_DISTANCE) / SPEED_BY_PROFILE.get(profile, AVG_SPEED_KMH)
+    km = distance_km or DEFAULT_DISTANCE
+    if vertical_m is not None and distance_km and vertical_m < distance_km * LOW_CLIMB_M_PER_KM:
+        speed = LOW_CLIMB_SPEED_KMH
+    else:
+        speed = SPEED_BY_PROFILE.get(profile, AVG_SPEED_KMH)
+    hours = km / speed
     return start, start + dt.timedelta(hours=hours) + FINISH_MARGIN
 
 
@@ -163,7 +172,7 @@ def plan_day(db, now: dt.datetime | None = None) -> int:
         if start_time == dt.time(0, 0):                # PCS pone 00:00 cuando aún no se sabe la hora: se usa la de por defecto
             start_time = None
         # PCS da la hora de salida en hora de España (CET/CEST), no en la local de la carrera
-        start, finish = estimate(date, start_time, distance, MADRID, info.get("profile"))
+        start, finish = estimate(date, start_time, distance, MADRID, info.get("profile"), info.get("vertical_m"))
         store.update_stage_times(db, stage_id, start, finish, distance)
         store.update_stage_course(db, stage_id, None, info.get("vertical_m"))
         if number == first:
