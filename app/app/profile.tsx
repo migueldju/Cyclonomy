@@ -98,7 +98,7 @@ export default function Perfil() {
       </Section>
 
       <View style={{ gap: space.m, marginTop: space.xl }}>
-        <Button kind="secondary" label={t('profile.switchLeague')} onPress={() => router.push('/ligas')} />
+        <Button kind="secondary" label={t('profile.switchLeague')} onPress={() => router.push('/leagues')} />
         {isAdmin ? <Button kind="secondary" label={t('profile.manualLoad')} onPress={() => router.push('/admin')} /> : null}
         <Button kind="danger" label={t('profile.signOut')}
                 onPress={async () => { await selectLeague(null); await supabase.auth.signOut(); }} />

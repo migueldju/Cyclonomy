@@ -197,7 +197,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
           <Txt variant="small" style={{ flex: 1 }}>
             {t('calendar.entriesOpen', { when: dateTime(r.entries_close_at) })} · {r.my_entry_count}/{r.max_entries}
           </Txt>
-          <Button small label={t('race.enter')} onPress={() => router.push(`/carrera/${r.race_id}`)} />
+          <Button small label={t('race.enter')} onPress={() => router.push(`/race/${r.race_id}`)} />
         </View>
       ) : null}
       <ErrorText error={error} />
@@ -212,7 +212,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
               <Txt variant="label" style={styles.numCol}>{t('calendar.yourPoints')}</Txt>
             </View>
             {d.stages.map((s, i) => (
-              <Pressable key={s.stage_id} onPress={() => router.push(`/etapa/${s.stage_id}`)} accessibilityRole="button"
+              <Pressable key={s.stage_id} onPress={() => router.push(`/stage/${s.stage_id}`)} accessibilityRole="button"
                          style={({ pressed }) => [styles.tr, i === d.stages.length - 1 && styles.trLast,
                                                   pressed && { backgroundColor: colors.road }]}>
                 <View style={styles.stageCol}>
@@ -286,7 +286,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
                   return g.rider_id == null ? (
                     <View key={`x${g.position}-${g.name}`} style={rowStyle}>{cells}</View>
                   ) : (
-                    <Pressable key={g.rider_id} onPress={() => router.push(`/ciclista/${g.rider_id}`)} accessibilityRole="button"
+                    <Pressable key={g.rider_id} onPress={() => router.push(`/rider/${g.rider_id}`)} accessibilityRole="button"
                                style={({ pressed }) => [...rowStyle, pressed && { backgroundColor: colors.road }]}>
                       {cells}
                     </Pressable>

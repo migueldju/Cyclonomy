@@ -37,7 +37,7 @@ export default function Etapa() {
   // la pestaña por defecto depende de si ya hay puntos (solo la primera vez: después manda el usuario)
   useEffect(() => { if (ready && tab == null) setTab(scored ? 'scores' : 'entries'); }, [ready, scored, tab]);
   const reload = () => { scores.reload(); entries.reload(); race.reload(); };
-  const open = (riderId: number) => router.push(`/ciclista/${riderId}`);
+  const open = (riderId: number) => router.push(`/rider/${riderId}`);
 
   return (
     <Screen onRefresh={reload} refreshing={scores.loading || entries.loading}>

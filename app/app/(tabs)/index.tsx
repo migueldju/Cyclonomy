@@ -39,7 +39,7 @@ export default function Inicio() {
           <Txt variant="display">{points(me?.points_total)}</Txt>
           <Txt variant="small">{t('home.thisWeek', { points: points(me?.points_week) })}</Txt>
         </View>
-        <Button small kind="dark" icon="book-outline" label={t('home.rules')} onPress={() => router.push('/normativa')} />
+        <Button small kind="dark" icon="book-outline" label={t('home.rules')} onPress={() => router.push('/rules')} />
       </View>
 
       {me?.sanctioned_this_week ? (
@@ -68,7 +68,7 @@ export default function Inicio() {
       <Section title={t('home.topRiders')}
                action={<Button small kind="dark" icon="bar-chart-outline" label={t('ranking.title')} onPress={() => router.push('/ranking')} />}>
         {top.data?.length ? top.data.map((r, i) => (
-          <Row key={r.rider_id} onPress={() => router.push(`/ciclista/${r.rider_id}`)} last={i === top.data!.length - 1}>
+          <Row key={r.rider_id} onPress={() => router.push(`/rider/${r.rider_id}`)} last={i === top.data!.length - 1}>
             <Txt variant="number" style={{ width: 20, color: colors.inkSoft }}>{i + 1}</Txt>
             <RiderAvatar url={r.photo_url} name={r.name} team={r.pro_team} />
             <View style={{ flex: 1 }}>
@@ -99,7 +99,7 @@ export default function Inicio() {
       <ErrorText error={today.error} />
 
       <Section title={t('home.upcoming')}
-               action={<Button small kind="dark" icon="calendar-outline" label={t('tabs.calendar')} onPress={() => router.navigate('/calendario')} />}>
+               action={<Button small kind="dark" icon="calendar-outline" label={t('tabs.calendar')} onPress={() => router.navigate('/calendar')} />}>
         {upcoming.length ? upcoming.map((r, i) => (
           <RaceRow key={r.race_id} r={r} last={i === upcoming.length - 1} />
         )) : <Empty text={calendar.loading ? t('common.loading') : t('home.noUpcoming')} />}
@@ -126,12 +126,12 @@ function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entrie
       </View>
       {/* antes de la salida: inscribirse; en carrera: en curso; con los puntos ya calculados: puntuaciones */}
       {s.status === 'scored' ? (
-        <Button small icon="list-outline" label={t('stage.scores')} onPress={() => router.push(`/etapa/${s.stage_id}`)} />
+        <Button small icon="list-outline" label={t('stage.scores')} onPress={() => router.push(`/stage/${s.stage_id}`)} />
       ) : entriesOpen ? (
         // inscribirse solo mientras la inscripción de la carrera siga abierta (en una vuelta, hasta la 1.ª etapa)
-        <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/carrera/${s.race_id}`)} />
+        <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/race/${s.race_id}`)} />
       ) : (
-        <Button small kind="dark" label={t('home.live')} onPress={() => router.push(`/etapa/${s.stage_id}`)} />
+        <Button small kind="dark" label={t('home.live')} onPress={() => router.push(`/stage/${s.stage_id}`)} />
       )}
     </Row>
   );
@@ -150,7 +150,7 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
           {r.my_entry_count ? t('race.entered', { n: r.my_entry_count, max: r.max_entries }) : t('race.notEntered')}
         </Txt>
       </View>
-      <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/carrera/${r.race_id}`)} />
+      <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/race/${r.race_id}`)} />
     </Row>
   );
 }

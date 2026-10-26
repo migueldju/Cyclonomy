@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { View } from 'react-native';
 import { t } from '../i18n';
-import { money, parseAmount } from '../lib/format';
+import { gameNow, money, parseAmount } from '../lib/format';
 import type { LeagueSettings, PayoutMode } from '../lib/types';
 import { space } from '../theme';
 import { Button } from './Button';
@@ -28,11 +28,22 @@ export const payoutOptions = (): { value: PayoutMode; label: string }[] => [
 export const DEFAULT_SETTINGS: Required<Pick<LeagueSettings,
   'max_riders' | 'calendar_depth' | 'market_size' | 'market_hour' | 'clauses_enabled' | 'payout_mode' |
   'payout_per_point' | 'payout_by_position' | 'scoring_system' | 'wt_split'>> = {
-  max_riders: 22, calendar_depth: 2, market_size: 10, market_hour: 8, clauses_enabled: true,
+  max_riders: 22, calendar_depth: 4, market_size: 18, market_hour: 8, clauses_enabled: true,
   payout_mode: 'per_point', payout_per_point: 100, payout_by_position: [500000, 300000, 150000],
   // por defecto, el sistema de Cyclonomy con el WorldTour dividido
   scoring_system: 'cyclonomy', wt_split: true,
 };
+
+/** La hora actual en Madrid (la del mercado), redondeada a la hora más cercana: la hora del mercado por defecto */
+export function currentMarketHour(): number {
+  const now = new Date(gameNow() + 30 * 60 * 1000);
+  try {
+    const h = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Europe/Madrid' }).format(now);
+    return Number(h) % 24;
+  } catch {
+    return now.getHours();
+  }
+}
 
 /**
  * Parámetros de la liga: se usa al crearla y en la normativa (solo el administrador). El sistema de puntuación solo

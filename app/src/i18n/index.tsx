@@ -6,6 +6,7 @@ import ca from './locales/ca';
 import cs from './locales/cs';
 import da from './locales/da';
 import de from './locales/de';
+import en from './locales/en';
 import es from './locales/es';
 import eu from './locales/eu';
 import fr from './locales/fr';
@@ -25,16 +26,16 @@ import type { Dict, Key } from './types';
  * Plurales: t(n === 1 ? 'x.one' : 'x.other', { n }) (simplificación: 1 frente al resto).
  */
 export const LANGUAGES: { code: Lang; name: string }[] = [
-  { code: 'es', name: 'Español' }, { code: 'fr', name: 'Français' }, { code: 'pt', name: 'Português' },
+  { code: 'es', name: 'Español' }, { code: 'en', name: 'English' }, { code: 'fr', name: 'Français' }, { code: 'pt', name: 'Português' },
   { code: 'it', name: 'Italiano' }, { code: 'nl', name: 'Nederlands' }, { code: 'de', name: 'Deutsch' },
   { code: 'ca', name: 'Català' }, { code: 'eu', name: 'Euskara' }, { code: 'gl', name: 'Galego' },
   { code: 'pl', name: 'Polski' }, { code: 'ru', name: 'Русский' }, { code: 'ar', name: 'العربية' },
   { code: 'ja', name: '日本語' }, { code: 'da', name: 'Dansk' }, { code: 'sl', name: 'Slovenščina' },
   { code: 'cs', name: 'Čeština' },
 ];
-export type Lang = 'es' | 'fr' | 'pt' | 'it' | 'nl' | 'de' | 'ca' | 'eu' | 'gl' | 'pl' | 'ru' | 'ar' | 'ja' | 'da' | 'sl' | 'cs';
+export type Lang = 'es' | 'en' | 'fr' | 'pt' | 'it' | 'nl' | 'de' | 'ca' | 'eu' | 'gl' | 'pl' | 'ru' | 'ar' | 'ja' | 'da' | 'sl' | 'cs';
 
-const DICTS: Record<Lang, Partial<Dict>> = { es, fr, pt, it, nl, de, ca, eu, gl, pl, ru, ar, ja, da, sl, cs };
+const DICTS: Record<Lang, Partial<Dict>> = { es, en, fr, pt, it, nl, de, ca, eu, gl, pl, ru, ar, ja, da, sl, cs };
 const STORAGE_KEY = 'cyclonomy:lang';
 
 function deviceLang(): Lang {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
-import { DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
+import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
@@ -25,7 +25,7 @@ export default function CrearLiga() {
         {t('create.note')}
       </Txt>
       <LeagueSettingsForm
-        initial={DEFAULT_SETTINGS}
+        initial={{ ...DEFAULT_SETTINGS, market_hour: currentMarketHour() }}
         initialName=""
         submitLabel={t('create.submit')}
         creating

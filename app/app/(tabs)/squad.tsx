@@ -49,7 +49,7 @@ export default function Plantilla() {
                    r.game_offer_amount ? t('squad.gameOffers', { amount: moneyShort(r.game_offer_amount) }) : null].filter(Boolean).join(' · ')}
             value={r.market_value}
             detail={`${points(r.league_points)} · ${t('squad.clause', { amount: moneyShort(r.clause) })}`}
-            onPress={() => router.push(`/ciclista/${r.rider_id}`)}
+            onPress={() => router.push(`/rider/${r.rider_id}`)}
             last={i === rows.length - 1}
           />
         )) : <Empty text={roster.loading ? t('common.loading') : t('squad.empty')} />}
