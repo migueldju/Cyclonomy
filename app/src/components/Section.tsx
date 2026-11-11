@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, space } from '../theme';
+import { cardShadow, colors, radius, space } from '../theme';
 import { Txt } from './Txt';
 
-/** Bloque con título en minúsculas de frase y un separador fino; sin tarjetas apiladas. */
+/** Bloque con su título encima y el contenido en una tarjeta blanca redondeada. */
 export function Section({ title, action, children, style }: {
   title?: string; action?: ReactNode; children: ReactNode; style?: ViewStyle;
 }) {
@@ -41,10 +41,12 @@ export function ErrorText({ error }: { error: string | null | undefined }) {
 const styles = StyleSheet.create({
   section: { marginTop: space.xl },
   head: {
-    flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between',
-    paddingHorizontal: space.l, marginBottom: space.s,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: space.l + 4, marginBottom: space.s,
   },
-  body: { backgroundColor: colors.paper, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.line },
+  body: {
+    backgroundColor: colors.paper, marginHorizontal: space.l, borderRadius: radius.l, overflow: 'hidden', ...cardShadow,
+  },
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l, paddingVertical: space.m, gap: space.m },
   rowLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   empty: { padding: space.l },

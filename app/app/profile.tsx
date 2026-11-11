@@ -8,6 +8,7 @@ import { LanguagePicker } from '@/components/LanguagePicker';
 import { Screen } from '@/components/Screen';
 import { Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import { useLeague } from '@/context/LeagueContext';
 import { LANGUAGES, t, useI18n } from '@/i18n';
@@ -39,7 +40,7 @@ export default function Perfil() {
   async function run(key: string, fn: () => Promise<string>) {
     setBusy(key);
     setMsg(null);
-    try { setMsg({ ok: true, text: await fn() }); refresh(); } catch (e) { setMsg({ ok: false, text: (e as Error).message }); }
+    try { showToast(await fn()); refresh(); } catch (e) { setMsg({ ok: false, text: (e as Error).message }); }
     setBusy(null);
   }
 

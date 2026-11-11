@@ -30,7 +30,7 @@ export function Chips<T extends string>({ label, items, value, onChange }: {
 
 const styles = StyleSheet.create({
   chip: {
-    paddingHorizontal: space.m, paddingVertical: 7, borderRadius: 16, borderWidth: 1.5,
+    paddingHorizontal: space.l, paddingVertical: 8, borderRadius: 999, borderWidth: 1,
     borderColor: colors.line, backgroundColor: colors.paper,
   },
   chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },

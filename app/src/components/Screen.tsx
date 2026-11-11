@@ -2,8 +2,8 @@ import { ReactNode } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { colors, space } from '../theme';
 
-/** Contenedor con scroll y "tirar para actualizar". Abajo, sin margen y con relleno blanco si sobra pantalla: la barra
- *  de pestañas siempre toca contenido, nunca el fondo gris */
+/** Contenedor con scroll y "tirar para actualizar". Abajo, un poco de aire bajo la última tarjeta: la barra
+ *  de pestañas no tapa la última tarjeta */
 export function Screen({ children, onRefresh, refreshing = false, padded }: {
   children: ReactNode; onRefresh?: () => void; refreshing?: boolean; padded?: boolean;
 }) {
@@ -20,7 +20,7 @@ export function Screen({ children, onRefresh, refreshing = false, padded }: {
   );
 }
 
-/** Relleno blanco hasta la barra de pestañas cuando el contenido no llena la pantalla (en listas: ListFooterComponent,
+/** Aire hasta la barra de pestañas cuando el contenido no llena la pantalla (en listas: ListFooterComponent,
  *  con contentContainerStyle={{ flexGrow: 1 }}) */
 export function BottomFill() {
   return <View style={styles.fill} />;
@@ -32,5 +32,5 @@ export function Field({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.road },
-  fill: { flexGrow: 1, backgroundColor: colors.paper },
+  fill: { flexGrow: 1, minHeight: space.xl },           // aire bajo la última tarjeta
 });

@@ -53,8 +53,9 @@ export default function Jugador() {
         {rows.length ? rows.map((r, i) => (
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
                     photo={r.photo_url} nationality={r.nationality}
-                    note={riderStatusNote(r.status)} value={r.market_value}
-                    detail={`${r.locked_next ? '🔒 ' : ''}${t('squad.clause', { amount: moneyShort(r.clause) })}`} onPress={() => setPicked(r)} last={i === rows.length - 1} />
+                    note={[riderStatusNote(r.status), r.locked_next ? t('squad.lockedNext') : null].filter(Boolean).join(' · ') || undefined}
+                    value={r.market_value}
+                    detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={i === rows.length - 1} />
         )) : <Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
       </Section>
       <ErrorText error={roster.error} />
@@ -70,7 +71,8 @@ export default function Jugador() {
         actions={picked?.transferable ? [
           { label: t('player.payClause', { amount: moneyShort(picked.clause) }), kind: 'primary' as const,
             hint: picked.locked_next ? t('player.lockedClause') : t('player.payClauseHint'),
-            onPress: () => api.payClause(picked.ownership_id) },
+            onPress: () => api.payClause(picked.ownership_id),
+            done: t(picked.locked_next ? 'toast.clausePaidLater' : 'toast.clausePaid', { name: picked.rider_name }) },
           { label: t('player.makeOffer'), hint: t('player.makeOfferHint'),
             onPress: () => { const p = picked; setTimeout(() => setOffering(p), 350); } },
         ] : []}
@@ -84,6 +86,7 @@ export default function Jugador() {
         initial={offering?.market_value}
         confirmLabel={t('player.sendOffer')}
         onConfirm={(amount) => api.makeOffer(offering!.ownership_id, amount)}
+        done={(amount) => t('toast.offerSent', { name: offering!.rider_name, amount: money(amount) })}
         onDone={done}
       />
     </Screen>

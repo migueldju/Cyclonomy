@@ -6,6 +6,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
@@ -31,6 +32,7 @@ export default function Unirse() {
     setError(null);
     try {
       const id = await api.joinLeague(clean, team.trim(), country!);
+      showToast(t('toast.joined'));
       setPendingInvite(null);
       await selectLeague(id);
       resetTo('/');

@@ -6,9 +6,9 @@ import type { Key } from './i18n/types';
 export const colors = {
   asphalt: '#1E272C',      // barra superior, texto principal
   asphaltSoft: '#3A464D',
-  road: '#DEE4E0',         // fondo
+  road: '#EEF1EF',         // fondo, claro: las tarjetas blancas se separan con sombra
   paper: '#FFFFFF',        // dorsal, superficies
-  line: '#D5DBD8',         // separadores
+  line: '#E3E8E5',         // separadores
   ink: '#1E272C',
   inkSoft: '#5E6B71',
   jersey: '#F5C400',       // acción principal (maillot amarillo)
@@ -23,18 +23,24 @@ export const fonts = {
   body: 'FiraSans_400Regular',
   bodyMedium: 'FiraSans_500Medium',
   bodyBold: 'FiraSans_600SemiBold',
-  display: 'FiraSansCondensed_600SemiBold',
+  display: 'BebasNeue_400Regular',         // títulos: condensada y en mayúsculas
   number: 'FiraSansCondensed_700Bold',
 };
 
-// Escala tipográfica (1,2): 13 · 15 · 18 · 22 · 26 · 32
+// Escala tipográfica (1,2): 13 · 15 · 18 · 24 · 30 · 38 (los títulos, en Bebas Neue, algo mayores: es más estrecha)
 export const type = {
   small: 13,
   body: 15,
   lead: 18,
-  title: 22,
-  display: 26,
-  hero: 32,
+  title: 24,
+  display: 30,
+  hero: 38,
+};
+
+// Esquinas y sombra de las tarjetas
+export const radius = { s: 8, m: 12, l: 16, pill: 999 };
+export const cardShadow = {
+  shadowColor: '#1E272C', shadowOpacity: 0.07, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 2,
 };
 
 export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 };

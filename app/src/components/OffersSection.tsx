@@ -5,6 +5,7 @@ import { useLoader } from '../hooks/useLoader';
 import { t } from '../i18n';
 import { api } from '../lib/api';
 import { dateTime, money } from '../lib/format';
+import { showToast } from './Toast';
 import type { OfferRow } from '../lib/types';
 import { space } from '../theme';
 import { Button } from './Button';
@@ -23,6 +24,8 @@ export function OffersSection() {
     try {
       if (o.direction === 'received') await api.respondOffer(o.offer_id, accept);
       else await api.cancelOffer(o.offer_id);
+      showToast(t(o.direction === 'sent' ? 'toast.offerCancelled' : accept ? 'toast.offerAccepted' : 'toast.offerRejected',
+                  { name: o.rider_name, amount: money(o.amount) }));
       offers.reload(); refresh();
     } catch (e) {
       setError((e as Error).message);

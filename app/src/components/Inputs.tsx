@@ -72,12 +72,12 @@ export function Toggle({ label, value, onChange, hint }: {
 
 const styles = StyleSheet.create({
   input: {
-    backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 6,
-    paddingHorizontal: space.m, paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
+    backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 12,
+    paddingHorizontal: space.m, paddingVertical: 12, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
   },
   segments: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
   segment: {
-    paddingHorizontal: space.m, paddingVertical: 8, borderRadius: 6, borderWidth: 1.5,
+    paddingHorizontal: space.l, paddingVertical: 8, borderRadius: 999, borderWidth: 1,
     borderColor: colors.line, backgroundColor: colors.paper,
   },
   segmentOn: { borderColor: colors.ink, backgroundColor: colors.ink },

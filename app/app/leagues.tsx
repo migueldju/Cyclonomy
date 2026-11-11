@@ -7,6 +7,7 @@ import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -35,6 +36,7 @@ export default function Ligas() {
     setJoinError(null);
     try {
       const id = await api.joinLeague(code.trim(), team.trim(), country!);
+      showToast(t('toast.joined'));
       await open(id);
     } catch (e) {
       setJoinError((e as Error).message);

@@ -46,7 +46,7 @@ export default function Plantilla() {
             nationality={r.nationality}
             status={r.status}
             note={[riderStatusNote(r.status), r.for_sale ? t('squad.forSale') : null,
-                   r.locked ? `🔒 ${t('squad.locked')}` : r.locked_next ? `🔒 ${t('squad.lockedNext')}` : null,
+                   r.locked ? t('squad.locked') : r.locked_next ? t('squad.lockedNext') : null,
                    r.game_offer_amount ? t('squad.gameOffers', { amount: moneyShort(r.game_offer_amount) }) : null].filter(Boolean).join(' · ')}
             value={r.market_value}
             detail={`${points(r.league_points)} · ${t('squad.clause', { amount: moneyShort(r.clause) })}`}

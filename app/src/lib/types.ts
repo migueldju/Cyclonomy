@@ -85,7 +85,7 @@ export interface RosterRow {
   price_paid: number;
   clause: number;
   clause_base: number;       // base de la cláusula: lo pagado o, si es mayor, el valor de mercado
-  locked: boolean;           // blindado esta semana: nadie puede pagar su cláusula
+  locked: boolean;           // blindado esta semana: si pagan su cláusula, llega una semana más tarde
   locked_next: boolean;      // blindado la semana que viene
   lock_cost: number;         // lo que cuesta blindarlo (8 % de su valor)
   season_points: number;

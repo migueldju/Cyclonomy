@@ -1,9 +1,11 @@
-import { ReactNode, useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { type ComponentProps, ReactNode, useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
 import { colors, fonts, space, type } from '../theme';
 import { Button } from './Button';
+import { showToast } from './Toast';
 import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
@@ -29,6 +31,11 @@ export interface SheetAction {
   hint?: string;
   kind?: 'primary' | 'secondary' | 'danger';
   onPress: () => Promise<unknown> | void;
+  /** con icono, la acción se muestra como fila compacta: icono, nombre y `detail` (un dato corto) */
+  icon?: ComponentProps<typeof Ionicons>['name'];
+  detail?: string;
+  /** aviso momentáneo al terminar bien */
+  done?: string;
 }
 
 /** Lista de acciones; ejecuta la elegida y muestra el error del servidor si lo hay */
@@ -44,6 +51,7 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
     setError(null);
     try {
       await actions[i].onPress();
+      if (actions[i].done) showToast(actions[i].done!);
       onDone?.();
       onClose();
     } catch (e) {
@@ -57,7 +65,22 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
     <Sheet visible={visible} onClose={onClose} title={title}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
       {actions.length === 0 ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
-      {actions.map((a, i) => (
+      {actions.map((a, i) => a.icon ? (
+        <Pressable key={a.label} onPress={() => run(i)} disabled={busy !== null} accessibilityRole="button"
+                   accessibilityLabel={a.label}
+                   style={({ pressed }) => [styles.action, a.kind === 'primary' && styles.actionPrimary,
+                                            pressed && { opacity: 0.75 }, busy !== null && busy !== i && { opacity: 0.45 }]}>
+          <View style={[styles.actionIcon, a.kind === 'primary' && { backgroundColor: colors.paper }]}>
+            <Ionicons name={a.icon} size={20} color={a.kind === 'danger' ? colors.red : colors.ink} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Txt style={styles.actionLabel}>{a.label}</Txt>
+            {a.detail ? <Txt variant="small" style={a.kind === 'primary' ? { color: colors.jerseyInk } : undefined}>{a.detail}</Txt> : null}
+          </View>
+          {busy === i ? <ActivityIndicator color={colors.ink} />
+            : <Ionicons name="chevron-forward" size={18} color={colors.inkSoft} />}
+        </Pressable>
+      ) : (
         <View key={a.label} style={{ marginBottom: space.m }}>
           <Button label={a.label} kind={a.kind ?? 'secondary'} onPress={() => run(i)} busy={busy === i}
                   disabled={busy !== null && busy !== i} />
@@ -71,9 +94,10 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
 }
 
 /** Pide una cantidad en euros (pujas y ofertas) */
-export function AmountSheet({ visible, onClose, title, subtitle, min, initial, confirmLabel, onConfirm, onDone }: {
+export function AmountSheet({ visible, onClose, title, subtitle, min, initial, confirmLabel, onConfirm, onDone, done }: {
   visible: boolean; onClose: () => void; title: string; subtitle?: string; min?: number; initial?: number;
   confirmLabel: string; onConfirm: (amount: number) => Promise<unknown>; onDone?: () => void;
+  done?: (amount: number) => string;          // aviso momentáneo al terminar bien
 }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -91,6 +115,7 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
     setError(null);
     try {
       await onConfirm(amount);
+      if (done) showToast(done(amount));
       onDone?.();
       onClose();
     } catch (e) {
@@ -126,6 +151,15 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
 }
 
 const styles = StyleSheet.create({
+  action: {
+    flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: space.m, paddingHorizontal: space.m,
+    borderRadius: 14, backgroundColor: colors.road, marginBottom: space.s,
+  },
+  actionPrimary: { backgroundColor: colors.jersey },
+  actionIcon: {
+    width: 36, height: 36, borderRadius: 18, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center',
+  },
+  actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
   sheet: {
     backgroundColor: colors.paper, padding: space.xl, paddingBottom: space.xxl,

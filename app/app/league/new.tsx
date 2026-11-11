@@ -5,6 +5,7 @@ import { Input } from '@/components/Inputs';
 import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
@@ -33,6 +34,7 @@ export default function CrearLiga() {
           if (!team.trim()) throw new Error(t('team.nameRequired'));
           if (!country) throw new Error(t('team.countryRequired'));
           const id = await api.createLeague(name, team.trim(), s, country);
+          showToast(t('toast.leagueCreated'));
           await selectLeague(id);
           resetTo('/');
         }}>

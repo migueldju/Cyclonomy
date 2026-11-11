@@ -46,10 +46,10 @@ const kinds: Record<Kind, { bg: string; fg: string; border: string }> = {
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 46, paddingHorizontal: 18, borderRadius: 6, borderWidth: 1.5,
+    minHeight: 46, paddingHorizontal: 20, borderRadius: 12, borderWidth: 1.5,
     alignItems: 'center', justifyContent: 'center',
   },
-  small: { minHeight: 34, paddingHorizontal: 12 },
+  small: { minHeight: 34, paddingHorizontal: 14, borderRadius: 999 },
   icon: { width: 46, paddingHorizontal: 0 },
   iconSmall: { width: 40, paddingHorizontal: 0 },
   // el oscuro resalta con una sombra corta bajo el botón

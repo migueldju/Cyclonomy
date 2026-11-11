@@ -6,6 +6,7 @@ import { Screen } from '@/components/Screen';
 import { ScoringGroups, schemeLabel, schemeOf } from '@/components/ScoringSystems';
 import { ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -43,6 +44,7 @@ export default function Normativa() {
               submitLabel={t('rules.save')}
               onSubmit={async (name, s) => {
                 await api.updateLeague(id, { ...s, name });
+                showToast(t('toast.leagueSaved'));
                 setEditing(false);
                 league.reload();
                 refresh();
@@ -74,7 +76,7 @@ export default function Normativa() {
             <Button kind="quiet" label={t('rules.newCode')}
                     onPress={async () => {
                       setCodeError(null);
-                      try { await api.regenerateCode(id); league.reload(); } catch (e) { setCodeError((e as Error).message); }
+                      try { await api.regenerateCode(id); showToast(t('toast.newCode')); league.reload(); } catch (e) { setCodeError((e as Error).message); }
                     }} />
             <ErrorText error={codeError} />
           </View>

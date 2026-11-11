@@ -7,6 +7,7 @@ import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '
 import type { RosterRow } from '../lib/types';
 import { colors, space } from '../theme';
 import { Button } from './Button';
+import { showToast } from './Toast';
 import { Sheet } from './Modal';
 import { RangeSlider } from './RangeSlider';
 import { ErrorText } from './Section';
@@ -42,6 +43,7 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
     setError(null);
     try {
       await api.setClause(row.ownership_id, target);
+      showToast(t('toast.clause', { name: row.rider_name, amount: money(target) }));
       onDone?.();
       onClose();
     } catch (e) {

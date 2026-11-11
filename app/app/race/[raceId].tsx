@@ -8,6 +8,7 @@ import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { StatusDot } from '@/components/StatusDot';
 import { Txt } from '@/components/Txt';
+import { showToast } from '@/components/Toast';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -59,6 +60,7 @@ export default function Inscripcion() {
     try {
       await api.saveEntry(id, Number(raceId), [...chosen]);
       setSaved(true);
+      showToast(t('entry.saved'));
       reload();
       refresh();
     } catch (e) {
