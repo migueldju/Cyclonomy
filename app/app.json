@@ -16,6 +16,10 @@
       "navigationBar": {
         "backgroundColor": "#1E272C",
         "barStyle": "light-content"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F4C63F"
       }
     },
     "plugins": [
@@ -27,12 +31,24 @@
           "photosPermission": "La app usa tus fotos para la imagen de tu perfil."
         }
       ],
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/logo-horizontal.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "backgroundColor": "#F4C63F"
+        }
+      ],
       "expo-status-bar",
       "expo-web-browser",
       "expo-localization",
       "expo-system-ui"
     ],
-    "backgroundColor": "#1E272C"
+    "backgroundColor": "#1E272C",
+    "icon": "./assets/icon.png",
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
   }
 }

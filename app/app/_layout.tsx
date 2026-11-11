@@ -11,6 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastHost } from '@/components/Toast';
 import { TopBar } from '@/components/TopBar';
@@ -79,6 +80,7 @@ function Gate() {
 
   const withBar = { headerShown: true, header: () => <TopBar back /> };
   return (
+    <>
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.road } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="player/[memberId]" options={withBar} />
@@ -88,5 +90,18 @@ function Gate() {
       <Stack.Screen name="profile" options={withBar} />
       <Stack.Screen name="admin" options={withBar} />
     </Stack>
+    {/* pantalla de carga, mientras se lee la sesión y la liga: el logo sobre el amarillo del icono */}
+    {loading || !ready ? (
+      <View style={styles.loading}>
+        <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
+               accessibilityLabel="Cyclonomy" />
+      </View>
+    ) : null}
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.logoYellow, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 240, height: 40 },
+});

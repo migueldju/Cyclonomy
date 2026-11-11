@@ -1,8 +1,7 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Bib } from '@/components/Bib';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
@@ -38,8 +37,8 @@ export default function Login() {
   return (
     <Screen padded>
       <View style={[styles.hero, { marginTop: insets.top + space.xl }]}>
-        <Bib value="1" size="l" />
-        <Txt variant="hero" style={styles.title}>Cyclonomy</Txt>
+        <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
+               accessibilityLabel="Cyclonomy" />
         <Txt variant="small">{t('login.tagline')}</Txt>
       </View>
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
@@ -61,7 +60,7 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'flex-start', gap: space.m, marginBottom: space.xxl },
-  title: { marginTop: space.s },
+  logo: { width: 232, height: 39 },          // 1200 × 202
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: space.xl },
   link: { color: colors.ink, textDecorationLine: 'underline' },
   forgot: { alignSelf: 'flex-end', marginTop: -space.s, marginBottom: space.m },

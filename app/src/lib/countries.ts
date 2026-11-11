@@ -1,6 +1,6 @@
 import { getLang } from '../i18n';
 
-// Países para el equipo de cada jugador: código ISO de 2 letras (como los de los ciclistas) y nombre en español
+// Países (para nombrarlos; los que se pueden elegir, más abajo): código ISO de 2 letras (como los de los ciclistas) y nombre en español
 const ALL: [string, string][] = [
   ['af', 'Afganistán'], ['al', 'Albania'], ['de', 'Alemania'], ['ad', 'Andorra'], ['ao', 'Angola'], ['ai', 'Anguila'],
   ['ag', 'Antigua y Barbuda'], ['sa', 'Arabia Saudí'], ['dz', 'Argelia'], ['ar', 'Argentina'], ['am', 'Armenia'],
@@ -53,15 +53,38 @@ const ALL: [string, string][] = [
   ['dj', 'Yibuti'], ['zm', 'Zambia'], ['zw', 'Zimbabue'],
 ];
 
+// Federaciones nacionales miembro de la UCI (207), por confederación: solo esos países se pueden elegir
+const UCI = new Set([
+  // asiáticas
+  'af', 'bd', 'bt', 'bh', 'bn', 'kh', 'cn', 'hk', 'id', 'in', 'ir', 'iq', 'jo', 'jp', 'kz', 'kg', 'kr', 'sa', 'kw',
+  'la', 'lb', 'mo', 'my', 'mv', 'mn', 'mm', 'np', 'om', 'pk', 'ph', 'ps', 'kp', 'qa', 'sg', 'lk', 'sy', 'th', 'tj',
+  'tm', 'tl', 'tw', 'ae', 'uz', 'vn', 'ye',
+  // africanas
+  'dz', 'ao', 'bi', 'bj', 'bw', 'bf', 'cf', 'cg', 'td', 'ci', 'cm', 'cd', 'km', 'cv', 'dj', 'eg', 'er', 'et', 'ga',
+  'gm', 'gw', 'gq', 'gh', 'gn', 'ke', 'ly', 'lr', 'ls', 'mg', 'ma', 'mw', 'ml', 'mz', 'mu', 'mr', 'na', 'ng', 'ne',
+  'za', 'rw', 'sn', 'sc', 'sl', 'so', 'ss', 'st', 'sd', 'sz', 'tz', 'tg', 'tn', 'ug', 'zm', 'zw',
+  // americanas
+  'ai', 'ag', 'ar', 'aw', 'bs', 'bb', 'bm', 'bz', 'bo', 'br', 'ca', 'ky', 'cl', 'co', 'cr', 'cu', 'cw', 'dm', 'do',
+  'ec', 'sv', 'gd', 'gt', 'gy', 'ht', 'hn', 'vi', 'vg', 'jm', 'lc', 'mx', 'ni', 'pa', 'py', 'pe', 'pr', 'kn', 'sr',
+  'sx', 'tt', 'uy', 'us', 've', 'vc',
+  // europeas
+  'al', 'ad', 'am', 'at', 'az', 'be', 'ba', 'by', 'bg', 'hr', 'cy', 'cz', 'dk', 'es', 'ee', 'fi', 'fr', 'gb', 'ge',
+  'de', 'gr', 'hu', 'ie', 'is', 'il', 'it', 'xk', 'lv', 'li', 'lt', 'lu', 'md', 'mk', 'mt', 'me', 'mc', 'nl', 'no',
+  'pl', 'pt', 'ro', 'ru', 'si', 'sm', 'rs', 'ch', 'sk', 'se', 'tr', 'ua', 'va',
+  // de Oceanía
+  'as', 'au', 'ck', 'fj', 'gu', 'ki', 'nr', 'nz', 'pw', 'sb', 'ws', 'to', 'vu',
+]);
+
 // Primero, los 10 mejores países de la historia (puntos del ranking histórico de ciclistas de PCS, sumados por
 // nacionalidad); después, todos en orden alfabético
 const TOP = ['it', 'be', 'fr', 'es', 'nl', 'de', 'ch', 'au', 'gb', 'dk'];
 export const COUNTRIES: [string, string][] = [
   ...TOP.map((code) => ALL.find(([c]) => c === code)!),
-  ...ALL.filter(([c]) => !TOP.includes(c)),
+  ...ALL.filter(([c]) => UCI.has(c) && !TOP.includes(c)),
 ];
 
-const spanish = (code: string | null | undefined) => COUNTRIES.find(([c]) => c === code)?.[1] ?? null;
+// el nombre se busca entre todos: un equipo creado antes puede tener un país que ya no se ofrece
+const spanish = (code: string | null | undefined) => ALL.find(([c]) => c === code)?.[1] ?? null;
 
 let names: { lang: string; dn: { of: (c: string) => string | undefined } | null } | null = null;
 

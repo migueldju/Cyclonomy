@@ -13,6 +13,7 @@ export const colors = {
   inkSoft: '#5E6B71',
   jersey: '#F5C400',       // acción principal (maillot amarillo)
   jerseyInk: '#2A2300',
+  logoYellow: '#F4C63F',   // fondo del icono y de la pantalla de carga
   green: '#17834A',        // dinero y puntos a favor
   orange: '#E9852B',       // llega el lunes
   red: '#D23A3A',          // se va el lunes / errores

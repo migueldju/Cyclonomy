@@ -16,7 +16,8 @@ export function TopBar({ back }: { back?: boolean }) {
   const initials = (me?.display_name ?? me?.team_name ?? '?').trim().slice(0, 1).toUpperCase();
 
   return (
-    <View style={[styles.bar, { paddingTop: insets.top + space.xs }]}>
+    <View style={styles.wrap}>
+    <View style={[styles.bar, { paddingTop: insets.top + space.s }]}>
       <View style={styles.left}>
         {back ? (
           <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={10}>
@@ -39,8 +40,13 @@ export function TopBar({ back }: { back?: boolean }) {
       <View style={styles.right}>
         <PositionJersey position={me?.position} size={28} />
         {/* el dinero del jugador (en rojo si está en negativo) */}
-        <Txt style={[styles.value, me && me.balance < 0 && { color: colors.red }]} numberOfLines={1}>{me ? moneyShort(me.balance) : ''}</Txt>
+        {me ? (
+          <View style={styles.pill}>
+            <Txt style={[styles.value, me.balance < 0 && { color: '#FF8A8A' }]} numberOfLines={1}>{moneyShort(me.balance)}</Txt>
+          </View>
+        ) : null}
       </View>
+    </View>
     </View>
   );
 }
@@ -52,15 +58,18 @@ function goBack() {
 }
 
 const styles = StyleSheet.create({
+  wrap: { backgroundColor: colors.road },      // lo que asoma tras las esquinas redondeadas
   bar: {
     backgroundColor: colors.asphalt, flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: space.l, paddingBottom: space.s, gap: space.m,
+    paddingHorizontal: space.l, paddingBottom: space.m, gap: space.m,
+    borderBottomLeftRadius: 22, borderBottomRightRadius: 22,
   },
   left: { flexDirection: 'row', alignItems: 'center', gap: space.s, minWidth: 92 },
-  avatar: { width: 28, height: 28, borderRadius: 14 },
+  avatar: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: colors.jersey },
   avatarEmpty: { backgroundColor: colors.asphaltSoft, alignItems: 'center', justifyContent: 'center' },
   initials: { fontFamily: fonts.bodyBold, color: colors.paper, fontSize: type.small },
-  team: { flex: 1, textAlign: 'center', fontFamily: fonts.display, fontSize: type.lead, color: colors.paper },
+  team: { flex: 1, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.8, color: colors.paper },
+  pill: { backgroundColor: colors.asphaltSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
   right: { flexDirection: 'row', alignItems: 'center', gap: space.s, minWidth: 92, justifyContent: 'flex-end' },
   value: { fontFamily: fonts.number, fontSize: type.body, color: colors.jersey },
 });
