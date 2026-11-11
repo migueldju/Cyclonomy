@@ -24,14 +24,14 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.road },
       }}>
       <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: icon('home-outline') }} />
-      <Tabs.Screen name="mercado" options={{ title: t('tabs.market'), tabBarIcon: icon('pricetags-outline') }} />
-      <Tabs.Screen name="plantilla" options={{ title: t('tabs.squad'), tabBarIcon: icon('people-outline') }} />
-      <Tabs.Screen name="clasificacion" options={{ title: t('tabs.standings'), tabBarIcon: icon('podium-outline') }} />
-      <Tabs.Screen name="calendario" options={{ title: t('tabs.calendar'), tabBarIcon: icon('calendar-outline') }} />
+      <Tabs.Screen name="market" options={{ title: t('tabs.market'), tabBarIcon: icon('pricetags-outline') }} />
+      <Tabs.Screen name="squad" options={{ title: t('tabs.squad'), tabBarIcon: icon('people-outline') }} />
+      <Tabs.Screen name="standings" options={{ title: t('tabs.standings'), tabBarIcon: icon('podium-outline') }} />
+      <Tabs.Screen name="calendar" options={{ title: t('tabs.calendar'), tabBarIcon: icon('calendar-outline') }} />
       {/* pantallas dentro de las pestañas (sin botón propio): conservan la barra inferior */}
       <Tabs.Screen name="ranking" options={{ href: null, header: () => <TopBar back /> }} />
-      <Tabs.Screen name="movimientos" options={{ href: null, header: () => <TopBar back /> }} />
-      <Tabs.Screen name="ciclista/[riderId]" options={{ href: null, header: () => <TopBar back /> }} />
+      <Tabs.Screen name="moves" options={{ href: null, header: () => <TopBar back /> }} />
+      <Tabs.Screen name="rider/[riderId]" options={{ href: null, header: () => <TopBar back /> }} />
     </Tabs>
   );
 }

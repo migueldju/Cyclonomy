@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Share, View } from 'react-native';
 import { Button } from '@/components/Button';
-import { DEFAULT_SETTINGS, depthHint, depthOptions, LeagueSettingsForm, payoutOptions } from '@/components/LeagueSettingsForm';
+import { DEFAULT_SETTINGS, depthHint, depthOptions, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
 import { ScoringGroups, schemeLabel, schemeOf } from '@/components/ScoringSystems';
 import { ErrorText, Row, Section } from '@/components/Section';
@@ -15,7 +15,7 @@ import { inviteMessage } from '@/lib/invite';
 import type { League } from '@/lib/types';
 import { space } from '@/theme';
 
-const rules = () => [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => t(`rules.r${n}` as 'rules.r1'));
+const rules = () => [1, 2, 3, 4, 5, 6, 7, 10, 8, 9].map((n) => t(`rules.r${n}` as 'rules.r1'));
 
 export default function Normativa() {
   const { leagueId, me, refresh } = useLeague();
@@ -60,8 +60,8 @@ export default function Normativa() {
                  hint={depthHint(lg.calendar_depth)} />
           <Param label={t('tabs.market')} value={t('rules.marketValue', { n: lg.market_size, hour: `${String(lg.market_hour).padStart(2, '0')}:00` })} />
           <Param label={t('settings.clauses')} value={lg.clauses_enabled ? t('rules.on') : t('rules.off')} />
-          <Param label={t('settings.payout')} value={payoutOptions().find((o) => o.value === lg.payout_mode)?.label ?? ''}
-                 hint={payoutHint(lg)} last />
+          <Param label={t('settings.payout')} value={t('rules.perPoint', { amount: money(lg.payout_per_point) })}
+                 hint={t('rules.paidMondays', { text: t('rules.perPoint', { amount: money(lg.payout_per_point) }) })} last />
         </Section>
       ) : null}
 
@@ -95,17 +95,8 @@ export default function Normativa() {
 }
 
 function pick(lg: League) {
-  const { max_riders, calendar_depth, market_size, market_hour, clauses_enabled, payout_mode, payout_per_point, payout_by_position } = lg;
-  return { max_riders, calendar_depth, market_size, market_hour, clauses_enabled, payout_mode, payout_per_point, payout_by_position };
-}
-
-function payoutHint(lg: League) {
-  const perPoint = t('rules.perPoint', { amount: money(lg.payout_per_point) });
-  const prizes = lg.payout_by_position.length
-    ? lg.payout_by_position.map((p, i) => `${t('fmt.ordinal', { n: i + 1 })} ${money(p)}`).join(', ') : t('rules.noPrizes');
-  const text = lg.payout_mode === 'per_point' ? perPoint : lg.payout_mode === 'by_position' ? prizes
-    : t('rules.both', { perPoint, prizes });
-  return t('rules.paidMondays', { text });
+  const { max_riders, calendar_depth, market_size, market_hour, clauses_enabled } = lg;
+  return { max_riders, calendar_depth, market_size, market_hour, clauses_enabled };
 }
 
 function Param({ label, value, hint, last }: { label: string; value: string; hint?: string; last?: boolean }) {

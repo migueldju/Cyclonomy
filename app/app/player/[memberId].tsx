@@ -54,7 +54,7 @@ export default function Jugador() {
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
                     photo={r.photo_url} nationality={r.nationality}
                     note={riderStatusNote(r.status)} value={r.market_value}
-                    detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={i === rows.length - 1} />
+                    detail={`${r.locked_next ? '🔒 ' : ''}${t('squad.clause', { amount: moneyShort(r.clause) })}`} onPress={() => setPicked(r)} last={i === rows.length - 1} />
         )) : <Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
       </Section>
       <ErrorText error={roster.error} />
@@ -64,11 +64,12 @@ export default function Jugador() {
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
         subtitle={picked ? (picked.transferable
-          ? t('player.riderSubtitle', { value: money(picked.market_value), clause: money(picked.clause), points: points(picked.season_points) })
+          ? [t('player.riderSubtitle', { value: money(picked.market_value), clause: money(picked.clause), points: points(picked.season_points) }),
+             picked.locked_next ? t('player.lockedClause') : null].filter(Boolean).join('. ')
           : t('player.pendingTransfer')) : undefined}
         actions={picked?.transferable ? [
-          { label: t('player.payClause', { amount: moneyShort(picked.clause) }), kind: 'primary',
-            hint: t('player.payClauseHint'),
+          { label: t('player.payClause', { amount: moneyShort(picked.clause) }), kind: 'primary' as const,
+            hint: picked.locked_next ? t('player.lockedClause') : t('player.payClauseHint'),
             onPress: () => api.payClause(picked.ownership_id) },
           { label: t('player.makeOffer'), hint: t('player.makeOfferHint'),
             onPress: () => { const p = picked; setTimeout(() => setOffering(p), 350); } },

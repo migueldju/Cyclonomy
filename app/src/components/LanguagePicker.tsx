@@ -11,7 +11,7 @@ import { Txt } from './Txt';
 // Bandera de cada idioma: la del país; el árabe, la de Arabia Saudí. Catalán, euskera y gallego, dibujadas aquí
 // (flagcdn.com no tiene las de las comunidades)
 const COUNTRY: Partial<Record<Lang, string>> = {
-  es: 'es', fr: 'fr', pt: 'pt', it: 'it', nl: 'nl', de: 'de', pl: 'pl', ru: 'ru', ar: 'sa', ja: 'jp', da: 'dk',
+  es: 'es', en: 'gb', fr: 'fr', pt: 'pt', it: 'it', nl: 'nl', de: 'de', pl: 'pl', ru: 'ru', ar: 'sa', ja: 'jp', da: 'dk',
   sl: 'si', cs: 'cz',
 };
 

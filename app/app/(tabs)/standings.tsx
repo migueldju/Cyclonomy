@@ -38,7 +38,7 @@ export default function Clasificacion() {
           const mine = r.member_id === me?.member_id;
           return (
             <Row key={r.member_id} last={i === rows.length - 1}
-                 onPress={() => (mine ? router.navigate('/plantilla') : router.push(`/jugador/${r.member_id}`))}>
+                 onPress={() => (mine ? router.navigate('/squad') : router.push(`/player/${r.member_id}`))}>
               <PositionJersey position={r.rank} />
               {r.avatar_url ? <Image source={{ uri: r.avatar_url }} style={styles.avatar} /> : <View style={[styles.avatar, styles.noAvatar]} />}
               <View style={{ flex: 1 }}>

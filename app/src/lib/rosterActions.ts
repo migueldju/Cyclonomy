@@ -4,7 +4,7 @@ import { api } from './api';
 import { dateTime, moneyShort } from './format';
 import type { RosterRow } from './types';
 
-/** Acciones sobre un ciclista de mi plantilla: vender al juego, subir la cláusula, poner o quitar de la venta */
+/** Acciones sobre un ciclista de mi plantilla: vender al juego, cambiar la cláusula, blindarlo, poner o quitar de la venta */
 export function actionsFor(r: RosterRow, opts: { onChangeClause?: () => void } = {}): SheetAction[] {
   if (!r.transferable) return [];               // le llega o se va el lunes: no se puede tocar
   const out: SheetAction[] = [];
@@ -18,10 +18,14 @@ export function actionsFor(r: RosterRow, opts: { onChangeClause?: () => void } =
   if (opts.onChangeClause) {
     out.push({
       label: t('actions.changeClause'),
-      hint: t('actions.changeClauseHint', { from: moneyShort(clauseLevelValue(r.price_paid, 0)),
-                                            to: moneyShort(clauseLevelValue(r.price_paid, CLAUSE_LEVELS - 1)) }),
+      hint: t('actions.changeClauseHint', { from: moneyShort(clauseMin(r)), to: moneyShort(r.clause_base * 7) }),
       onPress: opts.onChangeClause,
     });
+  }
+  // blindarlo la semana que viene (una vez por semana)
+  if (!r.locked_next) {
+    out.push({ label: t('actions.lock', { amount: moneyShort(r.lock_cost) }), hint: t('actions.lockHint'),
+               onPress: () => api.lockRider(r.ownership_id) });
   }
   out.push(r.for_sale
     ? { label: t('actions.unsell'), hint: t('actions.unsellHint'),
@@ -32,24 +36,18 @@ export function actionsFor(r: RosterRow, opts: { onChangeClause?: () => void } =
   return out;
 }
 
-/**
- * Escalones de la cláusula (las mismas cuentas que set_clause en la base de datos): del 150 % al 500 % de lo que
- * pagaste, de 50 en 50 puntos (niveles 0 a 7). Subir cuesta la mitad de lo que sube; bajar devuelve un cuarto.
- */
-export const CLAUSE_LEVELS = 8;
+/** La cláusula va del 130 % al 700 % de su base (lo pagado o, si es mayor, el valor de mercado), de 1 en 1 % */
+export const CLAUSE_MIN_PCT = 130;
+export const CLAUSE_MAX_PCT = 700;
 
-export function clauseLevelValue(pricePaid: number, level: number): number {
-  return Math.round(pricePaid * (1.5 + 0.5 * level));
-}
+/** Porcentaje actual de la cláusula sobre su base, redondeado al 1 % */
+export const clauseCurrentPct = (r: { clause: number; clause_base: number }) =>
+  Math.min(CLAUSE_MAX_PCT, Math.max(CLAUSE_MIN_PCT, Math.round((r.clause / Math.max(1, r.clause_base)) * 100)));
 
-/** Nivel más cercano a la cláusula actual */
-export function clauseLevel(clause: number, pricePaid: number): number {
-  if (!pricePaid) return 0;
-  return Math.min(CLAUSE_LEVELS - 1, Math.max(0, Math.round((clause / pricePaid - 1.5) / 0.5)));
-}
+/** Cláusula mínima: el 130 % de su base (lo pagado o, si es mayor, el valor de mercado), como en set_clause */
+export const clauseMin = (r: { clause_base: number }) => Math.ceil(r.clause_base * 1.3);
 
-/** Lo que cuesta (positivo) o devuelve (negativo) pasar de la cláusula actual a un nivel */
-export function clauseChange(clause: number, pricePaid: number, level: number): number {
-  const target = clauseLevelValue(pricePaid, level);
+/** Lo que cuesta (positivo) o devuelve (negativo) poner la cláusula en una cantidad: la mitad de la subida, un cuarto de la bajada */
+export function clauseChange(clause: number, target: number): number {
   return target >= clause ? Math.ceil((target - clause) / 2) : -Math.floor((clause - target) / 4);
 }

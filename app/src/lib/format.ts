@@ -30,8 +30,6 @@ export function course(km: number | null | undefined, vertical: number | null | 
   return [km ? `${thousands(km)} km` : '', vertical ? `${thousands(vertical)} m+` : ''].filter(Boolean).join(' · ');
 }
 
-const months = () => t('fmt.months').split(',');
-const weekdays = () => t('fmt.weekdays').split(',');
 
 /** 'YYYY-MM-DD' → Date a mediodía local (sin saltos de zona horaria) */
 export function parseDay(day: string): Date {
@@ -41,7 +39,7 @@ export function parseDay(day: string): Date {
 
 export function dayMonth(day: string): string {
   const d = parseDay(day);
-  return t('fmt.dayMonth', { d: d.getDate(), mon: months()[d.getMonth()] });
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
 export function dateRange(start: string, end: string): string {
@@ -69,11 +67,11 @@ export function time(ts: string | null): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-/** mié 6 mar, 12:15 */
+/** 06/03, 12:15 */
 export function dateTime(ts: string | null): string {
   if (!ts) return '—';
   const d = new Date(ts);
-  return t('fmt.dateTime', { wd: weekdays()[d.getDay()], d: d.getDate(), mon: months()[d.getMonth()], time: time(ts) });
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}, ${time(ts)}`;
 }
 
 /** en 3 h 20 min · en 2 días · ya */

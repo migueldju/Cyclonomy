@@ -63,7 +63,7 @@ export default function Ligas() {
       <ErrorText error={error} />
 
       <View style={{ padding: space.l }}>
-        <Button label={t('leagues.create')} onPress={() => router.push('/liga/crear')} />
+        <Button label={t('leagues.create')} onPress={() => router.push('/league/new')} />
       </View>
 
       <Section title={t('leagues.joinWithCode')}>
@@ -78,7 +78,7 @@ export default function Ligas() {
         </View>
       </Section>
       <View style={{ padding: space.l }}>
-        <Button label={t('topbar.profile')} kind="quiet" onPress={() => router.push('/perfil')} />
+        <Button label={t('topbar.profile')} kind="quiet" onPress={() => router.push('/profile')} />
       </View>
     </Screen>
   );

@@ -46,14 +46,14 @@ export default function Login() {
              autoComplete="email" textContentType="emailAddress" />
       <Input label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry
              autoComplete="password" textContentType="password" />
-      <Link href="/recuperar" style={styles.forgot}><Txt variant="small" style={styles.link}>{t('login.forgot')}</Txt></Link>
+      <Link href="/reset-password" style={styles.forgot}><Txt variant="small" style={styles.link}>{t('login.forgot')}</Txt></Link>
       <ErrorText error={error} />
       <Button label={t('login.signIn')} onPress={withEmail} busy={busy === 'email'} disabled={!email || !password} />
       <Button label={t('login.google')} kind="secondary" onPress={withGoogle} busy={busy === 'google'}
               style={{ marginTop: space.m }} />
       <View style={styles.footer}>
         <Txt variant="small">{t('login.noAccount')} </Txt>
-        <Link href="/registro"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
+        <Link href="/signup"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
       </View>
     </Screen>
   );

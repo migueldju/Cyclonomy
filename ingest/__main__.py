@@ -47,6 +47,8 @@ def main(argv=None):
                    help="solo las carreras que terminan desde esta fecha (AAAA-MM-DD)")
     h = sub.add_parser("history", help="resultados de una temporada pasada (para la ficha del ciclista)")
     h.add_argument("--season", type=int, required=True)
+    ti = sub.add_parser("titles", help="campeones nacionales, continentales y del mundo (para su maillot)")
+    ti.add_argument("--season", type=int, action="append", help="temporadas (por defecto, la del juego y la anterior)")
     sub.add_parser("photos", help="fotos de los ciclistas desde Wikimedia Commons, con autor y licencia")
     sub.add_parser("seed-values", help="valores de mercado iniciales a partir de los puntos PCS")
     sub.add_parser("plan", help="planifica hoy y mañana")
@@ -75,7 +77,14 @@ def main(argv=None):
     if args.cmd == "teams":
         print(jobs.load_teams(db, args.season or game_season(db), args.points_year, args.birthdates, args.seed_values))
     elif args.cmd == "calendar":
-        print(jobs.load_calendar(db, args.season or game_season(db), args.from_date))
+        season = args.season or game_season(db)
+        print(jobs.load_calendar(db, season, args.from_date))
+        from .titles import load_titles
+        print(load_titles(db, [season - 1, season]), "campeones")      # los títulos vigentes salen de ahí
+    elif args.cmd == "titles":
+        from .titles import load_titles
+        season = game_season(db)
+        print(load_titles(db, args.season or [season - 1, season]), "campeones")
     elif args.cmd == "history":
         from .history import load_history
         print(load_history(db, args.season))

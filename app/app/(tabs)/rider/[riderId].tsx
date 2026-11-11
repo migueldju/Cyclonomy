@@ -89,7 +89,7 @@ export default function Ciclista() {
         <Stat label={t('rider.marketValue')} value={moneyShort(r.market_value)} />
         <Stat label={t('rider.seasonPoints')} value={points(r.season_points)} />
         <Stat label={t('ranking.owner')} value={d.owner ? (d.owner.is_mine ? t('rider.you') : d.owner.team_name) : t('rider.freeCap')} />
-        {d.owner ? <Stat label={t('rider.clause')} value={moneyShort(d.owner.clause)} /> : null}
+        {d.owner ? <Stat label={t('rider.clause')} value={`${d.owner.locked ? '🔒 ' : ''}${moneyShort(d.owner.clause)}`} /> : null}
       </View>
 
       <View style={{ paddingHorizontal: space.l }}>
@@ -97,7 +97,7 @@ export default function Ciclista() {
           <Button kind="secondary" label={t('rider.manage')} onPress={() => setManaging(true)} disabled={!rosterRow} />
         ) : d.owner ? (
           <Button kind="secondary" label={t('rider.seeSquad', { team: d.owner.team_name })}
-                  onPress={() => router.push(`/jugador/${d.owner!.member_id}`)} />
+                  onPress={() => router.push(`/player/${d.owner!.member_id}`)} />
         ) : (
           <Txt variant="small">{t('rider.freeHint')}</Txt>
         )}
@@ -190,7 +190,7 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
   // una clásica tiene un solo resultado: sin desplegable (si es del juego, abre la etapa)
   const oneDay = !g.isStageRace;
   const stageId = oneDay ? g.rows[0]?.stage_id : null;
-  const onPress = oneDay ? (stageId ? () => router.push(`/etapa/${stageId}`) : undefined) : onToggle;
+  const onPress = oneDay ? (stageId ? () => router.push(`/stage/${stageId}`) : undefined) : onToggle;
   return (
     <View style={[!last && styles.line]}>
       <Pressable onPress={onPress} disabled={!onPress} accessibilityRole="button"
@@ -216,7 +216,7 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
               : !x.is_stage_race ? t('calendar.result') : x.number === 0 ? t('race.prologue') : t('race.stageN', { n: x.number });
             return (
               <Pressable key={`${x.kind}-${x.number}`} disabled={!x.stage_id}
-                         onPress={() => x.stage_id && router.push(`/etapa/${x.stage_id}`)} style={styles.detailLine}>
+                         onPress={() => x.stage_id && router.push(`/stage/${x.stage_id}`)} style={styles.detailLine}>
                 <Txt style={{ flex: 1 }}>{what}</Txt>
                 <Txt variant="number" style={{ width: 52, textAlign: 'right' }}>{ordinal(x.position)}</Txt>
                 <Txt variant="small" style={{ width: 64, textAlign: 'right' }}>{x.points ? points(x.points) : ''}</Txt>

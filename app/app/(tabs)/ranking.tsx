@@ -104,7 +104,7 @@ export default function Ranking() {
 function RankRow({ r }: { r: RankingRow & { rank: number } }) {
   const owner = r.is_mine ? t('rider.yours') : r.owner_team ?? t('rider.free');
   return (
-    <Pressable onPress={() => router.push(`/ciclista/${r.rider_id}`)} accessibilityRole="button"
+    <Pressable onPress={() => router.push(`/rider/${r.rider_id}`)} accessibilityRole="button"
                style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.road }]}>
       <Txt variant="number" style={styles.rank}>{r.rank}</Txt>
       <RiderAvatar url={r.photo_url} name={r.name} team={r.pro_team} />

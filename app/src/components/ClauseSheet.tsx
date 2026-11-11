@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
 import { api } from '../lib/api';
 import { money, moneyShort } from '../lib/format';
-import { CLAUSE_LEVELS, clauseChange, clauseLevel, clauseLevelValue } from '../lib/rosterActions';
+import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '../lib/rosterActions';
 import type { RosterRow } from '../lib/types';
 import { colors, space } from '../theme';
 import { Button } from './Button';
@@ -12,35 +12,36 @@ import { RangeSlider } from './RangeSlider';
 import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
-const pct = (level: number) => `${150 + 50 * level} %`;   // espacio que no se parte entre el número y el %
+const STEPS = CLAUSE_MAX_PCT - CLAUSE_MIN_PCT + 1;      // de 1 en 1 %: 130 %, 131 % … 700 %
 
 /**
- * Cambiar la cláusula de uno de mis ciclistas: 8 niveles del 150 % al 500 % de lo que pagó. La barra empieza
- * en el escalón actual; a la derecha se sube (pagando la mitad de la subida) y a la izquierda se baja
- * (recibiendo un cuarto de la bajada).
+ * Cambiar la cláusula de uno de mis ciclistas: una barra del 130 % al 700 % de su base (lo que pagó o, si es
+ * mayor, su valor de mercado), de 1 en 1 %, con − y + para afinar. Subir cuesta la mitad de lo que sube; bajar
+ * devuelve un cuarto.
  */
 export function ClauseSheet({ row, available, visible, onClose, onDone }: {
   row: RosterRow | null; available: number | null | undefined; visible: boolean; onClose: () => void; onDone?: () => void;
 }) {
-  const current = row ? clauseLevel(row.clause, row.price_paid) : 0;
-  const [chosen, setChosen] = useState(current);
+  const current = row ? clauseCurrentPct(row) : CLAUSE_MIN_PCT;
+  const [pct, setPct] = useState(current);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => { if (visible) { setChosen(current); setError(null); } }, [visible, current]);
+  useEffect(() => { if (visible) { setPct(current); setError(null); } }, [visible, current]);
 
   if (!row) return null;
-  const target = clauseLevelValue(row.price_paid, chosen);
-  const change = clauseChange(row.clause, row.price_paid, chosen);    // > 0 pago, < 0 me devuelven
-  const same = target === row.clause;
+  const target = Math.round((row.clause_base * pct) / 100);
+  const same = pct === current;
+  const change = same ? 0 : clauseChange(row.clause, target);     // > 0 pago, < 0 me devuelven
   const after = available != null ? available - change : null;
   const short = change > 0 && after != null && after < 0;
+  const move = (d: number) => setPct((p) => Math.min(CLAUSE_MAX_PCT, Math.max(CLAUSE_MIN_PCT, p + d)));
 
   async function confirm() {
     if (!row || same) return;
     setBusy(true);
     setError(null);
     try {
-      await api.setClause(row.ownership_id, chosen);
+      await api.setClause(row.ownership_id, target);
       onDone?.();
       onClose();
     } catch (e) {
@@ -56,7 +57,7 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
         <Txt variant="title" style={{ color: colors.inkSoft }}>{moneyShort(row.clause)}</Txt>
         <Txt variant="title" style={{ color: colors.inkSoft }}>→</Txt>
         <Txt variant="display">{moneyShort(target)}</Txt>
-        <Txt variant="small">({pct(chosen)})</Txt>
+        <Txt variant="small">({pct}{' '}%)</Txt>
       </View>
       <Txt style={{ marginBottom: space.m }}>
         {same ? t('clause.hint')
@@ -67,16 +68,21 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
         ) : null}
       </Txt>
 
-      <RangeSlider single steps={CLAUSE_LEVELS} low={0} high={chosen} label={t('clause.level')}
-                   onChange={(_, h) => setChosen(h)} />
-      {/* un porcentaje bajo cada escalón */}
-      <View style={styles.ticks}>
-        {Array.from({ length: CLAUSE_LEVELS }, (_, level) => (
-          <Txt key={level} variant="small"
-               style={[styles.tick, level === chosen && { color: colors.ink }, level === current && styles.current]}>
-            {pct(level)}
-          </Txt>
-        ))}
+      <View style={styles.sliderRow}>
+        <Pressable onPress={() => move(-1)} style={styles.step} accessibilityRole="button" accessibilityLabel="−1 %">
+          <Txt variant="lead">−</Txt>
+        </Pressable>
+        <View style={{ flex: 1 }}>
+          <RangeSlider single steps={STEPS} low={0} high={pct - CLAUSE_MIN_PCT} label={t('clause.level')}
+                       onChange={(_, h) => setPct(CLAUSE_MIN_PCT + h)} />
+        </View>
+        <Pressable onPress={() => move(1)} style={styles.step} accessibilityRole="button" accessibilityLabel="+1 %">
+          <Txt variant="lead">+</Txt>
+        </Pressable>
+      </View>
+      <View style={styles.ends}>
+        <Txt variant="small">{CLAUSE_MIN_PCT}{' '}%</Txt>
+        <Txt variant="small">{CLAUSE_MAX_PCT}{' '}%</Txt>
       </View>
 
       <ErrorText error={error} />
@@ -85,19 +91,19 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
                 ? t('clause.raiseTo', { clause: moneyShort(target), amount: money(change) })
                 : t('clause.lowerTo', { clause: moneyShort(target), amount: money(-change) })} />
       <Txt variant="small" style={{ marginTop: space.s }}>
-        {t('clause.rule', { paid: moneyShort(row.price_paid) })}
+        {t('clause.rule', { base: moneyShort(row.clause_base) })}
       </Txt>
       <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
     </Sheet>
   );
 }
 
-const TICK_W = 40;
-
 const styles = StyleSheet.create({
   headline: { flexDirection: 'row', alignItems: 'baseline', gap: space.s, marginBottom: space.xs, flexWrap: 'wrap' },
-  // un número centrado bajo cada escalón: los extremos de la barra están a 13 px (medio tirador) del borde
-  ticks: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -2, marginHorizontal: 13 - TICK_W / 2 },
-  tick: { width: TICK_W, textAlign: 'center', fontSize: 11 },
-  current: { textDecorationLine: 'underline' },
+  sliderRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
+  step: {
+    width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.line, alignItems: 'center',
+    justifyContent: 'center', backgroundColor: colors.paper,
+  },
+  ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 44 },
 });

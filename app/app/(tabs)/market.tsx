@@ -70,7 +70,7 @@ export default function Mercado() {
       <OffersSection />
 
       <Section title={t('market.daily')}
-               action={<Button small kind="dark" label={t('moves.history')} onPress={() => router.push('/movimientos')} />}>
+               action={<Button small kind="dark" label={t('moves.history')} onPress={() => router.push('/moves')} />}>
         {free.length ? free.map((r, i) => (
           <ListingRow key={r.listing_id} r={r} last={i === free.length - 1} onPress={() => open(r)} />
         )) : <Empty text={loading ? t('common.loading') : t('market.empty')} />}

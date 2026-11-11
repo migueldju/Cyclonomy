@@ -29,7 +29,7 @@ function shortName(name: string): string {
 export function MoveRow({ m, last, myId }: { m: LeagueMove; last?: boolean; myId?: string | null }) {
   const mine = !!myId && (m.buyer_id === myId || m.seller_id === myId);
   return (
-    <Row last={last} onPress={() => router.push(`/ciclista/${m.rider_id}`)}>
+    <Row last={last} onPress={() => router.push(`/rider/${m.rider_id}`)}>
       <RiderAvatar name={m.rider_name} team={m.pro_team} size={36} />
       <View style={{ flex: 1 }}>
         <Txt numberOfLines={1} style={mine ? { fontFamily: fonts.bodyBold } : undefined}>{moveText(m)}</Txt>
