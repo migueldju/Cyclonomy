@@ -438,6 +438,9 @@ const nl: Partial<Dict> = {
   "toast.joined": "Je bent lid van de competitie",
   "toast.leagueCreated": "Competitie aangemaakt",
   "info.how": "Hoe het werkt",
+  "auth.emailSendFailed": "De e-mail kon niet worden verzonden. Probeer het later opnieuw of log in met Google.",
+  "auth.rateLimited": "Te veel pogingen achter elkaar. Wacht een paar minuten en probeer het opnieuw.",
+  "auth.googleNoCode": "Google heeft de sessie niet teruggegeven aan de app. Probeer het opnieuw.",
   "topbar.profile": "Mijn profiel",
 };
 

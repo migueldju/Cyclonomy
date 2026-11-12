@@ -438,6 +438,9 @@ const ru: Partial<Dict> = {
   "toast.joined": "Ты вступил в лигу",
   "toast.leagueCreated": "Лига создана",
   "info.how": "Как это работает",
+  "auth.emailSendFailed": "Не удалось отправить письмо. Попробуй позже или войди через Google.",
+  "auth.rateLimited": "Слишком много попыток подряд. Подожди несколько минут и попробуй снова.",
+  "auth.googleNoCode": "Google не вернул сессию в приложение. Попробуй ещё раз.",
   "topbar.profile": "Мой профиль",
 };
 

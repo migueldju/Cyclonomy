@@ -7,7 +7,7 @@ import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { resetRedirectTo } from '@/lib/auth';
+import { authErrorText, resetRedirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { colors, space } from '@/theme';
 
@@ -23,7 +23,7 @@ export default function Recuperar() {
     setError(null);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: resetRedirectTo });
     setBusy(false);
-    if (error) setError(error.message);
+    if (error) setError(authErrorText(error.message));
     else setSent(true);
   }
 

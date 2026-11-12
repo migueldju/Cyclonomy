@@ -437,6 +437,9 @@ const es = {
   "toast.joined": "Te has unido a la liga",
   "toast.leagueCreated": "Liga creada",
   "info.how": "Cómo funciona",
+  "auth.emailSendFailed": "No se ha podido enviar el correo. Inténtalo más tarde o entra con Google.",
+  "auth.rateLimited": "Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.",
+  "auth.googleNoCode": "Google no ha devuelto la sesión a la app. Vuelve a intentarlo.",
   "topbar.profile": "Mi perfil",
 } as const;
 

@@ -438,6 +438,9 @@ const eu: Partial<Dict> = {
   "toast.joined": "Ligara batu zara",
   "toast.leagueCreated": "Liga sortuta",
   "info.how": "Nola dabilen",
+  "auth.emailSendFailed": "Ezin izan da mezua bidali. Saiatu geroago edo sartu Googlerekin.",
+  "auth.rateLimited": "Saiakera gehiegi jarraian. Itxaron minutu batzuk eta saiatu berriro.",
+  "auth.googleNoCode": "Googlek ez du saioa aplikaziora itzuli. Saiatu berriro.",
   "topbar.profile": "Nire profila",
 };
 

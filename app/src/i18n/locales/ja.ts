@@ -438,6 +438,9 @@ const ja: Partial<Dict> = {
   "toast.joined": "リーグに参加しました",
   "toast.leagueCreated": "リーグを作成しました",
   "info.how": "しくみ",
+  "auth.emailSendFailed": "メールを送信できませんでした。後でもう一度試すか、Googleでログインしてください。",
+  "auth.rateLimited": "短時間に試行が多すぎます。数分待ってからもう一度お試しください。",
+  "auth.googleNoCode": "Googleからアプリにセッションが戻りませんでした。もう一度お試しください。",
   "topbar.profile": "プロフィール",
 };
 

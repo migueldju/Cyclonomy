@@ -7,7 +7,7 @@ import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { redirectTo } from '@/lib/auth';
+import { authErrorText, redirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { space } from '@/theme';
 
@@ -28,7 +28,7 @@ export default function Registro() {
       options: { data: { full_name: name.trim() }, emailRedirectTo: redirectTo },
     });
     setBusy(false);
-    if (error) setError(error.message);
+    if (error) setError(authErrorText(error.message));
     else if (!data.session) setSent(true);      // el proyecto pide confirmar el email
   }
 

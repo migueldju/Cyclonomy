@@ -438,6 +438,9 @@ const ar: Partial<Dict> = {
   "toast.joined": "انضممت إلى الدوري",
   "toast.leagueCreated": "أُنشئ الدوري",
   "info.how": "كيف يعمل",
+  "auth.emailSendFailed": "تعذّر إرسال البريد. حاول لاحقًا أو ادخل عبر Google.",
+  "auth.rateLimited": "محاولات كثيرة متتالية. انتظر بضع دقائق ثم حاول مجددًا.",
+  "auth.googleNoCode": "لم يُعِد Google الجلسة إلى التطبيق. حاول مجددًا.",
   "topbar.profile": "ملفي الشخصي",
 };
 

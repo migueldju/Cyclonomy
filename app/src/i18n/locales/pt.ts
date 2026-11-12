@@ -438,6 +438,9 @@ const pt: Partial<Dict> = {
   "toast.joined": "Entraste na liga",
   "toast.leagueCreated": "Liga criada",
   "info.how": "Como funciona",
+  "auth.emailSendFailed": "Não foi possível enviar o email. Tenta mais tarde ou entra com o Google.",
+  "auth.rateLimited": "Demasiadas tentativas seguidas. Espera uns minutos e tenta de novo.",
+  "auth.googleNoCode": "O Google não devolveu a sessão à app. Tenta de novo.",
   "topbar.profile": "O meu perfil",
 };
 

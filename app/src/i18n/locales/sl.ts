@@ -438,6 +438,9 @@ const sl: Partial<Dict> = {
   "toast.joined": "Pridružil si se ligi",
   "toast.leagueCreated": "Liga ustvarjena",
   "info.how": "Kako deluje",
+  "auth.emailSendFailed": "E-pošte ni bilo mogoče poslati. Poskusi pozneje ali se prijavi z Googlom.",
+  "auth.rateLimited": "Preveč zaporednih poskusov. Počakaj nekaj minut in poskusi znova.",
+  "auth.googleNoCode": "Google seje ni vrnil v aplikacijo. Poskusi znova.",
   "topbar.profile": "Moj profil",
 };
 
