@@ -32,6 +32,13 @@ export async function exchangeFromUrl(url: string) {
 export function authErrorText(message: string): string {
   const m = message.toLowerCase();
   if (m.includes('rate limit') || m.includes('security purposes')) return t('auth.rateLimited');
+  if (m.includes('invalid login credentials')) return t('login.wrong');
+  if (m.includes('email not confirmed')) return t('auth.emailNotConfirmed');
+  if (m.includes('already registered') || m.includes('already been registered')) return t('auth.alreadyRegistered');
+  if (m.includes('token has expired') || m.includes('otp') || m.includes('invalid token')) return t('auth.invalidCode');
+  if (m.includes('unable to validate email') || m.includes('invalid format') || m.includes('is invalid')) return t('auth.invalidEmail');
+  if (m.includes('different from the old password')) return t('auth.samePassword');
+  if (m.includes('password should be') || m.includes('weak')) return t('auth.passwordShort');
   if (m.includes('error sending') || m.includes('not authorized') || m.includes('smtp')) return t('auth.emailSendFailed');
   return message;
 }
@@ -48,4 +55,13 @@ export async function signInWithGoogle() {
   // en Android la vuelta puede llegar también por el enlace (auth/callback): si ya hay sesión, nada que canjear
   if ((await supabase.auth.getSession()).data.session) return;
   await exchangeFromUrl(res.url);
+}
+
+/** Seguridad de una contraseña, de 0 (débil) a 3 (fuerte): longitud y variedad de caracteres */
+export function passwordStrength(password: string): 0 | 1 | 2 | 3 {
+  if (password.length < 8) return 0;
+  const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter((r) => r.test(password)).length;
+  if ((kinds >= 3 && password.length >= 12) || (kinds === 4 && password.length >= 10)) return 3;
+  if (kinds >= 3 || password.length >= 12) return 2;
+  return 1;
 }

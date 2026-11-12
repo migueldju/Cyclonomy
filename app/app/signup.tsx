@@ -1,6 +1,7 @@
 import { Image } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
@@ -17,7 +18,6 @@ export default function Registro() {
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
 
   async function signUp() {
     if (password.length < 8) { setError(t('auth.passwordShort')); return; }
@@ -29,19 +29,10 @@ export default function Registro() {
     });
     setBusy(false);
     if (error) setError(authErrorText(error.message));
-    else if (!data.session) setSent(true);      // el proyecto pide confirmar el email
-  }
-
-  if (sent) {
-    return (
-      <Screen padded>
-        <Txt variant="display" style={{ marginTop: space.xxl * 2 }}>{t('signup.checkEmail')}</Txt>
-        <Txt style={{ marginVertical: space.l }}>
-          {t('signup.sent', { email })}
-        </Txt>
-        <Button label={t('auth.backToLogin')} onPress={() => router.replace('/login')} />
-      </Screen>
-    );
+    // con un correo ya registrado Supabase no da error (para no revelar cuentas): devuelve un usuario sin identidades
+    else if (data.user && data.user.identities?.length === 0) setError(t('auth.alreadyRegistered'));
+    // el proyecto pide confirmar el correo: se escribe el código que llega (o se abre el enlace)
+    else if (!data.session) router.push({ pathname: '/auth/verify', params: { email: email.trim() } });
   }
 
   return (
@@ -52,10 +43,10 @@ export default function Registro() {
       <Input label={t('auth.yourName')} value={name} onChangeText={setName} maxLength={40} autoComplete="name" />
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" />
-      <Input label={t('auth.password')} value={password} onChangeText={setPassword} secureTextEntry
-             hint={t('auth.min8')} autoComplete="new-password" />
+      <PasswordInput label={t('auth.password')} value={password} onChangeText={setPassword} meter
+                     hint={t('auth.min8')} autoComplete="new-password" textContentType="newPassword" />
       <ErrorText error={error} />
-      <Button label={t('auth.createAccount')} onPress={signUp} busy={busy} disabled={!name || !email || !password} />
+      <Button label={t('auth.createAccount')} onPress={signUp} busy={busy} disabled={!name.trim() || !email.includes('@') || !password} />
       <Button label={t('signup.haveAccount')} kind="quiet" onPress={() => router.replace('/login')} style={{ marginTop: space.s }} />
     </Screen>
   );

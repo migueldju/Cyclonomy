@@ -26,7 +26,7 @@ SplashScreen.preventAutoHideAsync();
 SystemUI.setBackgroundColorAsync(colors.asphalt).catch(() => {});
 
 const AUTH_SCREENS = ['login', 'signup', 'reset-password', 'auth'];
-const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'admin'];
+const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin'];
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -92,6 +92,7 @@ function Gate({ splash }: { splash: boolean }) {
       <Stack.Screen name="stage/[stageId]" options={withBar} />
       <Stack.Screen name="rules" options={withBar} />
       <Stack.Screen name="profile" options={withBar} />
+      <Stack.Screen name="security" options={withBar} />
       <Stack.Screen name="admin" options={withBar} />
     </Stack>
     {/* pantalla de carga, mientras se lee la sesión y la liga: el logo sobre el amarillo del icono */}

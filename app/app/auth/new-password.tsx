@@ -1,11 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { CodeInput, PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
+import { authErrorText } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { colors, space } from '@/theme';
 
@@ -14,7 +15,9 @@ import { colors, space } from '@/theme';
  * contraseña nueva. El Gate de _layout no saca de aquí aunque ya haya sesión.
  */
 export default function NuevaContrasena() {
-  const { code } = useLocalSearchParams<{ code?: string }>();
+  const { code, email } = useLocalSearchParams<{ code?: string; email?: string }>();
+  const byCode = !code && !!email;            // viene de «Recuperar la contraseña»: falta el código del correo
+  const [otp, setOtp] = useState('');
   const [ready, setReady] = useState(false);
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
@@ -31,22 +34,26 @@ export default function NuevaContrasena() {
           setError(t('newpass.expired'));
           return;
         }
-      } else if (!(await supabase.auth.getSession()).data.session) {
+      } else if (!byCode && !(await supabase.auth.getSession()).data.session) {
         setError(t('newpass.openFromEmail'));
         return;
       }
       setReady(true);
     })();
-  }, [code]);
+  }, [code, byCode]);
 
   async function save() {
     if (password.length < 8) { setError(t('auth.passwordShort')); return; }
     if (password !== repeat) { setError(t('newpass.mismatch')); return; }
     setBusy(true);
     setError(null);
-    const { error } = await supabase.auth.updateUser({ password });
+    if (byCode && !(await supabase.auth.getSession()).data.session) {
+      const { error } = await supabase.auth.verifyOtp({ email: String(email), token: otp, type: 'recovery' });
+      if (error) { setBusy(false); setError(authErrorText(error.message)); return; }
+    }
+    const { error } = await supabase.auth.updateUser({ password, data: { has_password: true } });
     setBusy(false);
-    if (error) setError(error.message);
+    if (error) setError(authErrorText(error.message));
     else setDone(true);
   }
 
@@ -60,12 +67,20 @@ export default function NuevaContrasena() {
         </>
       ) : ready ? (
         <>
-          <Input label={t('newpass.title')} value={password} onChangeText={setPassword} secureTextEntry
-                 autoComplete="new-password" textContentType="newPassword" />
-          <Input label={t('newpass.repeat')} value={repeat} onChangeText={setRepeat} secureTextEntry
-                 autoComplete="new-password" textContentType="newPassword" />
+          {byCode ? (
+            <>
+              <Txt style={{ marginBottom: space.l }}>{t('auth.codeHint', { email: String(email) })}</Txt>
+              <CodeInput label={t('auth.code')} value={otp} onChange={setOtp} />
+            </>
+          ) : null}
+          <PasswordInput label={t('newpass.title')} value={password} onChangeText={setPassword} meter
+                         autoComplete="new-password" textContentType="newPassword" />
+          <PasswordInput label={t('newpass.repeat')} value={repeat} onChangeText={setRepeat}
+                         autoComplete="new-password" textContentType="newPassword" />
           <ErrorText error={error} />
-          <Button label={t('newpass.save')} onPress={save} busy={busy} disabled={!password || !repeat} />
+          <Button label={t('newpass.save')} onPress={save} busy={busy}
+                  disabled={!password || !repeat || (byCode && otp.length < 6)} />
+          {byCode ? <Button label={t('auth.backToLogin')} kind="quiet" onPress={() => router.replace('/login')} /> : null}
         </>
       ) : (
         <>
