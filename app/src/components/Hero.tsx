@@ -20,7 +20,7 @@ export function StatTile({ label, value, color, icon, wide }: {
 }) {
   return (
     <View style={[styles.tile, wide && { flexBasis: '100%' }]}>
-      <Txt variant="small" numberOfLines={wide ? 2 : 1}>{label}</Txt>
+      <Txt variant="small" numberOfLines={2}>{label}</Txt>
       <View style={styles.tileValue}>
         {icon ? <Ionicons name={icon} size={17} color={color ?? colors.ink} /> : null}
         <Txt variant="title" numberOfLines={1} style={[{ flexShrink: 1 }, color ? { color } : null]}>{value}</Txt>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
   tile: {
     flexGrow: 1, flexBasis: '45%', backgroundColor: colors.road, borderRadius: 14, paddingHorizontal: space.m,
-    paddingVertical: 10, gap: 2,
+    paddingVertical: 10, gap: 2, justifyContent: 'space-between',
   },
   tileValue: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   pills: { flexDirection: 'row', alignSelf: 'flex-start', backgroundColor: colors.line, borderRadius: 999, padding: 3 },

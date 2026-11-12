@@ -14,7 +14,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
-import { countdown, dateTime, money, moneyShort, time } from '@/lib/format';
+import { countdown, dateTime, money, moneyShort } from '@/lib/format';
 import type { MarketRow } from '@/lib/types';
 import { colors, space } from '@/theme';
 
@@ -59,9 +59,8 @@ export default function Mercado() {
     <Screen onRefresh={reload} refreshing={loading}>
       <HeroCard>
         <StatTiles>
-          <StatTile wide label={t('market.nextUpdate')} icon="time-outline"
-                    value={`${countdown(me?.next_market_at ?? null)} · ${time(me?.next_market_at ?? null)}`} />
-          <StatTile wide label={t('market.canSpend')} value={moneyShort(me?.available)}
+          <StatTile label={t('market.nextUpdate')} icon="time-outline" value={countdown(me?.next_market_at ?? null)} />
+          <StatTile label={t('market.canSpend')} value={moneyShort(me?.available)}
                     color={(me?.available ?? 0) >= 0 ? colors.green : colors.red} />
         </StatTiles>
         <InfoButton title={t('tabs.market')} style={{ marginTop: space.m }}
