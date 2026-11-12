@@ -27,6 +27,9 @@ const IRIS = ['#3B2A20', '#5A3A24', '#4F6E86', '#5E7A4C'];
 // Rasgos sacados de su foto, para los ciclistas que tienen un dibujo propio (por nombre)
 type Portrait = {
   hair?: string; style?: string; iris?: string; stubble?: boolean; skin?: number;
+  skinHex?: string;             // tono de piel exacto (de su foto); si no, el de `skin`
+  face?: 'narrow' | 'wide';     // cara más estrecha o más ancha
+  brows?: 'thick' | 'light';    // cejas pobladas o finas
   highlight?: string;           // mechones más claros en lo alto
   smile?: boolean;              // sonrisa abierta, con dientes
   blush?: boolean;              // mejillas sonrosadas
@@ -42,8 +45,14 @@ const QUIFF = 'M34.8 26 C34 17 36.5 9.5 41.5 6.4 C43.5 4.2 46.5 3.8 48.5 4.4 C50
 // afro y calvo (solo pelo en los lados)
 // pelo largo: por detrás de la cabeza, pegado a ella y cortado recto a la altura de las orejas
 const LONG_BACK = 'M32.2 30 C31 15.5 38.6 4.8 50 4.8 C61.4 4.8 69 15.5 67.8 30 L68.2 37.2 C67 38 65.6 37.6 64.6 36.8 L35.4 36.8 C34.4 37.6 33 38 31.8 37.2 Z';
-const AFRO = 'M31 30 C26 14 36 1 50 1 C64 1 74 14 69 30 C67 24 63.5 19.5 58 18.5 C53 20 47 20 42 18.5 C36.5 19.5 33 24 31 30 Z';
+// afro: redondo y con volumen, pero las puntas acaban pegadas a la cabeza (a la altura de las sienes)
+const AFRO = 'M34.8 29 C31 25 30.5 15.5 35 9.6 C39 4.6 45 3 50 3 C55 3 61 4.6 65 9.6 C69.5 15.5 69 25 65.2 29 C64.6 23.5 62.5 19.6 58 18.4 C53 20 47 20 42 18.4 C37.5 19.6 35.4 23.5 34.8 29 Z';
 const BALD = 'M34.8 31 C34.5 26.5 35.2 22.5 36.6 19.8 C37 23.5 37.2 27 37.3 31 Z M65.2 31 C65.5 26.5 64.8 22.5 63.4 19.8 C63 23.5 62.8 27 62.7 31 Z';
+// rizado corto, flequillo largo de lado, de punta y con entradas
+const CURLY = 'M34.6 27 C33.6 21 34.4 15 37 11.5 C36.6 8.5 39.5 6 42.5 6.8 C43.5 3.8 47.5 2.8 50 4.6 C52.5 2.8 56.5 3.8 57.5 6.8 C60.5 6 63.4 8.5 63 11.5 C65.6 15 66.4 21 65.4 27 C64.6 22.5 63 19.4 60.5 18 C58.5 19.6 56 19.2 54.5 17.8 C53 19.6 50.5 19.8 49 18 C47.2 19.8 44.6 19.6 43.4 17.8 C41.8 19.4 39.6 19.4 38.4 18.4 C36.4 20.4 35.2 23.4 34.6 27 Z';
+const FRINGE = 'M34.4 30 C32.6 14 40 5 51 5.2 C61 5.4 67.4 13 65.6 30 C65 25 63.8 21.5 62 19.5 C56 21.5 47 22.5 40.5 24.5 C37.5 25.5 35.4 27.5 34.4 30 Z';
+const SPIKY = 'M35 27 C34.2 18 36.5 12 40 9.4 L41.5 5.6 L44 8 L46.2 3.8 L48.6 7.2 L51 3.2 L53.2 7.2 L56 4 L57.6 8.2 L60.4 6.4 L60.6 10 C63.8 13 65.6 19 65 27 C63.6 21 61 17.6 57.5 16.4 C52.5 15.2 47.5 15.2 42.5 16.4 C39 17.6 36.4 21 35 27 Z';
+const RECEDING = 'M35.2 28 C34.6 20 36 14.5 39 11.4 C42 8.2 46 7.4 50 7.4 C54 7.4 58 8.2 61 11.4 C64 14.5 65.4 20 64.8 28 C63.8 23 62.6 19.5 61 17 C59.6 13.6 57.6 12.6 56 13.4 C54 15.6 46 15.6 44 13.4 C42.4 12.6 40.4 13.6 39 17 C37.4 19.5 36.2 23 35.2 28 Z';
 const IRIS_BY_CODE: Record<string, string> = { b: '#5E86A8', g: '#5E7A4C', d: '#4A2F22' };
 
 /** Rasgos de un ciclista a partir de su código en RIDER_LOOKS (ver riderLooks.ts). */
@@ -56,7 +65,11 @@ function fromLook(code: string | undefined): Portrait {
     style: styleByCode(c[0]), longHair: c[0] === 'L', stubble: c[1] === '1' || c[1] === '6', beard: c[1] === '2',
     mustache: c[1] === '3' || c[1] === '5' || c[1] === '6', goatee: c[1] === '4' || c[1] === '5', smile: c[2] === '1',
     iris: IRIS_BY_CODE[c[3]], earring: c.includes('e') ? 'left' : undefined, glasses: c.includes('x'),
-    hair: hex ? `#${hex}` : undefined, skin: tone ? Number(tone) : undefined,
+    hair: hex ? `#${hex}` : undefined,
+    // tras '/': el tono de la paleta (0–5) o el color exacto de la piel
+    skin: tone && tone.length === 1 ? Number(tone) : undefined, skinHex: tone && tone.length === 6 ? `#${tone}` : undefined,
+    face: c.includes('n') ? 'narrow' : c.includes('w') ? 'wide' : undefined,
+    brows: c.includes('t') ? 'thick' : c.includes('l') ? 'light' : undefined, blush: c.includes('r') || undefined,
   };
 }
 
@@ -67,8 +80,16 @@ const PORTRAITS: Record<string, Portrait> = {
 
 // los cuatro peinados básicos están en HAIRSTYLES (más abajo): se busca al usarlos
 function styleByCode(k: string): string | undefined {
-  return ({ C: HAIRSTYLES[0], P: HAIRSTYLES[1], R: HAIRSTYLES[2], O: HAIRSTYLES[3], Q: QUIFF, L: HAIRSTYLES[3], A: AFRO, B: BALD } as
+  return ({ C: HAIRSTYLES[0], P: HAIRSTYLES[1], R: HAIRSTYLES[2], O: HAIRSTYLES[3], Q: QUIFF, L: HAIRSTYLES[3], A: AFRO, B: BALD,
+            U: CURLY, F: FRINGE, S: SPIKY, H: RECEDING } as
     Record<string, string>)[k];
+}
+
+/** Sombra de un tono de piel: el mismo color, más oscuro y algo más rojizo */
+function darker(hex: string): string {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (v: number, k: number) => Math.round(Math.max(0, Math.min(255, v * k))).toString(16).padStart(2, '0');
+  return `#${ch(n >> 16, 0.88)}${ch((n >> 8) & 255, 0.82)}${ch(n & 255, 0.78)}`;
 }
 
 function hash(s: string) {
@@ -98,8 +119,10 @@ function Cyclist({ team, name, size }: { team?: string | null; name: string; siz
   const kit = teamKit(team);
   const h = hash(name);
   const p: Portrait = { ...fromLook(RIDER_LOOKS[name]), ...PORTRAITS[name] };
-  const skin = SKINS[p.skin ?? 1];
-  const shade = SHADES[p.skin ?? 1];
+  const skin = p.skinHex ?? SKINS[p.skin ?? 1];
+  const shade = p.skinHex ? darker(p.skinHex) : SHADES[p.skin ?? 1];
+  const faceW = p.face === 'narrow' ? 0.93 : p.face === 'wide' ? 1.07 : 1;
+  const brow = p.brows === 'thick' ? 2.4 : p.brows === 'light' ? 1.1 : 1.6;
   const hair = p.hair ?? HAIR[(h >>> 4) % HAIR.length];
   const style = p.style ?? HAIRSTYLES[(h >>> 8) % HAIRSTYLES.length];
   const iris = p.iris ?? IRIS[(h >>> 12) % IRIS.length];
@@ -127,7 +150,7 @@ function Cyclist({ team, name, size }: { team?: string | null; name: string; siz
         <Path d="M43.5 44 L56.5 44 L60 58.4 Q50 66.6 40 58.4 Z" fill={skin} />
         <Path d="M43.5 47 Q50 55 56.5 47 L57.6 52 Q50 59 42.4 52 Z" fill={shade} opacity={0.75} />
         <Path d="M40.6 58.6 Q50 65.6 59.4 58.6" fill="none" stroke="rgba(40,25,20,0.35)" strokeWidth={1.2} />
-        <G transform="translate(0 4) translate(50 51) scale(1.12) translate(-50 -51)">
+        <G transform={`translate(0 4) translate(50 51) scale(${1.12 * faceW} 1.12) translate(-50 -51)`}>
           {p.longHair ? <Path d={LONG_BACK} fill={hair} /> : null}
           {/* orejas */}
           <Path d="M35.6 29 C31.8 28 31 33 32.3 36 C33.2 38.3 34.8 39 36 38.6 Z" fill={skin} />
@@ -169,8 +192,10 @@ function Cyclist({ team, name, size }: { team?: string | null; name: string; siz
                   fill={hair} opacity={0.9} />
           ) : null}
           {/* cejas */}
-          <Path d="M39.4 26.6 C41.5 25 44.6 24.8 47 25.9" fill="none" stroke={hair} strokeWidth={1.6} strokeLinecap="round" />
-          <Path d="M60.6 26.6 C58.5 25 55.4 24.8 53 25.9" fill="none" stroke={hair} strokeWidth={1.6} strokeLinecap="round" />
+          <Path d="M39.4 26.6 C41.5 25 44.6 24.8 47 25.9" fill="none" stroke={hair} strokeWidth={brow} strokeLinecap="round"
+                opacity={p.brows === 'light' ? 0.7 : 1} />
+          <Path d="M60.6 26.6 C58.5 25 55.4 24.8 53 25.9" fill="none" stroke={hair} strokeWidth={brow} strokeLinecap="round"
+                opacity={p.brows === 'light' ? 0.7 : 1} />
           {/* ojos: blanco, iris, pupila, brillo y párpado */}
           <Path d="M40 30.6 C41.5 28.6 45.2 28.5 46.8 30.6 C45.2 32.3 41.6 32.4 40 30.6 Z" fill="#F7F4F0" />
           <Path d="M53.2 30.6 C54.8 28.5 58.5 28.6 60 30.6 C58.4 32.4 54.8 32.3 53.2 30.6 Z" fill="#F7F4F0" />
