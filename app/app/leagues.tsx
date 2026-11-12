@@ -9,6 +9,7 @@ import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
+import { SignOutButton } from '@/components/SignOutButton';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -87,6 +88,7 @@ export default function Ligas() {
       </Section>
       <View style={{ padding: space.l }}>
         <Button label={t('topbar.profile')} kind="quiet" onPress={() => router.push('/profile')} />
+        <SignOutButton />
       </View>
     </Screen>
   );

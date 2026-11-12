@@ -7,6 +7,7 @@ import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
+import { SignOutButton } from '@/components/SignOutButton';
 import { useAuth } from '@/context/AuthContext';
 import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
@@ -56,6 +57,7 @@ export default function Unirse() {
           <Txt variant="small" style={{ marginTop: space.m }}>
             {t('join.start')}
           </Txt>
+          <SignOutButton style={{ marginTop: space.m }} />
         </>
       ) : (
         <>

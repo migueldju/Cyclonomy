@@ -6,6 +6,7 @@ import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/compo
 import { Screen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
+import { SignOutButton } from '@/components/SignOutButton';
 import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
@@ -43,6 +44,7 @@ export default function CrearLiga() {
           <CountryPicker value={country} onChange={setCountry} />
         </View>
       </LeagueSettingsForm>
+      <SignOutButton style={{ marginTop: space.m }} />
     </Screen>
   );
 }
