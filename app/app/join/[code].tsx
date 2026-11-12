@@ -57,7 +57,9 @@ export default function Unirse() {
           <Txt variant="small" style={{ marginTop: space.m }}>
             {t('join.start')}
           </Txt>
-          <SignOutButton style={{ marginTop: space.m }} />
+          <Button kind="quiet" label={t('common.back')} onPress={() => { setPendingInvite(null); router.replace('/leagues'); }}
+                  style={{ marginTop: space.m }} />
+          <SignOutButton />
         </>
       ) : (
         <>
