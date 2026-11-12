@@ -146,12 +146,12 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
           return (
             <Pressable key={date} onPress={() => onSelect(date)} accessibilityRole="button" accessibilityState={{ selected: on }}
                        style={[styles.day, { width: cell }, on && styles.dayOn, date === today && !on && styles.dayToday]}>
-              <Txt style={[styles.dayNum, on && { color: colors.paper }]}>{d}</Txt>
+              <Txt style={[styles.dayNum, on && styles.dayNumOn]}>{d}</Txt>
               <View style={styles.bars}>
                 {here.slice(0, 3).map((r) => (
                   <View key={r.race_id} style={[styles.bar, { backgroundColor: categoryColor[r.category] ?? colors.inkSoft }]} />
                 ))}
-                {here.length > 3 ? <Txt style={[styles.more, on && { color: colors.paper }]}>+{here.length - 3}</Txt> : null}
+                {here.length > 3 ? <Txt style={styles.more}>+{here.length - 3}</Txt> : null}
               </View>
             </Pressable>
           );
@@ -316,8 +316,10 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   weekday: { textAlign: 'center', paddingBottom: space.xs, textTransform: 'capitalize' },
   day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 12 },
-  dayOn: { backgroundColor: colors.ink },
-  dayToday: { borderWidth: 1.5, borderColor: colors.ink },
+  // el día elegido, con borde y sin relleno: las rayas de las carreras (también las negras del WorldTour) se ven igual
+  dayOn: { borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.paper, paddingTop: 3 },
+  dayToday: { backgroundColor: colors.road },
+  dayNumOn: { fontFamily: fonts.bodyBold },
   dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
   bars: {
     flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 2, marginTop: 4,

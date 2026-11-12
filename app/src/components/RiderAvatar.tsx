@@ -75,7 +75,7 @@ function fromLook(code: string | undefined): Portrait {
 
 const PORTRAITS: Record<string, Portrait> = {
   'Abel Balderstone': { hair: '#B5672F', highlight: '#D99A5B', style: QUIFF, iris: '#6F98BC', stubble: false, smile: true,
-                        blush: true, earring: 'left' },
+                        earring: 'left' },
 };
 
 // los cuatro peinados básicos están en HAIRSTYLES (más abajo): se busca al usarlos
