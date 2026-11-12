@@ -437,6 +437,8 @@ const ja: Partial<Dict> = {
   "toast.newCode": "新しい招待コードを作成しました",
   "toast.joined": "リーグに参加しました",
   "toast.leagueCreated": "リーグを作成しました",
+  "info.how": "しくみ",
+  "ad.label": "広告",
   "topbar.profile": "プロフィール",
 };
 

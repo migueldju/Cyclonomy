@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HeroCard } from '@/components/Hero';
+import { InfoButton } from '@/components/Info';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
@@ -83,11 +84,8 @@ export default function Inscripcion() {
           {data.open ? t('entry.open', { max, when: dateTime(data.race.entries_close_at) }) : t('entry.closed')}
           {data.auto ? ` ${t('entry.auto')}` : ''}
         </Txt>
-        {data.open ? (
-          <Txt variant="small">
-            {t('entry.autoHint')}
-          </Txt>
-        ) : null}
+        <InfoButton title={t('race.enter')} style={{ marginTop: space.s }}
+                    items={[t('rules.r9'), t('entry.autoHint'), t('rules.r4')]} />
       </HeroCard>
 
       <Section title={t('entry.yourRiders', { n: chosen.size, max })}>

@@ -437,6 +437,8 @@ const ca: Partial<Dict> = {
   "toast.newCode": "Nou codi d'invitació creat",
   "toast.joined": "T'has unit a la lliga",
   "toast.leagueCreated": "Lliga creada",
+  "info.how": "Com funciona",
+  "ad.label": "Publicitat",
   "topbar.profile": "El meu perfil",
 };
 

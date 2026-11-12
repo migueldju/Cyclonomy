@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
+import { AdSlot, InfoButton } from '@/components/Info';
 import { Button } from '@/components/Button';
 import { ActionSheet, AmountSheet, SheetAction } from '@/components/Modal';
 import { OffersSection } from '@/components/OffersSection';
@@ -63,8 +64,10 @@ export default function Mercado() {
           <StatTile label={t('market.canSpend')} value={moneyShort(me?.available)}
                     color={(me?.available ?? 0) >= 0 ? colors.green : colors.red} />
         </StatTiles>
-        <Txt variant="small" style={{ marginTop: space.m }}>{t('market.note')}</Txt>
+        <InfoButton title={t('tabs.market')} style={{ marginTop: space.m }}
+                    items={[t('market.note'), t('rules.r8'), t('rules.r2')]} />
       </HeroCard>
+      <AdSlot />
 
       <OffersSection />
 

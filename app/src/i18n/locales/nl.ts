@@ -437,6 +437,8 @@ const nl: Partial<Dict> = {
   "toast.newCode": "Nieuwe uitnodigingscode aangemaakt",
   "toast.joined": "Je bent lid van de competitie",
   "toast.leagueCreated": "Competitie aangemaakt",
+  "info.how": "Hoe het werkt",
+  "ad.label": "Advertentie",
   "topbar.profile": "Mijn profiel",
 };
 

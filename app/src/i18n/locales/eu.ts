@@ -437,6 +437,8 @@ const eu: Partial<Dict> = {
   "toast.newCode": "Gonbidapen kode berria sortuta",
   "toast.joined": "Ligara batu zara",
   "toast.leagueCreated": "Liga sortuta",
+  "info.how": "Nola dabilen",
+  "ad.label": "Publizitatea",
   "topbar.profile": "Nire profila",
 };
 

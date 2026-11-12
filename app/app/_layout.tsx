@@ -102,6 +102,6 @@ function Gate() {
 }
 
 const styles = StyleSheet.create({
-  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.logoYellow, alignItems: 'center', justifyContent: 'center' },
+  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.jersey, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 240, height: 40 },
 });

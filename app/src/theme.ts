@@ -11,9 +11,8 @@ export const colors = {
   line: '#E3E8E5',         // separadores
   ink: '#1E272C',
   inkSoft: '#5E6B71',
-  jersey: '#F5C400',       // acción principal (maillot amarillo)
+  jersey: '#F4C63F',       // acción principal: el amarillo del logo
   jerseyInk: '#2A2300',
-  logoYellow: '#F4C63F',   // fondo del icono y de la pantalla de carga
   green: '#17834A',        // dinero y puntos a favor
   orange: '#E9852B',       // llega el lunes
   red: '#D23A3A',          // se va el lunes / errores
@@ -48,7 +47,7 @@ export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 };
 
 // Categorías: un color por tipo de carrera, para reconocerlas de un vistazo en el calendario
 export const categoryColor: Record<string, string> = {
-  TDF: '#F5C400', GT: '#E8578A', MON: '#7A4BC2', WC: '#2F6FDB', WC_ITT: '#2F6FDB',
+  TDF: '#F4C63F', GT: '#E8578A', MON: '#7A4BC2', WC: '#2F6FDB', WC_ITT: '#2F6FDB',
   MWT: '#1E272C', SWT: '#6B7A82', WT: '#1E272C', CC: '#2A9BB8', CC_ITT: '#2A9BB8', NC: '#C0613A', NC_ITT: '#C0613A',
   PRO: '#17834A', C1: '#9AA5AA',
 };

@@ -1,11 +1,9 @@
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
+import { AdSlot, InfoButton } from '@/components/Info';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
-import { StatusDot } from '@/components/StatusDot';
-import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -31,11 +29,11 @@ export default function Plantilla() {
           <StatTile label={t('admin.riders')} value={me ? `${me.roster_count}/${me.max_riders}` : '—'} />
           <StatTile label={t('squad.balance')} value={moneyShort(me?.balance)} color={(me?.balance ?? 0) < 0 ? colors.red : colors.green} />
         </StatTiles>
-        <View style={styles.legend}>
-          <View style={styles.legendItem}><StatusDot status="incoming" /><Txt variant="small">{t('squad.legendIncoming')}</Txt></View>
-          <View style={styles.legendItem}><StatusDot status="leaving" /><Txt variant="small">{t('squad.legendLeaving')}</Txt></View>
-        </View>
+        <InfoButton title={t('tabs.squad')} style={{ marginTop: space.m }}
+                    items={[{ dot: colors.orange, text: t('squad.legendIncoming') }, { dot: colors.red, text: t('squad.legendLeaving') },
+                            t('rules.r5'), t('rules.r10'), t('rules.r6')]} />
       </HeroCard>
+      <AdSlot />
 
       <Section style={{ marginTop: space.l }}>
         {rows.length ? rows.map((r, i) => (
@@ -60,8 +58,3 @@ export default function Plantilla() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  legend: { paddingTop: space.m, gap: space.xs },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: space.s },
-});

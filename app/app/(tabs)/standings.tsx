@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Pills } from '@/components/Hero';
+import { InfoButton } from '@/components/Info';
 import { PositionJersey } from '@/components/PositionJersey';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
@@ -55,9 +56,8 @@ export default function Clasificacion() {
         }) : <Empty text={loading ? t('common.loading') : t('standings.empty')} />}
       </Section>
       <ErrorText error={error} />
-      <Txt variant="small" style={{ padding: space.l, paddingHorizontal: space.l + 4 }}>
-        {t('standings.hint')}
-      </Txt>
+      <InfoButton title={t('tabs.standings')} style={{ margin: space.l }}
+                  items={[t('standings.hint'), t('rules.r6'), t('rules.r2')]} />
     </Screen>
   );
 }

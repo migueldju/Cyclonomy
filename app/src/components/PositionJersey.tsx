@@ -5,7 +5,7 @@ import { colors, fonts } from '../theme';
 
 // Maillot con el puesto en el pecho: amarillo el líder, plata el 2.º, bronce el 3.º y blanco grisáceo el resto
 const KITS: Record<number, { fill: string; stroke: string; ink: string }> = {
-  1: { fill: '#F5CF1B', stroke: '#C9A50A', ink: '#2A2300' },
+  1: { fill: '#F4C63F', stroke: '#C9A12A', ink: '#2A2300' },
   2: { fill: '#A9B0B9', stroke: '#747C87', ink: '#1E2227' },
   3: { fill: '#D08A4C', stroke: '#A3632C', ink: '#2E1A08' },
 };

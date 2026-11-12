@@ -436,6 +436,8 @@ const es = {
   "toast.newCode": "Nuevo código de invitación creado",
   "toast.joined": "Te has unido a la liga",
   "toast.leagueCreated": "Liga creada",
+  "info.how": "Cómo funciona",
+  "ad.label": "Publicidad",
   "topbar.profile": "Mi perfil",
 } as const;
 
