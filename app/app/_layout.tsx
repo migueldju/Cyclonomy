@@ -101,7 +101,7 @@ function Gate({ splash }: { splash: boolean }) {
   );
 }
 
-/** Pantalla de carga: el logo horizontal sobre el amarillo de la marca */
+/** Pantalla de carga: el logo horizontal sobre blanco */
 function LoadingScreen() {
   return (
     <View style={styles.loading}>
@@ -112,6 +112,6 @@ function LoadingScreen() {
 }
 
 const styles = StyleSheet.create({
-  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.jersey, alignItems: 'center', justifyContent: 'center' },
+  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 260, height: 44 },
 });

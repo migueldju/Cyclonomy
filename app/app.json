@@ -37,7 +37,7 @@
           "image": "./assets/logo-horizontal.png",
           "imageWidth": 240,
           "resizeMode": "contain",
-          "backgroundColor": "#F4C63F"
+          "backgroundColor": "#FFFFFF"
         }
       ],
       "expo-status-bar",
