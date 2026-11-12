@@ -10,7 +10,7 @@ import { Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastHost } from '@/components/Toast';
@@ -33,8 +33,12 @@ export default function RootLayout() {
     FiraSans_400Regular, FiraSans_500Medium, FiraSans_600SemiBold, FiraSansCondensed_600SemiBold, FiraSansCondensed_700Bold,
     BebasNeue_400Regular,
   });
-  useEffect(() => { if (fontsLoaded) SplashScreen.hideAsync(); }, [fontsLoaded]);
-  if (!fontsLoaded) return null;
+  // la pantalla de arranque nativa se quita enseguida: la de carga (el logo) la pinta la app, también en Expo Go
+  useEffect(() => { SplashScreen.hideAsync(); }, []);
+  // el logo se ve al menos un momento, aunque todo cargue al instante
+  const [shown, setShown] = useState(false);
+  useEffect(() => { const id = setTimeout(() => setShown(true), 1200); return () => clearTimeout(id); }, []);
+  if (!fontsLoaded) return <LoadingScreen />;
 
   return (
     <SafeAreaProvider>
@@ -43,7 +47,7 @@ export default function RootLayout() {
           <AuthProvider>
             <LeagueProvider>
               <StatusBar style="light" />
-              <Gate key={lang} />
+              <Gate key={lang} splash={!shown} />
               <ToastHost />
             </LeagueProvider>
           </AuthProvider>
@@ -54,7 +58,7 @@ export default function RootLayout() {
 }
 
 /** Redirige según haya sesión y liga elegida */
-function Gate() {
+function Gate({ splash }: { splash: boolean }) {
   const { session, loading } = useAuth();
   const { leagueId, ready, pendingInvite, setPendingInvite } = useLeague();
   const segments = useSegments();
@@ -91,17 +95,22 @@ function Gate() {
       <Stack.Screen name="admin" options={withBar} />
     </Stack>
     {/* pantalla de carga, mientras se lee la sesión y la liga: el logo sobre el amarillo del icono */}
-    {loading || !ready ? (
-      <View style={styles.loading}>
-        <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
-               accessibilityLabel="Cyclonomy" />
-      </View>
-    ) : null}
+    {loading || !ready || splash ? <LoadingScreen /> : null}
     </>
+  );
+}
+
+/** Pantalla de carga: el logo horizontal sobre el amarillo de la marca */
+function LoadingScreen() {
+  return (
+    <View style={styles.loading}>
+      <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
+             accessibilityLabel="Cyclonomy" />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.jersey, alignItems: 'center', justifyContent: 'center' },
-  logo: { width: 240, height: 40 },
+  logo: { width: 260, height: 44 },
 });
