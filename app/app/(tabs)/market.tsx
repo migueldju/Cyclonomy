@@ -59,9 +59,9 @@ export default function Mercado() {
     <Screen onRefresh={reload} refreshing={loading}>
       <HeroCard>
         <StatTiles>
-          <StatTile label={t('market.nextUpdate')} icon="time-outline"
+          <StatTile wide label={t('market.nextUpdate')} icon="time-outline"
                     value={`${countdown(me?.next_market_at ?? null)} · ${time(me?.next_market_at ?? null)}`} />
-          <StatTile label={t('market.canSpend')} value={moneyShort(me?.available)}
+          <StatTile wide label={t('market.canSpend')} value={moneyShort(me?.available)}
                     color={(me?.available ?? 0) >= 0 ? colors.green : colors.red} />
         </StatTiles>
         <InfoButton title={t('tabs.market')} style={{ marginTop: space.m }}

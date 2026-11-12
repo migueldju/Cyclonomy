@@ -14,12 +14,13 @@ export function StatTiles({ children, style }: { children: ReactNode; style?: Vi
   return <View style={[styles.tiles, style]}>{children}</View>;
 }
 
-export function StatTile({ label, value, color, icon }: {
+export function StatTile({ label, value, color, icon, wide }: {
   label: string; value: string; color?: string; icon?: ComponentProps<typeof Ionicons>['name'];
+  wide?: boolean;                 // ocupa toda la fila: para textos largos
 }) {
   return (
-    <View style={styles.tile}>
-      <Txt variant="small" numberOfLines={1}>{label}</Txt>
+    <View style={[styles.tile, wide && { flexBasis: '100%' }]}>
+      <Txt variant="small" numberOfLines={wide ? 2 : 1}>{label}</Txt>
       <View style={styles.tileValue}>
         {icon ? <Ionicons name={icon} size={17} color={color ?? colors.ink} /> : null}
         <Txt variant="title" numberOfLines={1} style={[{ flexShrink: 1 }, color ? { color } : null]}>{value}</Txt>
