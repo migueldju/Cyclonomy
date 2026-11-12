@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Flag } from '@/components/Flag';
 import { ActionSheet, AmountSheet } from '@/components/Modal';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
@@ -30,10 +31,10 @@ export default function Jugador() {
 
   return (
     <Screen onRefresh={roster.reload} refreshing={roster.loading}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l, paddingTop: space.xl }}>
+      <HeroCard style={{ flexDirection: 'row', alignItems: 'center', gap: space.m }}>
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
-            <Txt variant="hero" style={{ flexShrink: 1 }}>{player?.team_name ?? ''}</Txt>
+            <Txt variant="display" style={{ flexShrink: 1 }}>{player?.team_name ?? ''}</Txt>
             <Flag code={player?.country} height={16} />
           </View>
           <Txt variant="small">
@@ -48,8 +49,8 @@ export default function Jugador() {
             <Txt style={styles.crestInitial}>{player.team_name.trim().slice(0, 1).toUpperCase()}</Txt>
           </View>
         )) : null}
-      </View>
-      <Section>
+      </HeroCard>
+      <Section style={{ marginTop: space.l }}>
         {rows.length ? rows.map((r, i) => (
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
                     photo={r.photo_url} nationality={r.nationality}

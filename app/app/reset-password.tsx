@@ -1,3 +1,4 @@
+import { Image } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Button } from '@/components/Button';
@@ -28,7 +29,9 @@ export default function Recuperar() {
 
   return (
     <Screen padded>
-      <Txt variant="display" style={{ marginTop: space.xxl * 2 }}>{t('reset.title')}</Txt>
+      <Image source={require('../assets/logo-horizontal.png')} style={{ width: 180, height: 30, marginTop: space.xxl * 2 }}
+             resizeMode="contain" accessibilityLabel="Cyclonomy" />
+      <Txt variant="display" style={{ marginTop: space.xl }}>{t('reset.title')}</Txt>
       {sent ? (
         <>
           <Txt style={{ marginVertical: space.l }}>

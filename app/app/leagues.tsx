@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -13,7 +14,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
-import { space } from '@/theme';
+import { colors, space } from '@/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Ligas() {
@@ -47,7 +48,7 @@ export default function Ligas() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <Txt variant="hero" style={{ marginTop: insets.top + space.xl, paddingHorizontal: space.l }}>{t('leagues.title')}</Txt>
+      <Txt variant="hero" style={{ marginTop: insets.top + space.xl, paddingHorizontal: space.l + 4 }}>{t('leagues.title')}</Txt>
       <Section>
         {data?.length ? data.map((l, i) => (
           <Row key={l.league_id} onPress={() => open(l.league_id)} last={i === data.length - 1}>
@@ -58,7 +59,12 @@ export default function Ligas() {
                 {l.is_admin ? ` · ${t('leagues.admin')}` : ''}
               </Txt>
             </View>
-            {l.league_id === leagueId ? <Txt variant="label">{t('leagues.open')}</Txt> : null}
+            {l.league_id === leagueId ? (
+              <View style={{ backgroundColor: colors.jersey, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 }}>
+                <Txt variant="label" style={{ color: colors.jerseyInk }}>{t('leagues.open')}</Txt>
+              </View>
+            ) : null}
+            <Ionicons name="chevron-forward" size={18} color={colors.inkSoft} />
           </Row>
         )) : <Empty text={loading ? t('common.loading') : t('leagues.empty')} />}
       </Section>

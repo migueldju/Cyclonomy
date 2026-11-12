@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import { Pills } from '@/components/Hero';
 import { PositionJersey } from '@/components/PositionJersey';
 import { Flag } from '@/components/Flag';
-import { Segmented } from '@/components/Inputs';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
@@ -29,22 +29,20 @@ export default function Clasificacion() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl, paddingBottom: 0 }}>
-        <Segmented label={t('admin.classification')} value={mode} onChange={setMode}
-                   options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />
-      </View>
-      <Section style={{ marginTop: 0 }}>
+      <Section title={t('admin.classification')}
+               action={<Pills value={mode} onChange={setMode}
+                              options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />}>
         {rows.length ? rows.map((r, i) => {
           const mine = r.member_id === me?.member_id;
           return (
-            <Row key={r.member_id} last={i === rows.length - 1}
+            <Row key={r.member_id} last={i === rows.length - 1} highlight={mine}
                  onPress={() => (mine ? router.navigate('/squad') : router.push(`/player/${r.member_id}`))}>
               <PositionJersey position={r.rank} />
               {r.avatar_url ? <Image source={{ uri: r.avatar_url }} style={styles.avatar} /> : <View style={[styles.avatar, styles.noAvatar]} />}
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
                   <Txt variant="lead" numberOfLines={1}
-                       style={[{ flexShrink: 1 }, mine ? { textDecorationLine: 'underline' } : null]}>
+                       style={{ flexShrink: 1 }}>
                     {r.team_name}
                   </Txt>
                   <Flag code={r.country} />
@@ -57,7 +55,7 @@ export default function Clasificacion() {
         }) : <Empty text={loading ? t('common.loading') : t('standings.empty')} />}
       </Section>
       <ErrorText error={error} />
-      <Txt variant="small" style={{ padding: space.l }}>
+      <Txt variant="small" style={{ padding: space.l, paddingHorizontal: space.l + 4 }}>
         {t('standings.hint')}
       </Txt>
     </Screen>
@@ -65,6 +63,6 @@ export default function Clasificacion() {
 }
 
 const styles = StyleSheet.create({
-  avatar: { width: 32, height: 32, borderRadius: 16 },
+  avatar: { width: 36, height: 36, borderRadius: 18 },
   noAvatar: { backgroundColor: colors.line },
 });

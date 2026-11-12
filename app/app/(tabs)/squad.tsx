@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
@@ -23,20 +24,20 @@ export default function Plantilla() {
 
   return (
     <Screen onRefresh={done} refreshing={roster.loading}>
-      <View style={styles.summary}>
-        <Stat label={t('squad.value')} value={moneyShort(me?.team_value)} />
-        <Stat label={t('squad.points')} value={points(totalPoints)} />
-        <Stat label={t('admin.riders')} value={me ? `${me.roster_count}/${me.max_riders}` : '—'} />
-        <Stat label={t('squad.balance')} value={moneyShort(me?.balance)} color={(me?.balance ?? 0) < 0 ? colors.red : colors.green} />
-      </View>
+      <HeroCard>
+        <StatTiles>
+          <StatTile label={t('squad.value')} value={moneyShort(me?.team_value)} />
+          <StatTile label={t('squad.points')} value={points(totalPoints)} />
+          <StatTile label={t('admin.riders')} value={me ? `${me.roster_count}/${me.max_riders}` : '—'} />
+          <StatTile label={t('squad.balance')} value={moneyShort(me?.balance)} color={(me?.balance ?? 0) < 0 ? colors.red : colors.green} />
+        </StatTiles>
+        <View style={styles.legend}>
+          <View style={styles.legendItem}><StatusDot status="incoming" /><Txt variant="small">{t('squad.legendIncoming')}</Txt></View>
+          <View style={styles.legendItem}><StatusDot status="leaving" /><Txt variant="small">{t('squad.legendLeaving')}</Txt></View>
+        </View>
+      </HeroCard>
 
-
-      <View style={styles.legend}>
-        <View style={styles.legendItem}><StatusDot status="incoming" /><Txt variant="small">{t('squad.legendIncoming')}</Txt></View>
-        <View style={styles.legendItem}><StatusDot status="leaving" /><Txt variant="small">{t('squad.legendLeaving')}</Txt></View>
-      </View>
-
-      <Section>
+      <Section style={{ marginTop: space.l }}>
         {rows.length ? rows.map((r, i) => (
           <RiderRow
             key={r.ownership_id}
@@ -60,18 +61,7 @@ export default function Plantilla() {
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
-  return (
-    <View style={styles.stat}>
-      <Txt variant="small">{label}</Txt>
-      <Txt variant="title" style={color ? { color } : undefined}>{value}</Txt>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  summary: { flexDirection: 'row', flexWrap: 'wrap', padding: space.l, paddingTop: space.xl, rowGap: space.m },
-  stat: { width: '50%' },
-  legend: { paddingHorizontal: space.l, paddingTop: space.l, gap: space.xs },
+  legend: { paddingTop: space.m, gap: space.xs },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: space.s },
 });

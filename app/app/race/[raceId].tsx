@@ -2,6 +2,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
@@ -72,9 +73,9 @@ export default function Inscripcion() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl, gap: 4 }}>
+      <HeroCard style={{ gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
-          <Txt variant="hero" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
+          <Txt variant="display" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
           <Flag code={data.race.country} height={16} />
         </View>
         <Txt variant="small">{categoryName(data.race.category)} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
@@ -87,7 +88,7 @@ export default function Inscripcion() {
             {t('entry.autoHint')}
           </Txt>
         ) : null}
-      </View>
+      </HeroCard>
 
       <Section title={t('entry.yourRiders', { n: chosen.size, max })}>
         {riders.length ? riders.map((r, i) => {
@@ -96,8 +97,9 @@ export default function Inscripcion() {
           return (
             <Pressable key={r.rider_id} onPress={() => toggle(r.rider_id)} disabled={disabled}
                        accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled }}
-                       style={[styles.row, i < riders.length - 1 && styles.line, disabled && !on && { opacity: 0.5 }]}>
-              <Ionicons name={on ? 'checkbox' : 'square-outline'} size={24} color={on ? colors.ink : colors.inkSoft} />
+                       style={[styles.row, i < riders.length - 1 && styles.line, on && { backgroundColor: '#FFF7D1' },
+                               disabled && !on && { opacity: 0.5 }]}>
+              <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={26} color={on ? colors.ink : colors.line} />
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
                   <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{r.name}</Txt>

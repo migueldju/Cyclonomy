@@ -20,8 +20,10 @@ export function Section({ title, action, children, style }: {
   );
 }
 
-export function Row({ children, onPress, last }: { children: ReactNode; onPress?: () => void; last?: boolean }) {
-  const content = <View style={[styles.row, !last && styles.rowLine]}>{children}</View>;
+export function Row({ children, onPress, last, highlight }: {
+  children: ReactNode; onPress?: () => void; last?: boolean; highlight?: boolean;      // highlight: la fila propia
+}) {
+  const content = <View style={[styles.row, !last && styles.rowLine, highlight && styles.rowMine]}>{children}</View>;
   return onPress ? (
     <Pressable onPress={onPress} style={({ pressed }) => pressed && { backgroundColor: colors.road }}>
       {content}
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l, paddingVertical: space.m, gap: space.m },
   rowLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  rowMine: { backgroundColor: '#FFF7D1' },
   empty: { padding: space.l },
   error: { color: colors.red, paddingHorizontal: space.l, paddingVertical: space.s },
 });

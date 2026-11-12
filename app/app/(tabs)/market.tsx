@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { router } from 'expo-router';
+import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { ActionSheet, AmountSheet, SheetAction } from '@/components/Modal';
 import { OffersSection } from '@/components/OffersSection';
@@ -55,21 +56,15 @@ export default function Mercado() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <View style={styles.head}>
-        <View>
-          <Txt variant="small">{t('market.nextUpdate')}</Txt>
-          <Txt variant="title">{countdown(me?.next_market_at ?? null)} · {time(me?.next_market_at ?? null)}</Txt>
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Txt variant="small">{t('market.canSpend')}</Txt>
-          <Txt variant="title" style={{ color: (me?.available ?? 0) >= 0 ? colors.green : colors.red }}>
-            {moneyShort(me?.available)}
-          </Txt>
-        </View>
-      </View>
-      <Txt variant="small" style={styles.note}>
-        {t('market.note')}
-      </Txt>
+      <HeroCard>
+        <StatTiles>
+          <StatTile label={t('market.nextUpdate')} icon="time-outline"
+                    value={`${countdown(me?.next_market_at ?? null)} · ${time(me?.next_market_at ?? null)}`} />
+          <StatTile label={t('market.canSpend')} value={moneyShort(me?.available)}
+                    color={(me?.available ?? 0) >= 0 ? colors.green : colors.red} />
+        </StatTiles>
+        <Txt variant="small" style={{ marginTop: space.m }}>{t('market.note')}</Txt>
+      </HeroCard>
 
       <OffersSection />
 
@@ -146,7 +141,3 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
   );
 }
 
-const styles = StyleSheet.create({
-  head: { flexDirection: 'row', justifyContent: 'space-between', padding: space.l, paddingTop: space.xl },
-  note: { paddingHorizontal: space.l },
-});

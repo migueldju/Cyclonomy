@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
@@ -14,7 +15,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, points } from '@/lib/format';
 import type { RankingRow } from '@/lib/types';
-import { colors, fonts, space, type } from '@/theme';
+import { cardShadow, colors, fonts, space, type } from '@/theme';
 
 // Propietario: todos, libres, míos o los de un jugador concreto (member_id)
 type Owner = 'all' | 'free' | 'mine' | string;
@@ -72,9 +73,12 @@ export default function Ranking() {
         // los filtros se desplazan con la lista: en pantallas bajas no tapan los ciclistas
         ListHeaderComponent={
           <View style={styles.filters}>
-            <Txt variant="hero">{t('ranking.title')}</Txt>
-            <TextInput value={query} onChangeText={setQuery} placeholder={t('ranking.search')}
-                       placeholderTextColor={colors.inkSoft} style={styles.search} accessibilityLabel={t('ranking.search')} />
+            <Txt variant="display">{t('ranking.title')}</Txt>
+            <View style={styles.search}>
+              <Ionicons name="search" size={18} color={colors.inkSoft} />
+              <TextInput value={query} onChangeText={setQuery} placeholder={t('ranking.search')}
+                         placeholderTextColor={colors.inkSoft} style={styles.searchInput} accessibilityLabel={t('ranking.search')} />
+            </View>
             <Chips label={t('ranking.owner')} items={ownerChips} value={owner} onChange={setOwner} />
             <View style={{ gap: space.xs }}>
               <View style={styles.valueHead}>
@@ -92,20 +96,21 @@ export default function Ranking() {
           </View>
         }
         ListFooterComponent={<><ErrorText error={error} /><BottomFill /></>}
-        ListEmptyComponent={<Txt variant="small" style={{ padding: space.l }}>
+        ListEmptyComponent={<Txt variant="small" style={{ padding: space.l, paddingHorizontal: space.l + 4 }}>
           {loading ? t('common.loading') : t('ranking.noMatch')}
         </Txt>}
-        renderItem={({ item }) => <RankRow r={item} />}
+        renderItem={({ item, index }) => <RankRow r={item} first={index === 0} last={index === rows.length - 1} />}
       />
     </View>
   );
 }
 
-function RankRow({ r }: { r: RankingRow & { rank: number } }) {
+function RankRow({ r, first, last }: { r: RankingRow & { rank: number }; first: boolean; last: boolean }) {
   const owner = r.is_mine ? t('rider.yours') : r.owner_team ?? t('rider.free');
   return (
     <Pressable onPress={() => router.push(`/rider/${r.rider_id}`)} accessibilityRole="button"
-               style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.road }]}>
+               style={({ pressed }) => [styles.row, first && styles.rowFirst, last && styles.rowLast,
+                                        pressed && { backgroundColor: colors.road }]}>
       <Txt variant="number" style={styles.rank}>{r.rank}</Txt>
       <RiderAvatar url={r.photo_url} name={r.name} team={r.pro_team} />
       <View style={{ flex: 1, gap: 2 }}>
@@ -130,16 +135,23 @@ function normalize(s: string) {
 }
 
 const styles = StyleSheet.create({
-  filters: { padding: space.l, paddingTop: space.xl, gap: space.m, backgroundColor: colors.road },
-  search: {
-    backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 6, paddingHorizontal: space.m,
-    paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
+  filters: {
+    margin: space.l, padding: space.l, gap: space.m, backgroundColor: colors.paper, borderRadius: 20, ...cardShadow,
   },
+  search: {
+    flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.road, borderRadius: 999,
+    paddingHorizontal: space.l,
+  },
+  searchInput: { flex: 1, paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink },
+  // las filas forman una sola tarjeta: redondeada la primera por arriba y la última por abajo
   row: {
     flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m,
-    backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line,
+    marginHorizontal: space.l, backgroundColor: colors.paper,
+    borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line,
   },
-  rank: { width: 32, color: colors.inkSoft },
+  rowFirst: { borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+  rowLast: { borderBottomLeftRadius: 16, borderBottomRightRadius: 16, borderBottomWidth: 0 },
+  rank: { width: 28, color: colors.inkSoft },
   nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   valueHead: { flexDirection: 'row', justifyContent: 'space-between' },
   mine: { color: colors.green, fontFamily: fonts.bodyBold },

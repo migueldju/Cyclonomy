@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Share, StyleSheet, View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { PositionJersey } from '@/components/PositionJersey';
 import { MoveRow } from '@/components/MoveRow';
@@ -32,7 +33,7 @@ export default function Inicio() {
   return (
     <Screen onRefresh={reload} refreshing={today.loading}>
       {/* Mi puesto */}
-      <View style={styles.hero}>
+      <HeroCard style={styles.hero}>
         <PositionJersey position={me?.position} size={56} />
         <View style={{ flex: 1 }}>
           <Txt variant="small">{t('home.of', { n: me?.members ?? '—', league: me?.league_name ?? '' })}</Txt>
@@ -40,7 +41,7 @@ export default function Inicio() {
           <Txt variant="small">{t('home.thisWeek', { points: points(me?.points_week) })}</Txt>
         </View>
         <Button small kind="dark" icon="book-outline" label={t('home.rules')} onPress={() => router.push('/rules')} />
-      </View>
+      </HeroCard>
 
       {me?.sanctioned_this_week ? (
         <Txt style={styles.warning}>
@@ -59,7 +60,7 @@ export default function Inicio() {
       ) : null}
 
       {/* noticias: los últimos movimientos de la liga */}
-      <Section title={t('news.title')} style={{ marginTop: space.s }}>
+      <Section title={t('news.title')}>
         {news.data?.length ? news.data.map((m, i) => (
           <MoveRow key={m.id} m={m} last={i === news.data!.length - 1} myId={me?.member_id} />
         )) : <Empty text={news.loading ? t('common.loading') : t('moves.empty')} />}
@@ -156,8 +157,8 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
 }
 
 const styles = StyleSheet.create({
-  hero: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
-  warning: { color: colors.red, paddingHorizontal: space.l },
+  hero: { flexDirection: 'row', alignItems: 'center', gap: space.m },
+  warning: { color: colors.red, paddingHorizontal: space.l + 4, paddingTop: space.m },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
 });

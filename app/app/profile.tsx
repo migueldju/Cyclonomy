@@ -14,7 +14,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { LANGUAGES, t, useI18n } from '@/i18n';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
-import { colors, space } from '@/theme';
+import { cardShadow, colors, space } from '@/theme';
 
 export default function Perfil() {
   const { session } = useAuth();
@@ -109,8 +109,11 @@ export default function Perfil() {
 }
 
 const styles = StyleSheet.create({
-  head: { flexDirection: 'row', alignItems: 'center', gap: space.l, marginBottom: space.l },
-  avatar: { width: 56, height: 56, borderRadius: 28 },
+  head: {
+    flexDirection: 'row', alignItems: 'center', gap: space.l, marginBottom: space.xl, backgroundColor: colors.paper,
+    borderRadius: 20, padding: space.l, ...cardShadow,
+  },
+  avatar: { width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: colors.jersey },
   // campo con su botón de guardar al lado, a la altura del campo
   inline: { flexDirection: 'row', alignItems: 'flex-end', gap: space.s },
   save: { marginBottom: space.l, minHeight: 44 },

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -13,7 +14,7 @@ import { api } from '@/lib/api';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
+import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -61,7 +62,7 @@ export default function Calendario() {
                      onNext={index < months.length - 1 ? () => pager.current?.scrollToIndex({ index: index + 1 }) : undefined} />
         )}
       />
-      <Txt variant="label" style={styles.dayTitle}>{dayTitle(day)}</Txt>
+      <Txt variant="title" style={styles.dayTitle}>{dayTitle(day)}</Txt>
       <ErrorText error={error} />
     </>
   );
@@ -75,7 +76,7 @@ export default function Calendario() {
       ListFooterComponent={<BottomFill />}
       contentContainerStyle={{ flexGrow: 1 }}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
-      ListEmptyComponent={<Txt variant="small" style={{ paddingHorizontal: space.l }}>
+      ListEmptyComponent={<Txt variant="small" style={{ paddingHorizontal: space.l + 4 }}>
         {loading ? t('common.loading') : t('calendar.noRacesDay')}
       </Txt>}
       renderItem={({ item }) => (
@@ -119,16 +120,19 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
   const wd = t('fmt.weekdays').split(',');
   const weekdays = [...wd.slice(1), wd[0]];
   const today = todayISO();
-  const cell = (width - space.l * 2) / 7;
+  const cell = (width - space.l * 2 - space.s * 2) / 7;
   return (
-    <View style={{ width, paddingHorizontal: space.l }}>
+    <View style={{ width, paddingHorizontal: space.l, paddingTop: space.l, paddingBottom: space.m }}>
+      <View style={styles.month}>
       <View style={styles.monthHead}>
-        <Pressable onPress={onPrev} disabled={!onPrev} hitSlop={10} accessibilityRole="button">
-          <Txt variant="title" style={!onPrev && { opacity: 0.25 }}>‹</Txt>
+        <Pressable onPress={onPrev} disabled={!onPrev} hitSlop={10} accessibilityRole="button"
+                   style={[styles.monthBtn, !onPrev && { opacity: 0.3 }]}>
+          <Ionicons name="chevron-back" size={18} color={colors.ink} />
         </Pressable>
         <Txt variant="title">{monthTitle(month)}</Txt>
-        <Pressable onPress={onNext} disabled={!onNext} hitSlop={10} accessibilityRole="button">
-          <Txt variant="title" style={!onNext && { opacity: 0.25 }}>›</Txt>
+        <Pressable onPress={onNext} disabled={!onNext} hitSlop={10} accessibilityRole="button"
+                   style={[styles.monthBtn, !onNext && { opacity: 0.3 }]}>
+          <Ionicons name="chevron-forward" size={18} color={colors.ink} />
         </Pressable>
       </View>
       <View style={styles.grid}>
@@ -153,6 +157,7 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
           );
         })}
       </View>
+      </View>
     </View>
   );
 }
@@ -176,7 +181,8 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
             {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryName(r.category)} · {status(r.status)}
           </Txt>
         </View>
-        <Txt variant="label">{open ? t('common.close') : t('common.see')}</Txt>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft}
+                  accessibilityLabel={open ? t('common.close') : t('common.see')} />
       </Pressable>
       {open ? <RaceDetailView r={r} leagueId={leagueId} /> : null}
     </View>
@@ -304,10 +310,12 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
 const styles = StyleSheet.create({
   stageCol: { width: 116 },
   winner: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: space.m, paddingBottom: space.xs },
+  month: { backgroundColor: colors.paper, borderRadius: 20, padding: space.s, paddingBottom: space.m, ...cardShadow },
+  monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: space.s, paddingBottom: space.m },
+  monthBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.road, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   weekday: { textAlign: 'center', paddingBottom: space.xs, textTransform: 'capitalize' },
-  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 8 },
+  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 12 },
   dayOn: { backgroundColor: colors.ink },
   dayToday: { borderWidth: 1.5, borderColor: colors.ink },
   dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
@@ -317,12 +325,15 @@ const styles = StyleSheet.create({
   },
   bar: { width: 9, height: 4, borderRadius: 2 },
   more: { fontFamily: fonts.bodyMedium, fontSize: 9, color: colors.inkSoft },
-  dayTitle: { paddingHorizontal: space.l, paddingTop: space.xs, paddingBottom: space.xs },
-  item: { backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  dayTitle: { paddingHorizontal: space.l + 4, paddingTop: space.xs, paddingBottom: space.s },
+  item: {
+    backgroundColor: colors.paper, marginHorizontal: space.l, marginBottom: space.s, borderRadius: 16, overflow: 'hidden',
+    ...cardShadow,
+  },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
-  detail: { paddingHorizontal: space.l, paddingBottom: space.l, paddingLeft: space.l + 16 },
+  detail: { paddingHorizontal: space.l, paddingBottom: space.l },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 6 },
   subhead: { marginTop: space.m, marginBottom: 2 },
   scoredFor: { color: colors.green, fontFamily: fonts.bodyMedium },

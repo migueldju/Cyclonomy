@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { HeroCard, Pills } from '@/components/Hero';
 import { Flag } from '@/components/Flag';
 import { RiderRow } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
@@ -13,7 +14,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { course, dateRange, dateTime, dayMonth, ordinal, points } from '@/lib/format';
 import type { RaceDetail, StageScores } from '@/lib/types';
-import { colors, fonts, space, type } from '@/theme';
+import { colors, fonts, space } from '@/theme';
 
 type View_ = 'scores' | 'entries';
 
@@ -41,10 +42,10 @@ export default function Etapa() {
 
   return (
     <Screen onRefresh={reload} refreshing={scores.loading || entries.loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl, gap: space.m }}>
+      <HeroCard style={{ gap: space.m }}>
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
-            <Txt variant="hero" style={{ flexShrink: 1 }}>{st?.race_name ?? ''}</Txt>
+            <Txt variant="display" style={{ flexShrink: 1 }}>{st?.race_name ?? ''}</Txt>
             <Flag code={st?.country} height={16} />
           </View>
           <Txt variant="small">
@@ -53,17 +54,9 @@ export default function Etapa() {
                 ? dateRange(race.data.stages[0].date, race.data.stages[race.data.stages.length - 1].date) : ''}
           </Txt>
         </View>
-        <View style={styles.segment} accessibilityRole="tablist">
-          {(['scores', 'entries'] as View_[]).map((v) => (
-            <Pressable key={v} onPress={() => setTab(v)} accessibilityRole="tab" accessibilityState={{ selected: tab === v }}
-                       style={[styles.segBtn, tab === v && styles.segOn]}>
-              <Txt style={[styles.segText, tab === v && { color: colors.paper }]}>
-                {v === 'scores' ? t('stage.scores') : t('stage.entries')}
-              </Txt>
-            </Pressable>
-          ))}
-        </View>
-      </View>
+        <Pills value={tab} onChange={setTab}
+               options={[{ value: 'scores', label: t('stage.scores') }, { value: 'entries', label: t('stage.entries') }]} />
+      </HeroCard>
       <ErrorText error={scores.error ?? entries.error} />
 
       {tab === 'scores' && scores.data ? (
@@ -72,14 +65,14 @@ export default function Etapa() {
                      initialStage={st.id} />
         ) : (
           <>
-            {!scored ? <Txt style={{ paddingHorizontal: space.l }}>{t('stage.noResultsYet')}</Txt> : null}
+            {!scored ? <Txt style={{ paddingHorizontal: space.l + 4, paddingTop: space.l }}>{t('stage.noResultsYet')}</Txt> : null}
             <StageScoresBody data={scores.data} open={open} />
           </>
         )
       ) : tab === 'entries' ? (
         <>
           {entries.data && !entries.data.visible ? (
-            <Txt variant="small" style={{ paddingHorizontal: space.l }}>
+            <Txt variant="small" style={{ paddingHorizontal: space.l + 4, paddingTop: space.l }}>
               {t('stage.hiddenUntil', { when: dateTime(entries.data.entries_close_at) })}
             </Txt>
           ) : null}
@@ -350,15 +343,8 @@ const styles = StyleSheet.create({
   winnerText: { flexShrink: 1, fontFamily: fonts.bodyMedium },
   stageOpen: { backgroundColor: colors.asphalt },
   stagePanel: { backgroundColor: colors.road, padding: space.m, gap: space.m },
-  panel: { backgroundColor: colors.paper, borderRadius: 8, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
+  panel: { backgroundColor: colors.paper, borderRadius: 14, overflow: 'hidden' },
   panelHead: { paddingHorizontal: space.l, paddingVertical: 8, borderLeftWidth: 4 },
-  segment: {
-    flexDirection: 'row', alignSelf: 'flex-start', borderWidth: 1.5, borderColor: colors.line, borderRadius: 16,
-    overflow: 'hidden',
-  },
-  segBtn: { paddingHorizontal: space.l, paddingVertical: 6, backgroundColor: colors.paper },
-  segOn: { backgroundColor: colors.ink },
-  segText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
   mine: { fontFamily: fonts.bodyBold },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   teamRow: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },

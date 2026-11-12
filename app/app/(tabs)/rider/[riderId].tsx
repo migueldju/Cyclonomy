@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { HeroCard, Pills, StatTile, StatTiles } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { ClauseSheet } from '@/components/ClauseSheet';
 import { LockSheet } from '@/components/LockSheet';
@@ -19,7 +20,7 @@ import { api } from '@/lib/api';
 import { dateRange, money, moneyShort, ordinal, points, todayISO } from '@/lib/format';
 import { actionsFor } from '@/lib/rosterActions';
 import type { RiderResult } from '@/lib/types';
-import { categoryColor, colors, fonts, space, type } from '@/theme';
+import { categoryColor, colors, space } from '@/theme';
 
 type Filter = 'recent' | 'top';
 const PAGE = 5;
@@ -74,6 +75,7 @@ export default function Ciclista() {
 
   return (
     <Screen onRefresh={detail.reload} refreshing={detail.loading}>
+      <HeroCard>
       <View style={styles.head}>
         <RiderAvatar url={r.photo?.url} name={r.name} team={r.pro_team} size={72} />
         <View style={{ flex: 1, gap: 2 }}>
@@ -87,14 +89,16 @@ export default function Ciclista() {
         </View>
       </View>
 
-      <View style={styles.stats}>
-        <Stat label={t('rider.marketValue')} value={moneyShort(r.market_value)} />
-        <Stat label={t('rider.seasonPoints')} value={points(r.season_points)} />
-        <Stat label={t('ranking.owner')} value={d.owner ? (d.owner.is_mine ? t('rider.you') : d.owner.team_name) : t('rider.freeCap')} />
-        {d.owner ? <Stat label={t('rider.clause')} value={moneyShort(d.owner.clause)} locked={d.owner.locked} /> : null}
-      </View>
+      <StatTiles style={{ marginBottom: space.m }}>
+        <StatTile label={t('rider.marketValue')} value={moneyShort(r.market_value)} />
+        <StatTile label={t('rider.seasonPoints')} value={points(r.season_points)} />
+        <StatTile label={t('ranking.owner')} value={d.owner ? (d.owner.is_mine ? t('rider.you') : d.owner.team_name) : t('rider.freeCap')} />
+        {/* candado: blindado la semana que viene */}
+        {d.owner ? <StatTile label={t('rider.clause')} value={moneyShort(d.owner.clause)}
+                             icon={d.owner.locked ? 'lock-closed' : undefined} /> : null}
+      </StatTiles>
 
-      <View style={{ paddingHorizontal: space.l }}>
+      <View>
         {mine ? (
           <Button kind="secondary" label={t('rider.manage')} onPress={() => setManaging(true)} disabled={!rosterRow} />
         ) : d.owner ? (
@@ -104,6 +108,7 @@ export default function Ciclista() {
           <Txt variant="small">{t('rider.freeHint')}</Txt>
         )}
       </View>
+      </HeroCard>
 
       <Section title={t('rider.marketValue')}>
         <ValueChart points={d.values} />
@@ -111,17 +116,8 @@ export default function Ciclista() {
 
       <Section title={t('admin.results')}
                action={
-                 <View style={styles.segment} accessibilityRole="tablist">
-                   {(['recent', 'top'] as Filter[]).map((f) => (
-                     <Pressable key={f} onPress={() => pickFilter(f)} accessibilityRole="tab"
-                                accessibilityState={{ selected: filter === f }}
-                                style={[styles.segBtn, filter === f && styles.segOn]}>
-                       <Txt style={[styles.segText, filter === f && { color: colors.paper }]}>
-                         {f === 'recent' ? t('rider.recent') : t('rider.highlights')}
-                       </Txt>
-                     </Pressable>
-                   ))}
-                 </View>
+                 <Pills value={filter} onChange={pickFilter}
+                        options={[{ value: 'recent', label: t('rider.recent') }, { value: 'top', label: t('rider.highlights') }]} />
                }>
         {groups.length ? (
           <>
@@ -235,31 +231,12 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
 }
 
 
-function Stat({ label, value, locked }: { label: string; value: string; locked?: boolean }) {
-  return (
-    <View style={styles.stat}>
-      <Txt variant="small">{label}</Txt>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-        {/* candado: blindado la semana que viene */}
-        {locked ? <Ionicons name="lock-closed" size={18} color={colors.ink} accessibilityLabel={t('squad.lockedNext')} /> : null}
-        <Txt variant="title" numberOfLines={1} style={{ flexShrink: 1 }}>{value}</Txt>
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  head: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l, paddingTop: space.xl },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: space.l, paddingBottom: space.l, rowGap: space.m },
-  stat: { width: '50%', paddingRight: space.s },
+  head: { flexDirection: 'row', alignItems: 'center', gap: space.m, marginBottom: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   raceHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
   detail: { paddingLeft: space.l + 16, paddingRight: space.l, paddingBottom: space.m },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 5 },
   more: { alignItems: 'center', paddingVertical: space.m, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.line },
-  segment: { flexDirection: 'row', borderWidth: 1.5, borderColor: colors.line, borderRadius: 16, overflow: 'hidden' },
-  segBtn: { paddingHorizontal: space.m, paddingVertical: 5, backgroundColor: colors.paper },
-  segOn: { backgroundColor: colors.ink },
-  segText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
 });

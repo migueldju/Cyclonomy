@@ -1,3 +1,4 @@
+import { Image } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Button } from '@/components/Button';
@@ -45,7 +46,9 @@ export default function Registro() {
 
   return (
     <Screen padded>
-      <Txt variant="display" style={{ marginTop: space.xxl * 2, marginBottom: space.xl }}>{t('auth.createAccount')}</Txt>
+      <Image source={require('../assets/logo-horizontal.png')} style={{ width: 180, height: 30, marginTop: space.xxl * 2 }}
+             resizeMode="contain" accessibilityLabel="Cyclonomy" />
+      <Txt variant="display" style={{ marginTop: space.xl, marginBottom: space.xl }}>{t('auth.createAccount')}</Txt>
       <Input label={t('auth.yourName')} value={name} onChangeText={setName} maxLength={40} autoComplete="name" />
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" />

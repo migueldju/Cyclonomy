@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Share, View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { DEFAULT_SETTINGS, depthHint, depthOptions, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
@@ -29,10 +30,10 @@ export default function Normativa() {
 
   return (
     <Screen onRefresh={league.reload} refreshing={league.loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl }}>
-        <Txt variant="hero">{t('home.rules')}</Txt>
+      <HeroCard>
+        <Txt variant="display">{t('home.rules')}</Txt>
         <Txt variant="small">{lg?.name ?? ''}</Txt>
-      </View>
+      </HeroCard>
       <ErrorText error={league.error} />
 
       {lg && editing ? (
