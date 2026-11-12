@@ -438,7 +438,6 @@ const de: Partial<Dict> = {
   "toast.joined": "Du bist der Liga beigetreten",
   "toast.leagueCreated": "Liga erstellt",
   "info.how": "So funktioniert's",
-  "ad.label": "Anzeige",
   "topbar.profile": "Mein Profil",
 };
 

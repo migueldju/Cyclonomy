@@ -35,13 +35,9 @@ export function InfoButton({ title, items, style }: { title: string; items: Info
   );
 }
 
-/** Hueco reservado para un banner de anuncios (320 × 50) */
+/** Hueco reservado para un banner de anuncios (320 × 50); de momento vacío y sin marcar: solo guarda el sitio */
 export function AdSlot({ style }: { style?: ViewStyle }) {
-  return (
-    <View style={[styles.ad, style]} accessibilityLabel={t('ad.label')}>
-      <Txt variant="small" style={{ color: colors.inkSoft }}>{t('ad.label')}</Txt>
-    </View>
-  );
+  return <View style={[styles.ad, style]} />;
 }
 
 const styles = StyleSheet.create({
@@ -52,8 +48,5 @@ const styles = StyleSheet.create({
   label: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink },
   item: { flexDirection: 'row', gap: space.m },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
-  ad: {
-    height: 58, marginHorizontal: space.l, marginTop: space.l, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed',
-    borderColor: '#C9D1CD', alignItems: 'center', justifyContent: 'center',
-  },
+  ad: { height: 58, marginHorizontal: space.l, marginTop: space.l },
 });

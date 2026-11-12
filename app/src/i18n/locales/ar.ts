@@ -438,7 +438,6 @@ const ar: Partial<Dict> = {
   "toast.joined": "انضممت إلى الدوري",
   "toast.leagueCreated": "أُنشئ الدوري",
   "info.how": "كيف يعمل",
-  "ad.label": "إعلان",
   "topbar.profile": "ملفي الشخصي",
 };
 

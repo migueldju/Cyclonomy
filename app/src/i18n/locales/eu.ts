@@ -438,7 +438,6 @@ const eu: Partial<Dict> = {
   "toast.joined": "Ligara batu zara",
   "toast.leagueCreated": "Liga sortuta",
   "info.how": "Nola dabilen",
-  "ad.label": "Publizitatea",
   "topbar.profile": "Nire profila",
 };
 

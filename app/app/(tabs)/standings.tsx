@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Pills } from '@/components/Hero';
-import { InfoButton } from '@/components/Info';
+import { AdSlot, InfoButton } from '@/components/Info';
 import { PositionJersey } from '@/components/PositionJersey';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
@@ -30,6 +30,7 @@ export default function Clasificacion() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
+      <AdSlot />
       <Section title={t('admin.classification')}
                action={<Pills value={mode} onChange={setMode}
                               options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />}>
