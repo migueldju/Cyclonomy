@@ -76,7 +76,9 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
       ) : null}
       <Stepper label={t('settings.maxRiders')} value={s.max_riders} min={16} max={40}
                onChange={(v) => set('max_riders', v)} />
-      <Segmented label={t('settings.depth')} options={depthOptions()} value={s.calendar_depth}
+      <Segmented label={t('settings.depth')} value={s.calendar_depth}
+                 // «WT de primer nivel» ya no se ofrece; solo se mantiene en las ligas que ya lo tenían
+                 options={depthOptions().filter((o) => o.value !== 1 || initial.calendar_depth === 1)}
                  onChange={(v) => set('calendar_depth', v)} />
       <Txt variant="small" style={{ marginTop: -space.s, marginBottom: space.l }}>{depthHint(s.calendar_depth)}</Txt>
       <Stepper label={t('settings.marketSize')} value={s.market_size} min={1} max={30}
