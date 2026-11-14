@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
 import { LanguagePicker } from '@/components/LanguagePicker';
@@ -15,6 +16,12 @@ import { LANGUAGES, t, useI18n } from '@/i18n';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 import { cardShadow, colors, space } from '@/theme';
+
+// redes de Cyclonomy
+const SOCIAL = [
+  { icon: 'logo-instagram', name: 'Instagram', handle: '@cyclonomy', url: 'https://www.instagram.com/cyclonomy' },
+  { icon: 'logo-x', name: 'X', handle: '@cyclonomy_game', url: 'https://x.com/cyclonomy_game' },
+] as const;
 
 export default function Perfil() {
   const { session } = useAuth();
@@ -105,6 +112,20 @@ export default function Perfil() {
         <Button kind="danger" label={t('profile.signOut')}
                 onPress={async () => { await selectLeague(null); await supabase.auth.signOut(); }} />
       </View>
+
+      <View style={styles.social}>
+        {SOCIAL.map((n) => (
+          <Pressable key={n.name} onPress={() => Linking.openURL(n.url)} accessibilityRole="link"
+                     accessibilityLabel={`${n.name} ${n.handle}`}
+                     style={({ pressed }) => [styles.socialCard, pressed && { opacity: 0.7 }]}>
+            <View style={styles.socialIcon}><Ionicons name={n.icon} size={22} color={colors.jersey} /></View>
+            <View style={{ flex: 1 }}>
+              <Txt variant="lead">{n.name}</Txt>
+              <Txt variant="small" numberOfLines={1}>{n.handle}</Txt>
+            </View>
+          </Pressable>
+        ))}
+      </View>
     </Screen>
   );
 }
@@ -119,4 +140,12 @@ const styles = StyleSheet.create({
   inline: { flexDirection: 'row', alignItems: 'flex-end', gap: space.s },
   save: { marginBottom: space.l, minHeight: 44 },
   noAvatar: { backgroundColor: colors.line },
+  social: { flexDirection: 'row', gap: space.m, marginTop: space.xl },
+  socialCard: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.m, backgroundColor: colors.paper, borderRadius: 16,
+    padding: space.m, ...cardShadow,
+  },
+  socialIcon: {
+    width: 40, height: 40, borderRadius: 20, backgroundColor: colors.asphalt, alignItems: 'center', justifyContent: 'center',
+  },
 });

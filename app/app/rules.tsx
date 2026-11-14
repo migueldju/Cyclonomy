@@ -91,7 +91,7 @@ export default function Normativa() {
       </Section>
 
       <Section title={t('rules.pointsByCategory')}>
-        {lg ? <ScoringGroups scheme={schemeOf(lg.scoring_system, lg.wt_split)} cats={cats.data ?? []} depth={lg.calendar_depth} /> : null}
+        {lg ? <ScoringGroups scheme={schemeOf(lg.scoring_system, lg.wt_split)} cats={cats.data ?? []} depth={lg.calendar_depth} races={false} /> : null}
       </Section>
     </Screen>
   );

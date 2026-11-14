@@ -36,8 +36,11 @@ const kindLabel = (k: string) => {
 /**
  * Tablas de un sistema: por cada grupo (categoría), sus carreras de la temporada (desplegable) y los puntos de cada
  * tipo de resultado. Con `cats` y `depth`, solo las categorías que entran en la liga y su máximo de inscritos.
+ * Con `races={false}` no se listan las carreras (en la normativa de la liga).
  */
-export function ScoringGroups({ scheme, cats, depth }: { scheme: ScoringScheme; cats?: Category[]; depth?: number }) {
+export function ScoringGroups({ scheme, cats, depth, races = true }: {
+  scheme: ScoringScheme; cats?: Category[]; depth?: number; races?: boolean;
+}) {
   const data = useLoader(() => api.scoringSystems());
   const [open, setOpen] = useState<string | null>(null);
   const cat = new Map((cats ?? []).map((c) => [c.code, c]));
@@ -66,7 +69,7 @@ export function ScoringGroups({ scheme, cats, depth }: { scheme: ScoringScheme; 
                   {pts.length > 5 ? ` … ${t('rules.upToPos', { n: pts.length })}` : ''}
                 </Txt>
               ))}
-              {g.races.length ? (
+              {races && g.races.length ? (
                 <Pressable onPress={() => setOpen(isOpen ? null : g.grp)} accessibilityRole="button"
                            accessibilityState={{ expanded: isOpen }}>
                   <Txt variant="small" style={styles.link}>
