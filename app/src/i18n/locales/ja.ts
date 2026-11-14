@@ -167,7 +167,7 @@ const ja: Partial<Dict> = {
   "login.google": "Googleで続ける",
   "login.noAccount": "アカウントをお持ちでないですか？",
   "login.signIn": "ログイン",
-  "login.tagline": "自転車ロードレースの知識を示して、最強のチームを作ろう",
+  "login.tagline": "最強のサイクリングチームを作ろう",
   "login.wrong": "メールアドレスまたはパスワードが違います。",
   "market.bid": "入札",
   "market.bidFor": "{name}に入札",

@@ -167,7 +167,7 @@ const nl: Partial<Dict> = {
   "login.google": "Doorgaan met Google",
   "login.noAccount": "Geen account?",
   "login.signIn": "Inloggen",
-  "login.tagline": "Laat zien wat je van wielrennen weet en bouw de ultieme ploeg",
+  "login.tagline": "Bouw de ultieme wielerploeg",
   "login.wrong": "Onjuist e-mailadres of wachtwoord.",
   "market.bid": "Bieden",
   "market.bidFor": "Bieden op {name}",

@@ -167,7 +167,7 @@ const ru: Partial<Dict> = {
   "login.google": "Продолжить с Google",
   "login.noAccount": "Нет аккаунта?",
   "login.signIn": "Войти",
-  "login.tagline": "Покажи свои знания велоспорта и собери идеальную команду",
+  "login.tagline": "Собери идеальную велокоманду",
   "login.wrong": "Неверная почта или пароль.",
   "market.bid": "Сделать ставку",
   "market.bidFor": "Ставка: {name}",

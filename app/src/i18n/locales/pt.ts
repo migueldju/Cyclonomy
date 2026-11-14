@@ -167,7 +167,7 @@ const pt: Partial<Dict> = {
   "login.google": "Continuar com o Google",
   "login.noAccount": "Não tens conta?",
   "login.signIn": "Entrar",
-  "login.tagline": "Mostra o que sabes de ciclismo e constrói a equipa definitiva",
+  "login.tagline": "Constrói a equipa de ciclismo definitiva",
   "login.wrong": "Email ou palavra-passe incorretos.",
   "market.bid": "Licitar",
   "market.bidFor": "Licitar por {name}",

@@ -167,7 +167,7 @@ const ar: Partial<Dict> = {
   "login.google": "المتابعة باستخدام Google",
   "login.noAccount": "ليس لديك حساب؟",
   "login.signIn": "دخول",
-  "login.tagline": "أثبت معرفتك بالدراجات وابنِ الفريق المثالي",
+  "login.tagline": "ابنِ فريق الدراجات المثالي",
   "login.wrong": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
   "market.bid": "زايد",
   "market.bidFor": "المزايدة على {name}",

@@ -167,7 +167,7 @@ const sl: Partial<Dict> = {
   "login.google": "Nadaljuj z Googlom",
   "login.noAccount": "Nimaš računa?",
   "login.signIn": "Prijava",
-  "login.tagline": "Dokaži svoje znanje o kolesarstvu in sestavi popolno ekipo",
+  "login.tagline": "Sestavi popolno kolesarsko ekipo",
   "login.wrong": "Napačna e-pošta ali geslo.",
   "market.bid": "Ponudi",
   "market.bidFor": "Ponudba za {name}",

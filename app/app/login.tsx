@@ -41,7 +41,6 @@ export default function Login() {
     <AuthScreen
       footer={(
         <View style={styles.footer}>
-          <Txt variant="small">{t('login.noAccount')} </Txt>
           <Link href="/signup"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
         </View>
       )}>
