@@ -95,8 +95,10 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
 }
 
 /** Pide una cantidad en euros (pujas y ofertas) */
-export function AmountSheet({ visible, onClose, title, subtitle, min, initial, confirmLabel, onConfirm, onDone, done }: {
+export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done }: {
   visible: boolean; onClose: () => void; title: string; subtitle?: string; min?: number; initial?: number;
+  /** datos cortos con icono (equipo, cierre…), en vez de una frase */
+  chips?: { icon: ComponentProps<typeof Ionicons>['name']; text: string }[];
   confirmLabel: string; onConfirm: (amount: number) => Promise<unknown>; onDone?: () => void;
   done?: (amount: number) => string;          // aviso momentáneo al terminar bien
 }) {
@@ -129,6 +131,16 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
   return (
     <Sheet visible={visible} onClose={onClose} title={title}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
+      {chips?.length ? (
+        <View style={styles.chips}>
+          {chips.map((c) => (
+            <View key={c.text} style={styles.chip}>
+              <Ionicons name={c.icon} size={14} color={colors.inkSoft} />
+              <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>{c.text}</Txt>
+            </View>
+          ))}
+        </View>
+      ) : null}
       <View style={styles.amountBox}>
         <TextInput
           value={amount != null ? money(amount).replace(' €', '') : ''}
@@ -141,7 +153,11 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
         />
         <Txt style={styles.euro}>€</Txt>
       </View>
-      {min != null ? <Txt variant="small" style={{ textAlign: 'center', marginBottom: space.m }}>{t('sheet.minimum', { amount: money(min) })}</Txt> : null}
+      {min != null ? (
+        <Txt variant="small" style={[{ textAlign: 'center', marginBottom: space.m }, amount != null && amount < min && { color: colors.red }]}>
+          {t('sheet.minimum', { amount: money(min) })}
+        </Txt>
+      ) : null}
       <View style={styles.quick}>
         {[0.05, 0.1, 0.25].map((p) => (
           <Pressable key={p} onPress={() => bump(p)} accessibilityRole="button" accessibilityLabel={`+${p * 100} %`}
@@ -182,6 +198,11 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   euro: { fontFamily: fonts.number, fontSize: type.title, color: colors.inkSoft },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s, marginBottom: space.m },
+  chip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5, maxWidth: '100%', backgroundColor: colors.road, borderRadius: 999,
+    paddingHorizontal: 10, paddingVertical: 5,
+  },
   quick: { flexDirection: 'row', gap: space.s, marginBottom: space.l },
   bump: { flex: 1, alignItems: 'center', backgroundColor: colors.road, borderRadius: 999, paddingVertical: 9 },
   bumpText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.ink },

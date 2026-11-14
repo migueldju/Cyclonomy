@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { CountryPicker } from '@/components/CountryPicker';
+import { InfoButton } from '@/components/Info';
 import { Input } from '@/components/Inputs';
 import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
@@ -24,9 +25,12 @@ export default function CrearLiga() {
   return (
     <Screen padded>
       <View style={[styles.wrap, { paddingTop: insets.top + space.s }]}>
-      <View style={[styles.card, { marginBottom: space.l }]}>
-        <Txt variant="display">{t('create.title')}</Txt>
-        <Txt variant="small">{t('create.note')}</Txt>
+      <View style={[styles.card, styles.head]}>
+        <Txt variant="display" style={{ flex: 1 }}>{t('create.title')}</Txt>
+        <InfoButton compact title={t('create.title')}
+                    items={[t('create.note'), `${t('country.label')}: ${t('country.permanent')}`,
+                            `${t('scoring.title')}: ${t('scoring.fixed')}`, t('scoring.cyclonomyHint'), t('scoring.uciHint'),
+                            t('scoring.splitHint'), `${t('settings.clauses')}: ${t('settings.clausesHint')}`]} />
       </View>
       <View style={styles.card}>
       <LeagueSettingsForm
@@ -44,7 +48,7 @@ export default function CrearLiga() {
         }}>
         <View>
           <Input label={t('team.yourTeamName')} value={team} onChangeText={setTeam} maxLength={40} />
-          <CountryPicker value={country} onChange={setCountry} />
+          <CountryPicker value={country} onChange={setCountry} hint={false} />
         </View>
       </LeagueSettingsForm>
       </View>
@@ -58,4 +62,5 @@ export default function CrearLiga() {
 const styles = StyleSheet.create({
   wrap: { width: '100%', maxWidth: 560, alignSelf: 'center' },
   card: { backgroundColor: colors.paper, borderRadius: 20, padding: space.l, ...cardShadow },
+  head: { flexDirection: 'row', alignItems: 'center', gap: space.m, marginBottom: space.l },
 });

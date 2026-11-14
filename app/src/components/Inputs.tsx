@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Switch, TextInput, TextInputProps, View } from 'react-native';
 import { colors, fonts, space, type } from '../theme';
 import { t } from '../i18n';
@@ -36,18 +38,26 @@ export function Segmented<T extends string | number>({ label, options, value, on
 }
 
 /** Número con botones − / + */
-export function Stepper({ label, value, onChange, min, max, step = 1, format }: {
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
+/** Icono de un ajuste, en un círculo blanco a la izquierda de su baldosa */
+function TileIcon({ name }: { name: IconName }) {
+  return <View style={styles.tileIcon}><Ionicons name={name} size={18} color={colors.ink} /></View>;
+}
+
+export function Stepper({ label, value, onChange, min, max, step = 1, format, icon }: {
   label: string; value: number; onChange: (v: number) => void; min: number; max: number; step?: number;
-  format?: (v: number) => string;
+  format?: (v: number) => string; icon?: IconName;
 }) {
   const set = (v: number) => onChange(Math.max(min, Math.min(max, v)));
   return (
     <View style={[styles.stepRow, styles.tile]}>
+      {icon ? <TileIcon name={icon} /> : null}
       <Txt style={{ flex: 1 }}>{label}</Txt>
       <Pressable onPress={() => set(value - step)} style={styles.stepBtn} accessibilityLabel={t('input.less', { label })}>
         <Txt variant="lead">−</Txt>
       </Pressable>
-      <Txt variant="number" style={{ minWidth: 64, textAlign: 'center' }}>{format ? format(value) : value}</Txt>
+      <Txt variant="number" style={{ minWidth: 52, textAlign: 'center' }}>{format ? format(value) : value}</Txt>
       <Pressable onPress={() => set(value + step)} style={styles.stepBtn} accessibilityLabel={t('input.more', { label })}>
         <Txt variant="lead">+</Txt>
       </Pressable>
@@ -55,12 +65,13 @@ export function Stepper({ label, value, onChange, min, max, step = 1, format }: 
   );
 }
 
-export function Toggle({ label, value, onChange, hint }: {
-  label: string; value: boolean; onChange: (v: boolean) => void; hint?: string;
+export function Toggle({ label, value, onChange, hint, icon }: {
+  label: string; value: boolean; onChange: (v: boolean) => void; hint?: string; icon?: IconName;
 }) {
   return (
     <View style={styles.tile}>
       <View style={styles.stepRow}>
+        {icon ? <TileIcon name={icon} /> : null}
         <Txt style={{ flex: 1 }}>{label}</Txt>
         <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.jersey, false: colors.line }}
                 thumbColor={colors.paper} accessibilityLabel={label} />
@@ -86,6 +97,9 @@ const styles = StyleSheet.create({
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   // cada ajuste, en su baldosa gris (como las cifras de las cabeceras)
   tile: { backgroundColor: colors.road, borderRadius: 14, paddingHorizontal: space.m, paddingVertical: 10, marginBottom: space.m },
+  tileIcon: {
+    width: 34, height: 34, borderRadius: 17, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center',
+  },
   stepBtn: {
     width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.paper,
   },

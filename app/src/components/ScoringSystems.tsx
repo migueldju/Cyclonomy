@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useLoader } from '../hooks/useLoader';
@@ -91,34 +92,32 @@ export function ScoringSystemPicker({ system, wtSplit, onChange }: {
   system: ScoringSystem; wtSplit: boolean; onChange: (system: ScoringSystem, wtSplit: boolean) => void;
 }) {
   const [how, setHow] = useState<ScoringScheme | null>(null);
+  // el texto de cada sistema queda para los lectores de pantalla; a la vista, el nombre y el botón de «cómo puntúa»
   const option = (value: ScoringSystem, title: string, hint: string) => {
     const on = system === value;
     return (
       <Pressable onPress={() => onChange(value, wtSplit)} accessibilityRole="radio" accessibilityState={{ selected: on }}
-                 style={[styles.card, on && styles.cardOn]}>
-        <View style={styles.cardHead}>
-          <View style={[styles.radio, on && styles.radioOn]} />
-          <Txt variant="lead" style={{ flex: 1 }}>{title}</Txt>
-        </View>
-        <Txt variant="small">{hint}</Txt>
-        <Button small kind="quiet" label={t('scoring.how')} style={{ alignSelf: 'flex-start', paddingHorizontal: 0 }}
-                onPress={() => setHow(value === 'uci' ? 'uci' : schemeOf('cyclonomy', wtSplit))} />
+                 accessibilityLabel={title} accessibilityHint={hint} style={[styles.card, on && styles.cardOn]}>
+        <Txt numberOfLines={1} adjustsFontSizeToFit style={styles.cardTitle}>{title}</Txt>
+        <Pressable onPress={() => setHow(value === 'uci' ? 'uci' : schemeOf('cyclonomy', wtSplit))} hitSlop={8}
+                   accessibilityRole="button" accessibilityLabel={`${t('scoring.how')}: ${title}`} style={styles.how}>
+          <Ionicons name="information-circle-outline" size={20} color={colors.ink} />
+        </Pressable>
       </Pressable>
     );
   };
   return (
     <View style={{ marginBottom: space.l }}>
       <Txt variant="label" style={{ marginBottom: space.xs }}>{t('scoring.title')}</Txt>
-      <View style={{ gap: space.s }}>
+      <View style={{ flexDirection: 'row', gap: space.s }}>
         {option('cyclonomy', t('scoring.cyclonomy'), t('scoring.cyclonomyHint'))}
         {option('uci', t('scoring.uci'), t('scoring.uciHint'))}
       </View>
       {system === 'cyclonomy' ? (
-        <View style={{ marginTop: space.m }}>
-          <Toggle label={t('scoring.split')} value={wtSplit} onChange={(v) => onChange(system, v)} hint={t('scoring.splitHint')} />
+        <View style={{ marginTop: space.m, marginBottom: -space.m }}>
+          <Toggle label={t('scoring.split')} value={wtSplit} onChange={(v) => onChange(system, v)} icon="git-branch-outline" />
         </View>
       ) : null}
-      <Txt variant="small" style={{ marginTop: space.xs }}>{t('scoring.fixed')}</Txt>
 
       <Sheet visible={how != null} onClose={() => setHow(null)}
              title={how === 'uci' ? t('scoring.uci') : t('scoring.cyclonomy')}>
@@ -131,7 +130,13 @@ export function ScoringSystemPicker({ system, wtSplit, onChange }: {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1.5, borderColor: colors.line, borderRadius: 16, backgroundColor: colors.paper, padding: space.m, gap: 4 },
+  card: {
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.s, borderWidth: 1.5, borderColor: colors.line,
+    borderRadius: 16, backgroundColor: colors.paper, paddingLeft: space.m, paddingRight: space.s, paddingVertical: space.s,
+  },
+  // la elegida se distingue por el fondo amarillo y el borde: sin círculo, el nombre cabe entero
+  cardTitle: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 16, color: colors.ink },
+  how: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.road, alignItems: 'center', justifyContent: 'center' },
   cardOn: { borderColor: colors.asphalt, backgroundColor: '#FFF7D1' },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.line },

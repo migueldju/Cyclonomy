@@ -100,8 +100,11 @@ export default function Mercado() {
         visible={!!bidding}
         onClose={() => setBidding(null)}
         title={bidding ? t('market.bidFor', { name: bidding.rider_name }) : ''}
-        subtitle={bidding ? [bidding.pro_team, bidding.seller_team ? t('market.soldBy', { team: bidding.seller_team }) : null,
-                             t('market.closes', { when: countdown(bidding.closes_at) })].filter(Boolean).join(' · ') : undefined}
+        chips={bidding ? [
+          ...(bidding.pro_team ? [{ icon: 'shirt-outline' as const, text: bidding.pro_team }] : []),
+          ...(bidding.seller_team ? [{ icon: 'person-outline' as const, text: bidding.seller_team }] : []),
+          { icon: 'time-outline' as const, text: countdown(bidding.closes_at) },
+        ] : undefined}
         min={bidding?.base_value}
         initial={bidding?.my_bid ?? bidding?.base_value}
         confirmLabel={t('market.bid')}

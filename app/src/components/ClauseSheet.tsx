@@ -8,6 +8,8 @@ import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '
 import type { RosterRow } from '../lib/types';
 import { colors, fonts, space, type } from '../theme';
 import { Button } from './Button';
+import { StatTile, StatTiles } from './Hero';
+import { InfoButton } from './Info';
 import { showToast } from './Toast';
 import { Sheet } from './Modal';
 import { RangeSlider } from './RangeSlider';
@@ -62,14 +64,17 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
         <Txt variant="display">{moneyShort(target)}</Txt>
         <View style={styles.pct}><Txt style={styles.pctText}>{pct}{' '}%</Txt></View>
       </View>
-      <Txt style={{ marginBottom: space.l, textAlign: 'center' }}>
-        {same ? t('clause.hint')
-          : change > 0 ? <>{t('clause.pay')} <Txt variant="number">{money(change)}</Txt></>
-          : <>{t('clause.receive')} <Txt variant="number" style={{ color: colors.green }}>{money(-change)}</Txt></>}
-        {!same && after != null ? (
-          <Txt variant="small" style={short ? { color: colors.red } : undefined}>{'  ·  '}{t('clause.balanceAfter', { amount: money(after) })}</Txt>
-        ) : null}
-      </Txt>
+      {same ? null : (
+        <StatTiles style={{ marginBottom: space.m }}>
+          <StatTile label={change > 0 ? t('clause.pay') : t('clause.receive')} value={money(Math.abs(change))}
+                    icon={change > 0 ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'}
+                    color={change > 0 ? undefined : colors.green} />
+          {after != null ? (
+            <StatTile label={t('squad.balance')} value={money(after)} icon="wallet-outline"
+                      color={short ? colors.red : undefined} />
+          ) : null}
+        </StatTiles>
+      )}
 
       <View style={styles.sliderRow}>
         <Pressable onPress={() => move(-1)} style={styles.step} accessibilityRole="button" accessibilityLabel="−1 %">
@@ -93,10 +98,11 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
               label={same ? t('clause.chooseOther') : change > 0
                 ? t('clause.raiseTo', { clause: moneyShort(target), amount: money(change) })
                 : t('clause.lowerTo', { clause: moneyShort(target), amount: money(-change) })} />
-      <Txt variant="small" style={{ marginTop: space.s }}>
-        {t('clause.rule', { base: moneyShort(row.clause_base) })}
-      </Txt>
-      <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
+      <View style={styles.foot}>
+        <InfoButton title={t('clause.title', { name: row.rider_name })}
+                    items={[t('clause.rule', { base: moneyShort(row.clause_base) }), t('clause.hint')]} />
+        <Button label={t('common.cancel')} kind="quiet" onPress={onClose} />
+      </View>
     </Sheet>
   );
 }
@@ -108,6 +114,7 @@ const styles = StyleSheet.create({
   },
   pct: { backgroundColor: colors.jersey, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
   pctText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.jerseyInk },
+  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.m },
   sliderRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   step: {
     width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.road,

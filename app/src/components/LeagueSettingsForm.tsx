@@ -74,19 +74,19 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
         <ScoringSystemPicker system={s.scoring_system} wtSplit={s.wt_split}
                              onChange={(system, split) => setS((prev) => ({ ...prev, scoring_system: system, wt_split: split }))} />
       ) : null}
-      <Stepper label={t('settings.maxRiders')} value={s.max_riders} min={16} max={40}
+      <Stepper label={t('settings.maxRiders')} value={s.max_riders} min={16} max={40} icon="people-outline"
                onChange={(v) => set('max_riders', v)} />
       <Segmented label={t('settings.depth')} value={s.calendar_depth}
                  // «WT de primer nivel» ya no se ofrece; solo se mantiene en las ligas que ya lo tenían
                  options={depthOptions().filter((o) => o.value !== 1 || initial.calendar_depth === 1)}
                  onChange={(v) => set('calendar_depth', v)} />
       <Txt variant="small" style={{ marginTop: -space.s, marginBottom: space.l }}>{depthHint(s.calendar_depth)}</Txt>
-      <Stepper label={t('settings.marketSize')} value={s.market_size} min={1} max={30}
+      <Stepper label={t('settings.marketSize')} value={s.market_size} min={1} max={30} icon="pricetags-outline"
                onChange={(v) => set('market_size', v)} />
-      <Stepper label={t('settings.marketHour')} value={s.market_hour} min={0} max={23}
+      <Stepper label={t('settings.marketHour')} value={s.market_hour} min={0} max={23} icon="time-outline"
                onChange={(v) => set('market_hour', v)} format={(v) => `${String(v).padStart(2, '0')}:00`} />
       <Toggle label={t('settings.clauses')} value={s.clauses_enabled} onChange={(v) => set('clauses_enabled', v)}
-              hint={t('settings.clausesHint')} />
+              icon="flash-outline" />
       <ErrorText error={error} />
       <Button label={submitLabel} onPress={submit} busy={busy} />
     </View>

@@ -39,7 +39,7 @@ export default function Registro() {
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" />
       <PasswordInput label={t('auth.password')} value={password} onChangeText={setPassword} meter
-                     hint={t('auth.min8')} autoComplete="new-password" textContentType="newPassword" />
+                     placeholder={t('auth.min8')} autoComplete="new-password" textContentType="newPassword" />
       <ErrorText error={error} />
       <Button label={t('auth.createAccount')} onPress={signUp} busy={busy} disabled={!name.trim() || !email.includes('@') || !password} />
     </AuthScreen>
