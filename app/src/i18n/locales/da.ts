@@ -167,7 +167,7 @@ const da: Partial<Dict> = {
   "login.google": "Fortsæt med Google",
   "login.noAccount": "Ingen konto?",
   "login.signIn": "Log ind",
-  "login.tagline": "Køb, tilmeld og scor point med de rigtige resultater.",
+  "login.tagline": "Vis din cykelviden og byg det ultimative hold",
   "login.wrong": "Forkert e-mail eller adgangskode.",
   "market.bid": "Byd",
   "market.bidFor": "Byd på {name}",

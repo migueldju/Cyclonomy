@@ -167,7 +167,7 @@ const eu: Partial<Dict> = {
   "login.google": "Jarraitu Googlerekin",
   "login.noAccount": "Ez duzu konturik?",
   "login.signIn": "Sartu",
-  "login.tagline": "Fitxatu, eman izena eta batu benetako emaitzekin.",
+  "login.tagline": "Erakutsi txirrindularitzaz dakizuna eta eraiki talde onena",
   "login.wrong": "Posta edo pasahitz okerra.",
   "market.bid": "Eskaintza egin",
   "market.bidFor": "{name}(r)en truke eskaini",

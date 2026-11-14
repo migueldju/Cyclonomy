@@ -167,7 +167,7 @@ const cs: Partial<Dict> = {
   "login.google": "Pokračovat přes Google",
   "login.noAccount": "Nemáš účet?",
   "login.signIn": "Přihlásit se",
-  "login.tagline": "Kupuj, přihlašuj a sbírej body podle skutečných výsledků.",
+  "login.tagline": "Ukaž, co víš o cyklistice, a postav dokonalý tým",
   "login.wrong": "Nesprávný e-mail nebo heslo.",
   "market.bid": "Přihodit",
   "market.bidFor": "Příhoz: {name}",

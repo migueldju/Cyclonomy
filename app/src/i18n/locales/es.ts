@@ -166,7 +166,7 @@ const es = {
   "login.google": "Continuar con Google",
   "login.noAccount": "¿No tienes cuenta?",
   "login.signIn": "Entrar",
-  "login.tagline": "Ficha, inscribe y suma con los resultados reales.",
+  "login.tagline": "Demuestra tus conocimientos de ciclismo y construye el equipo definitivo",
   "login.wrong": "Email o contraseña incorrectos.",
   "market.bid": "Pujar",
   "market.bidFor": "Pujar por {name}",

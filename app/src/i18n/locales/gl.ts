@@ -167,7 +167,7 @@ const gl: Partial<Dict> = {
   "login.google": "Continuar con Google",
   "login.noAccount": "Non tes conta?",
   "login.signIn": "Entrar",
-  "login.tagline": "Ficha, inscribe e suma cos resultados reais.",
+  "login.tagline": "Demostra os teus coñecementos de ciclismo e constrúe o equipo definitivo",
   "login.wrong": "Correo ou contrasinal incorrectos.",
   "market.bid": "Poxar",
   "market.bidFor": "Poxar por {name}",
