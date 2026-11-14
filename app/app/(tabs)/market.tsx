@@ -14,7 +14,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
-import { countdown, dateTime, money, moneyShort } from '@/lib/format';
+import { countdown, dateTime, money, moneyShort, points } from '@/lib/format';
 import type { MarketRow } from '@/lib/types';
 import { colors, space } from '@/theme';
 
@@ -103,6 +103,7 @@ export default function Mercado() {
         chips={bidding ? [
           ...(bidding.pro_team ? [{ icon: 'shirt-outline' as const, text: bidding.pro_team }] : []),
           ...(bidding.seller_team ? [{ icon: 'person-outline' as const, text: bidding.seller_team }] : []),
+          { icon: 'podium-outline' as const, text: points(bidding.season_points) },
           { icon: 'time-outline' as const, text: countdown(bidding.closes_at) },
         ] : undefined}
         min={bidding?.base_value}
@@ -130,7 +131,8 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
       team={r.pro_team}
       photo={r.photo_url}
       nationality={r.nationality}
-      note={[who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null,
+      // los puntos de la temporada, lo primero tras el equipo
+      note={[points(r.season_points), who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null,
              !r.seller_member_id && r.age ? t('rider.age', { n: r.age }) : null].filter(Boolean).join(' · ')}
       value={r.base_value}
       last={last}
