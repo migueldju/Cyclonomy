@@ -17,7 +17,7 @@ import { stageLabel } from '@/lib/stages';
 import { course, dateRange, dayMonth, moneyShort, points, time, todayISO } from '@/lib/format';
 import { inviteMessage } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
-import { categoryColor, categoryLabel, colors, space } from '@/theme';
+import { categoryColor, categoryLabel, categoryRank, colors, space } from '@/theme';
 
 export default function Inicio() {
   const { leagueId, me } = useLeague();
@@ -29,6 +29,17 @@ export default function Inicio() {
   const reload = () => { today.reload(); calendar.reload(); top.reload(); news.reload(); };
 
   const upcoming = (calendar.data ?? []).filter((r) => r.status === 'upcoming' && r.start_date >= todayISO()).slice(0, 5);
+
+  // las de hoy: primero las carreras que empiezan hoy (clásicas y primeras etapas); después, por categoría (la más
+  // importante arriba) y, dentro de la misma, por hora de salida
+  const startsToday = (s: TodayRow) => {
+    const race = calendar.data?.find((r) => r.race_id === s.race_id);
+    // con prólogo la primera etapa es la 0: manda la fecha de inicio de la carrera
+    return (race ? race.start_date === todayISO() : !s.is_stage_race || s.number <= 1) ? 0 : 1;
+  };
+  const todayRows = [...(today.data ?? [])].sort((a, b) =>
+    startsToday(a) - startsToday(b) || categoryRank(a.category) - categoryRank(b.category)
+    || (a.start_at ?? '').localeCompare(b.start_at ?? ''));
 
   return (
     <Screen onRefresh={reload} refreshing={today.loading}>
@@ -92,8 +103,8 @@ export default function Inicio() {
 
 
       <Section title={`${t('home.today')} · ${dayMonth(todayISO())}`}>
-        {today.data?.length ? today.data.map((s, i) => (
-          <StageRow key={s.stage_id} s={s} last={i === today.data!.length - 1}
+        {todayRows.length ? todayRows.map((s, i) => (
+          <StageRow key={s.stage_id} s={s} last={i === todayRows.length - 1}
                     entriesOpen={!!calendar.data?.find((r) => r.race_id === s.race_id)?.entries_open} />
         )) : <Empty text={today.loading ? t('common.loading') : t('home.noToday')} />}
       </Section>
