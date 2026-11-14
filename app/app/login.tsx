@@ -1,6 +1,6 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { AuthScreen, Divider } from '@/components/AuthCard';
 import { PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
@@ -39,11 +39,7 @@ export default function Login() {
 
   return (
     <AuthScreen
-      footer={(
-        <View style={styles.footer}>
-          <Link href="/signup"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
-        </View>
-      )}>
+      footer={<Button label={t('auth.createAccount')} kind="quiet" onPress={() => router.push('/signup')} />}>
       <Txt style={styles.tagline}>{t('login.tagline')}</Txt>
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" textContentType="emailAddress" />
@@ -60,7 +56,6 @@ export default function Login() {
 
 const styles = StyleSheet.create({
   tagline: { fontFamily: fonts.bodyMedium, textAlign: 'center', color: colors.inkSoft, marginBottom: space.xl },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
   link: { fontFamily: fonts.bodyBold, color: colors.ink, textDecorationLine: 'underline' },
   forgot: { alignSelf: 'flex-end', marginTop: -space.s, marginBottom: space.m },
 });
