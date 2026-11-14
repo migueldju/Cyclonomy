@@ -3,6 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
 import { LanguagePicker } from '@/components/LanguagePicker';
@@ -22,6 +23,24 @@ const SOCIAL = [
   { icon: 'logo-instagram', name: 'Instagram', handle: '@cyclonomy', url: 'https://www.instagram.com/cyclonomy' },
   { icon: 'logo-x', name: 'X', handle: '@cyclonomy_game', url: 'https://x.com/cyclonomy_game' },
 ] as const;
+
+/** Fondo del logo de Instagram: su degradado (amarillo abajo a la izquierda → naranja → rosa → morado → azul) */
+function InstagramDisc() {
+  return (
+    <Svg width={40} height={40} style={{ position: 'absolute' }}>
+      <Defs>
+        <RadialGradient id="ig" cx="30%" cy="107%" r="150%">
+          <Stop offset="0" stopColor="#FDF497" />
+          <Stop offset="0.05" stopColor="#FDF497" />
+          <Stop offset="0.45" stopColor="#FD5949" />
+          <Stop offset="0.6" stopColor="#D6249F" />
+          <Stop offset="0.9" stopColor="#285AEB" />
+        </RadialGradient>
+      </Defs>
+      <Circle cx={20} cy={20} r={20} fill="url(#ig)" />
+    </Svg>
+  );
+}
 
 export default function Perfil() {
   const { session } = useAuth();
@@ -118,7 +137,10 @@ export default function Perfil() {
           <Pressable key={n.name} onPress={() => Linking.openURL(n.url)} accessibilityRole="link"
                      accessibilityLabel={`${n.name} ${n.handle}`}
                      style={({ pressed }) => [styles.socialCard, pressed && { opacity: 0.7 }]}>
-            <View style={styles.socialIcon}><Ionicons name={n.icon} size={22} color={colors.jersey} /></View>
+            <View style={styles.socialIcon}>
+              {n.name === 'Instagram' ? <InstagramDisc /> : null}
+              <Ionicons name={n.icon} size={22} color="#FFFFFF" />
+            </View>
             <View style={{ flex: 1 }}>
               <Txt variant="lead">{n.name}</Txt>
               <Txt variant="small" numberOfLines={1}>{n.handle}</Txt>
@@ -146,6 +168,6 @@ const styles = StyleSheet.create({
     padding: space.m, ...cardShadow,
   },
   socialIcon: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: colors.asphalt, alignItems: 'center', justifyContent: 'center',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: '#000000', overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
   },
 });
