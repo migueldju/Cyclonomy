@@ -40,8 +40,10 @@ export interface SheetAction {
 }
 
 /** Lista de acciones; ejecuta la elegida y muestra el error del servidor si lo hay */
-export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone }: {
+export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer }: {
   visible: boolean; onClose: () => void; title: string; subtitle?: string; actions: SheetAction[]; onDone?: () => void;
+  /** contenido propio sobre las acciones (cifras) y junto a «Cerrar» (botón de información) */
+  header?: ReactNode; footer?: ReactNode;
 }) {
   const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +67,8 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
   return (
     <Sheet visible={visible} onClose={onClose} title={title}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
-      {actions.length === 0 ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
+      {header}
+      {actions.length === 0 && !subtitle ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
       {actions.map((a, i) => a.icon ? (
         <Pressable key={a.label} onPress={() => run(i)} disabled={busy !== null} accessibilityRole="button"
                    accessibilityLabel={a.label}
@@ -89,13 +92,19 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
         </View>
       ))}
       <ErrorText error={error} />
-      <Button label={t('common.close')} kind="quiet" onPress={onClose} />
+      {footer ? (
+        <View style={styles.foot}>
+          {footer}
+          <Button label={t('common.close')} kind="quiet" onPress={onClose} />
+        </View>
+      ) : <Button label={t('common.close')} kind="quiet" onPress={onClose} />}
     </Sheet>
   );
 }
 
 /** Pide una cantidad en euros (pujas y ofertas) */
-export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done }: {
+export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done, quick = true }: {
+  quick?: boolean;            // atajos +5 %, +10 % y +25 %
   visible: boolean; onClose: () => void; title: string; subtitle?: string; min?: number; initial?: number;
   /** datos cortos con icono (equipo, cierre…), en vez de una frase */
   chips?: { icon: ComponentProps<typeof Ionicons>['name']; text: string }[];
@@ -158,14 +167,14 @@ export function AmountSheet({ visible, onClose, title, subtitle, chips, min, ini
           {t('sheet.minimum', { amount: money(min) })}
         </Txt>
       ) : null}
-      <View style={styles.quick}>
+      {quick ? <View style={styles.quick}>
         {[0.05, 0.1, 0.25].map((p) => (
           <Pressable key={p} onPress={() => bump(p)} accessibilityRole="button" accessibilityLabel={`+${p * 100} %`}
                      style={({ pressed }) => [styles.bump, pressed && { opacity: 0.7 }]}>
             <Txt style={styles.bumpText}>+{p * 100} %</Txt>
           </Pressable>
         ))}
-      </View>
+      </View> : null}
       <ErrorText error={error} />
       <Button label={confirmLabel} onPress={confirm} busy={busy} disabled={amount == null || (min != null && amount < min)} />
       <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
@@ -198,6 +207,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   euro: { fontFamily: fonts.number, fontSize: type.title, color: colors.inkSoft },
+  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.xs },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s, marginBottom: space.m },
   chip: {
     flexDirection: 'row', alignItems: 'center', gap: 5, maxWidth: '100%', backgroundColor: colors.road, borderRadius: 999,

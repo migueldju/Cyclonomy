@@ -108,6 +108,7 @@ export default function Mercado() {
         min={bidding?.base_value}
         initial={bidding?.my_bid ?? bidding?.base_value}
         confirmLabel={t('market.bid')}
+        quick={false}
         onConfirm={(amount) => api.placeBid(bidding!.listing_id, amount)}
         done={(amount) => t('toast.bid', { name: bidding!.rider_name, amount: money(amount) })}
         onDone={done}

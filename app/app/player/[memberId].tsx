@@ -1,7 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { HeroCard } from '@/components/Hero';
+import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
+import { InfoButton } from '@/components/Info';
 import { Flag } from '@/components/Flag';
 import { ActionSheet, AmountSheet } from '@/components/Modal';
 import { RiderRow, riderStatusNote } from '@/components/RiderRow';
@@ -65,25 +66,35 @@ export default function Jugador() {
         visible={!!picked}
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
-        subtitle={picked ? (picked.transferable
-          ? [t('player.riderSubtitle', { value: money(picked.market_value), clause: money(picked.clause), points: points(picked.season_points) }),
-             picked.locked_next ? t('player.lockedClause') : null].filter(Boolean).join('. ')
+        // sin frases: las cifras en baldosas, las acciones con icono y la explicación en «Cómo funciona»
+        subtitle={picked ? (picked.transferable ? (picked.locked_next ? t('player.lockedClause') : undefined)
           : t('player.pendingTransfer')) : undefined}
+        header={picked ? (
+          <StatTiles style={{ marginBottom: space.m }}>
+            <StatTile label={t('rider.marketValue')} value={moneyShort(picked.market_value)} icon="trending-up-outline" />
+            <StatTile label={t('rider.clause')} value={moneyShort(picked.clause)}
+                      icon={picked.locked_next ? 'lock-closed-outline' : 'flash-outline'} />
+            <StatTile wide label={t('rider.seasonPoints')} value={points(picked.season_points)} icon="podium-outline" />
+          </StatTiles>
+        ) : null}
         actions={picked?.transferable ? [
-          { label: t('player.payClause', { amount: moneyShort(picked.clause) }), kind: 'primary' as const,
-            hint: picked.locked_next ? t('player.lockedClause') : t('player.payClauseHint'),
+          { icon: 'flash-outline' as const, kind: 'primary' as const, label: t('player.payClause', { amount: moneyShort(picked.clause) }),
             onPress: () => api.payClause(picked.ownership_id),
             done: t(picked.locked_next ? 'toast.clausePaidLater' : 'toast.clausePaid', { name: picked.rider_name }) },
-          { label: t('player.makeOffer'), hint: t('player.makeOfferHint'),
+          { icon: 'pricetag-outline' as const, label: t('player.makeOffer'),
             onPress: () => { const p = picked; setTimeout(() => setOffering(p), 350); } },
         ] : []}
+        footer={picked?.transferable ? (
+          <InfoButton title={picked.rider_name} items={[t('player.payClauseHint'), t('player.makeOfferHint'), t('rules.r7')]} />
+        ) : undefined}
         onDone={done}
       />
       <AmountSheet
         visible={!!offering}
         onClose={() => setOffering(null)}
         title={offering ? t('player.offerFor', { name: offering.rider_name }) : ''}
-        subtitle={offering ? `${t('rider.marketValue')}: ${money(offering.market_value)}` : undefined}
+        chips={offering ? [{ icon: 'trending-up-outline' as const, text: money(offering.market_value) },
+                           { icon: 'time-outline' as const, text: '48 h' }] : undefined}
         initial={offering?.market_value}
         confirmLabel={t('player.sendOffer')}
         onConfirm={(amount) => api.makeOffer(offering!.ownership_id, amount)}
