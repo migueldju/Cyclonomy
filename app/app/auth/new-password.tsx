@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { AuthScreen } from '@/components/AuthCard';
 import { CodeInput, PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
-import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
@@ -58,8 +58,7 @@ export default function NuevaContrasena() {
   }
 
   return (
-    <Screen padded>
-      <Txt variant="display" style={{ marginTop: space.xxl * 2, marginBottom: space.l }}>{t('newpass.title')}</Txt>
+    <AuthScreen title={t('newpass.title')}>
       {done ? (
         <>
           <Txt style={{ marginBottom: space.l, color: colors.green }}>{t('newpass.saved')}</Txt>
@@ -89,6 +88,6 @@ export default function NuevaContrasena() {
           {error ? <Button label={t('auth.backToLogin')} onPress={() => router.replace('/login')} /> : null}
         </>
       )}
-    </Screen>
+    </AuthScreen>
   );
 }

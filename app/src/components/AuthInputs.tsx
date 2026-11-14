@@ -69,16 +69,16 @@ export function ResendButton({ onResend, seconds = 60 }: { onResend: () => Promi
 const styles = StyleSheet.create({
   box: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line,
-    borderRadius: 12,
+    borderRadius: 14,
   },
   input: {
-    flex: 1, paddingHorizontal: space.m, paddingVertical: 12, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
+    flex: 1, paddingHorizontal: space.l, paddingVertical: 13, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
   },
   eye: { paddingHorizontal: space.m, paddingVertical: 10 },
   meter: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
   bar: { flex: 1, height: 4, borderRadius: 2 },
   code: {
-    backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 12, paddingVertical: 12,
+    backgroundColor: colors.road, borderRadius: 16, paddingVertical: 14,
     textAlign: 'center', fontFamily: fonts.number, fontSize: 30, letterSpacing: 10, color: colors.ink,
   },
 });

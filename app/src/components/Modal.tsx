@@ -18,6 +18,7 @@ export function Sheet({ visible, onClose, title, children }: {
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
+          <View style={styles.handle} />
           <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>
           {children}
         </View>
@@ -128,21 +129,27 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
   return (
     <Sheet visible={visible} onClose={onClose} title={title}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
-      <TextInput
-        value={amount != null ? money(amount).replace(' €', '') : ''}
-        onChangeText={setText}
-        keyboardType="number-pad"
-        style={styles.amount}
-        accessibilityLabel={t('sheet.amountLabel')}
-        placeholder="0"
-        placeholderTextColor={colors.inkSoft}
-      />
+      <View style={styles.amountBox}>
+        <TextInput
+          value={amount != null ? money(amount).replace(' €', '') : ''}
+          onChangeText={setText}
+          keyboardType="number-pad"
+          style={styles.amount}
+          accessibilityLabel={t('sheet.amountLabel')}
+          placeholder="0"
+          placeholderTextColor={colors.inkSoft}
+        />
+        <Txt style={styles.euro}>€</Txt>
+      </View>
+      {min != null ? <Txt variant="small" style={{ textAlign: 'center', marginBottom: space.m }}>{t('sheet.minimum', { amount: money(min) })}</Txt> : null}
       <View style={styles.quick}>
         {[0.05, 0.1, 0.25].map((p) => (
-          <Button key={p} small kind="secondary" label={`+${p * 100} %`} onPress={() => bump(p)} />
+          <Pressable key={p} onPress={() => bump(p)} accessibilityRole="button" accessibilityLabel={`+${p * 100} %`}
+                     style={({ pressed }) => [styles.bump, pressed && { opacity: 0.7 }]}>
+            <Txt style={styles.bumpText}>+{p * 100} %</Txt>
+          </Pressable>
         ))}
       </View>
-      {min != null ? <Txt variant="small" style={{ marginBottom: space.m }}>{t('sheet.minimum', { amount: money(min) })}</Txt> : null}
       <ErrorText error={error} />
       <Button label={confirmLabel} onPress={confirm} busy={busy} disabled={amount == null || (min != null && amount < min)} />
       <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
@@ -162,12 +169,20 @@ const styles = StyleSheet.create({
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
   sheet: {
-    backgroundColor: colors.paper, padding: space.xl, paddingBottom: space.xxl,
-    borderTopLeftRadius: 14, borderTopRightRadius: 14,
+    backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
+    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+  },
+  handle: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: space.l },
+  amountBox: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, backgroundColor: colors.road,
+    borderRadius: 18, paddingHorizontal: space.l, paddingVertical: space.m, marginBottom: space.s,
   },
   amount: {
-    fontFamily: fonts.number, fontSize: type.hero, color: colors.ink, borderBottomWidth: 2,
-    borderBottomColor: colors.ink, paddingVertical: space.s, marginBottom: space.m,
+    flexShrink: 1, minWidth: 60, textAlign: 'center', fontFamily: fonts.number, fontSize: type.hero, color: colors.ink,
+    paddingVertical: 0,
   },
-  quick: { flexDirection: 'row', gap: space.s, marginBottom: space.m },
+  euro: { fontFamily: fonts.number, fontSize: type.title, color: colors.inkSoft },
+  quick: { flexDirection: 'row', gap: space.s, marginBottom: space.l },
+  bump: { flex: 1, alignItems: 'center', backgroundColor: colors.road, borderRadius: 999, paddingVertical: 9 },
+  bumpText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.ink },
 });

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
@@ -5,7 +6,7 @@ import { api } from '../lib/api';
 import { money, moneyShort } from '../lib/format';
 import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '../lib/rosterActions';
 import type { RosterRow } from '../lib/types';
-import { colors, space } from '../theme';
+import { colors, fonts, space, type } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
 import { Sheet } from './Modal';
@@ -57,11 +58,11 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
     <Sheet visible={visible} onClose={onClose} title={t('clause.title', { name: row.rider_name })}>
       <View style={styles.headline}>
         <Txt variant="title" style={{ color: colors.inkSoft }}>{moneyShort(row.clause)}</Txt>
-        <Txt variant="title" style={{ color: colors.inkSoft }}>→</Txt>
+        <Ionicons name="arrow-forward" size={20} color={colors.inkSoft} />
         <Txt variant="display">{moneyShort(target)}</Txt>
-        <Txt variant="small">({pct}{' '}%)</Txt>
+        <View style={styles.pct}><Txt style={styles.pctText}>{pct}{' '}%</Txt></View>
       </View>
-      <Txt style={{ marginBottom: space.m }}>
+      <Txt style={{ marginBottom: space.l, textAlign: 'center' }}>
         {same ? t('clause.hint')
           : change > 0 ? <>{t('clause.pay')} <Txt variant="number">{money(change)}</Txt></>
           : <>{t('clause.receive')} <Txt variant="number" style={{ color: colors.green }}>{money(-change)}</Txt></>}
@@ -101,11 +102,15 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
 }
 
 const styles = StyleSheet.create({
-  headline: { flexDirection: 'row', alignItems: 'baseline', gap: space.s, marginBottom: space.xs, flexWrap: 'wrap' },
+  headline: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, flexWrap: 'wrap',
+    backgroundColor: colors.road, borderRadius: 18, paddingVertical: space.m, paddingHorizontal: space.l, marginBottom: space.m,
+  },
+  pct: { backgroundColor: colors.jersey, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  pctText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.jerseyInk },
   sliderRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   step: {
-    width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.line, alignItems: 'center',
-    justifyContent: 'center', backgroundColor: colors.paper,
+    width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.road,
   },
   ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 44 },
 });

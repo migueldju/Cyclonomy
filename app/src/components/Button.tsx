@@ -7,11 +7,13 @@ import { Txt } from './Txt';
 type Kind = 'primary' | 'secondary' | 'dark' | 'danger' | 'quiet';
 
 export function Button({
-  label, onPress, kind = 'primary', disabled, busy, style, small, icon,
+  label, onPress, kind = 'primary', disabled, busy, style, small, icon, leftIcon,
 }: {
   label: string; onPress: () => void; kind?: Kind; disabled?: boolean; busy?: boolean; style?: ViewStyle; small?: boolean;
   /** solo el icono (el texto queda para los lectores de pantalla) */
   icon?: ComponentProps<typeof Ionicons>['name'];
+  /** icono delante del texto */
+  leftIcon?: ComponentProps<typeof Ionicons>['name'];
 }) {
   const k = kinds[kind];
   return (
@@ -30,7 +32,10 @@ export function Button({
       {busy ? <ActivityIndicator color={k.fg} /> : icon ? (
         <Ionicons name={icon} size={small ? 18 : 22} color={k.fg} />
       ) : (
-        <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg, letterSpacing: 0.3 }}>{label}</Txt>
+        <>
+          {leftIcon ? <Ionicons name={leftIcon} size={small ? 16 : 18} color={k.fg} /> : null}
+          <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg, letterSpacing: 0.3 }}>{label}</Txt>
+        </>
       )}
     </Pressable>
   );
@@ -46,8 +51,8 @@ const kinds: Record<Kind, { bg: string; fg: string; border: string }> = {
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 46, paddingHorizontal: 20, borderRadius: 12, borderWidth: 1.5,
-    alignItems: 'center', justifyContent: 'center',
+    minHeight: 48, paddingHorizontal: 20, borderRadius: 14, borderWidth: 1.5,
+    flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center',
   },
   small: { minHeight: 34, paddingHorizontal: 14, borderRadius: 999 },
   icon: { width: 46, paddingHorizontal: 0 },

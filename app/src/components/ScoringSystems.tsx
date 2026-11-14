@@ -131,8 +131,8 @@ export function ScoringSystemPicker({ system, wtSplit, onChange }: {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1.5, borderColor: colors.line, borderRadius: 8, backgroundColor: colors.paper, padding: space.m, gap: 4 },
-  cardOn: { borderColor: colors.asphalt },
+  card: { borderWidth: 1.5, borderColor: colors.line, borderRadius: 16, backgroundColor: colors.paper, padding: space.m, gap: 4 },
+  cardOn: { borderColor: colors.asphalt, backgroundColor: '#FFF7D1' },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.line },
   radioOn: { borderColor: colors.asphalt, borderWidth: 6 },

@@ -1,16 +1,13 @@
-import { Image } from 'react-native';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { AuthScreen } from '@/components/AuthCard';
 import { PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
-import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
-import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { authErrorText, redirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { space } from '@/theme';
 
 export default function Registro() {
   const [name, setName] = useState('');
@@ -36,10 +33,8 @@ export default function Registro() {
   }
 
   return (
-    <Screen padded>
-      <Image source={require('../assets/logo-horizontal.png')} style={{ width: 180, height: 30, marginTop: space.xxl * 2 }}
-             resizeMode="contain" accessibilityLabel="Cyclonomy" />
-      <Txt variant="display" style={{ marginTop: space.xl, marginBottom: space.xl }}>{t('auth.createAccount')}</Txt>
+    <AuthScreen title={t('auth.createAccount')}
+                footer={<Button label={t('signup.haveAccount')} kind="quiet" onPress={() => router.replace('/login')} />}>
       <Input label={t('auth.yourName')} value={name} onChangeText={setName} maxLength={40} autoComplete="name" />
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" />
@@ -47,7 +42,6 @@ export default function Registro() {
                      hint={t('auth.min8')} autoComplete="new-password" textContentType="newPassword" />
       <ErrorText error={error} />
       <Button label={t('auth.createAccount')} onPress={signUp} busy={busy} disabled={!name.trim() || !email.includes('@') || !password} />
-      <Button label={t('signup.haveAccount')} kind="quiet" onPress={() => router.replace('/login')} style={{ marginTop: space.s }} />
-    </Screen>
+    </AuthScreen>
   );
 }

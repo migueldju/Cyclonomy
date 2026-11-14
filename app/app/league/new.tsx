@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
 import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
@@ -12,7 +12,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
-import { space } from '@/theme';
+import { cardShadow, colors, space } from '@/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function CrearLiga() {
@@ -23,10 +23,12 @@ export default function CrearLiga() {
 
   return (
     <Screen padded>
-      <Txt variant="hero" style={{ marginTop: insets.top + space.l }}>{t('create.title')}</Txt>
-      <Txt variant="small" style={{ marginBottom: space.xl }}>
-        {t('create.note')}
-      </Txt>
+      <View style={[styles.wrap, { paddingTop: insets.top + space.s }]}>
+      <View style={[styles.card, { marginBottom: space.l }]}>
+        <Txt variant="display">{t('create.title')}</Txt>
+        <Txt variant="small">{t('create.note')}</Txt>
+      </View>
+      <View style={styles.card}>
       <LeagueSettingsForm
         initial={{ ...DEFAULT_SETTINGS, market_hour: currentMarketHour() }}
         initialName=""
@@ -45,8 +47,15 @@ export default function CrearLiga() {
           <CountryPicker value={country} onChange={setCountry} />
         </View>
       </LeagueSettingsForm>
+      </View>
       <Button kind="quiet" label={t('common.back')} onPress={() => resetTo('/leagues')} style={{ marginTop: space.m }} />
       <SignOutButton />
+      </View>
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  wrap: { width: '100%', maxWidth: 560, alignSelf: 'center' },
+  card: { backgroundColor: colors.paper, borderRadius: 20, padding: space.l, ...cardShadow },
+});

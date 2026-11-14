@@ -1,20 +1,18 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
+import { AuthScreen, Divider } from '@/components/AuthCard';
 import { PasswordInput } from '@/components/AuthInputs';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Inputs';
-import { Screen } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { authErrorText, redirectTo, signInWithGoogle } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { colors, space } from '@/theme';
+import { colors, fonts, space } from '@/theme';
 
 export default function Login() {
-  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState<'email' | 'google' | null>(null);
@@ -40,12 +38,14 @@ export default function Login() {
   }
 
   return (
-    <Screen padded>
-      <View style={[styles.hero, { marginTop: insets.top + space.xl }]}>
-        <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
-               accessibilityLabel="Cyclonomy" />
-        <Txt variant="small">{t('login.tagline')}</Txt>
-      </View>
+    <AuthScreen
+      footer={(
+        <View style={styles.footer}>
+          <Txt variant="small">{t('login.noAccount')} </Txt>
+          <Link href="/signup"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
+        </View>
+      )}>
+      <Txt style={styles.tagline}>{t('login.tagline')}</Txt>
       <Input label={t('auth.email')} value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address"
              autoComplete="email" textContentType="emailAddress" />
       <PasswordInput label={t('auth.password')} value={password} onChangeText={setPassword}
@@ -53,20 +53,15 @@ export default function Login() {
       <Link href="/reset-password" style={styles.forgot}><Txt variant="small" style={styles.link}>{t('login.forgot')}</Txt></Link>
       <ErrorText error={error} />
       <Button label={t('login.signIn')} onPress={withEmail} busy={busy === 'email'} disabled={!email || !password} />
-      <Button label={t('login.google')} kind="secondary" onPress={withGoogle} busy={busy === 'google'}
-              style={{ marginTop: space.m }} />
-      <View style={styles.footer}>
-        <Txt variant="small">{t('login.noAccount')} </Txt>
-        <Link href="/signup"><Txt style={styles.link}>{t('auth.createAccount')}</Txt></Link>
-      </View>
-    </Screen>
+      <Divider />
+      <Button label={t('login.google')} kind="secondary" leftIcon="logo-google" onPress={withGoogle} busy={busy === 'google'} />
+    </AuthScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: 'flex-start', gap: space.m, marginBottom: space.xxl },
-  logo: { width: 232, height: 39 },          // 1200 × 202
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: space.xl },
-  link: { color: colors.ink, textDecorationLine: 'underline' },
+  tagline: { fontFamily: fonts.bodyMedium, textAlign: 'center', color: colors.inkSoft, marginBottom: space.xl },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
+  link: { fontFamily: fonts.bodyBold, color: colors.ink, textDecorationLine: 'underline' },
   forgot: { alignSelf: 'flex-end', marginTop: -space.s, marginBottom: space.m },
 });
