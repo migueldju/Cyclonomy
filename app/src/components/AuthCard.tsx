@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cardShadow, colors, space } from '../theme';
+import { cardShadow, colors, fonts, space, type } from '../theme';
 import { Screen } from './Screen';
 import { Txt } from './Txt';
 
@@ -19,7 +19,7 @@ export function AuthScreen({ title, subtitle, children, footer }: {
         <Image source={require('../../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
                accessibilityLabel="Cyclonomy" />
         <View style={styles.card}>
-          {title ? <Txt variant="display" style={{ marginBottom: subtitle ? space.xs : space.l }}>{title}</Txt> : null}
+          {title ? <Txt style={[styles.title, { marginBottom: subtitle ? space.xs : space.l }]}>{title}</Txt> : null}
           {subtitle ? <Txt variant="small" style={{ marginBottom: space.l }}>{subtitle}</Txt> : null}
           {children}
         </View>
@@ -39,6 +39,8 @@ const styles = StyleSheet.create({
   wrap: { width: '100%', maxWidth: 460, alignSelf: 'center' },
   logo: { width: 214, height: 36, alignSelf: 'center', marginBottom: space.xl },          // 1200 × 202
   card: { backgroundColor: colors.paper, borderRadius: 24, padding: space.xl, ...cardShadow },
+  // título en la letra del texto (Fira Sans), no en la condensada de las cabeceras
+  title: { fontFamily: fonts.bodyBold, fontSize: type.title, color: colors.ink, letterSpacing: -0.2 },
   footer: { alignItems: 'center', marginTop: space.l, gap: space.xs },
   or: { height: 1, backgroundColor: colors.line, marginVertical: space.l },
 });
