@@ -22,13 +22,15 @@ export const schemeLabel = (system: ScoringSystem, wtSplit: boolean) =>
 const UCI_AS_CATEGORY: Record<string, string> = {
   'GT.A': 'TDF', 'GT.B': 'GT', Monument: 'MON', WO: 'WC', 'WO.TT': 'WC_ITT', CC: 'CC', 'CC.TT': 'CC_ITT', NC: 'NC',
   'NC.TT': 'NC_ITT', Pro: 'PRO', 1: 'C1',
+  // los dos niveles del WorldTour en la UCI son los mismos WT A y WT B del juego
+  C1: 'MWT', C2: 'SWT',
 };
 const groupName = (scheme: ScoringScheme, grp: string) => scheme !== 'uci' ? categoryName(grp)
-  : grp === 'C1' ? 'WorldTour 1' : grp === 'C2' ? 'WorldTour 2' : categoryName(UCI_AS_CATEGORY[grp] ?? grp);
+  : categoryName(UCI_AS_CATEGORY[grp] ?? grp);
 
-/** Nombre corto del tipo de carrera para la esquina de la tabla: TDF, GV, 1.MWT / 2.MWT, 1.Pro / 2.Pro… */
+/** Nombre corto del tipo de carrera para la esquina de la tabla: Tour, Gran Vuelta, 1.WT.A / 2.WT.A, 1.Pro / 2.Pro… */
 const groupShort = (scheme: ScoringScheme, grp: string, stageRace: boolean) => scheme !== 'uci' ? categoryLabel(grp, stageRace)
-  : grp === 'C1' || grp === 'C2' ? `${stageRace ? 2 : 1}.WT${grp.slice(1)}` : categoryLabel(UCI_AS_CATEGORY[grp] ?? grp, stageRace);
+  : categoryLabel(UCI_AS_CATEGORY[grp] ?? grp, stageRace);
 
 const KIND_ORDER = ['oneday', 'gc', 'stage', 'leader', 'points_jersey', 'kom_jersey', 'points_final', 'kom_final'];
 const kindLabel = (k: string) => {
