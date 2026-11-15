@@ -48,18 +48,19 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
   const data = useLoader(() => api.scoringSystems());
   const [open, setOpen] = useState<string | null>(null);
   const cat = new Map((cats ?? []).map((c) => [c.code, c]));
-  const groups = (data.data?.[scheme] ?? []).filter((g) => scheme === 'uci' || depth == null || !cat.get(g.grp)
+  const visible = (data.data?.[scheme] ?? []).filter((g) => scheme === 'uci' || depth == null || !cat.get(g.grp)
     || cat.get(g.grp)!.depth_level <= depth);
+  // el Mundial CRI se muestra dentro del Mundial, como una tabla más del mismo nivel
+  const [worlds, worldsTT] = scheme === 'uci' ? ['WO', 'WO.TT'] : ['WC', 'WC_ITT'];
+  const tt = visible.some((g) => g.grp === worlds) ? visible.find((g) => g.grp === worldsTT) : undefined;
+  const groups = tt ? visible.filter((g) => g !== tt) : visible;
   if (!data.data) return <Txt variant="small" style={{ padding: space.l }}>{t('common.loading')}</Txt>;
   return (
     <>
       {scheme !== 'uci' ? <Txt variant="small" style={{ padding: space.l, paddingBottom: 0 }}>{t('scoring.teamBonus')}</Txt> : null}
       {groups.map((g, i) => {
         const isOpen = open === g.grp;
-        const rules = g.rules ?? {};
-        // sin etapas (solo clásicas), la general no aplica (en la UCI repite la tabla de la clásica)
-        const kinds = Object.entries(rules).filter(([k]) => !(k === 'gc' && !('stage' in rules)))
-          .sort(([a], [b]) => KIND_ORDER.indexOf(a) - KIND_ORDER.indexOf(b));
+        const kinds = kindsOf(g);
         return (
           <Row key={g.grp} last={i === groups.length - 1}>
             <View style={{ flex: 1, gap: 2 }}>
@@ -73,6 +74,9 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
               ) : null}
               {kinds.some(([k]) => k !== 'oneday') ? (
                 <PointsTable kinds={kinds.filter(([k]) => k !== 'oneday')} corner={groupShort(scheme, g.grp, true)} />
+              ) : null}
+              {tt && g.grp === worlds ? (
+                <PointsTable kinds={kindsOf(tt).filter(([k]) => k === 'oneday')} corner={groupShort(scheme, tt.grp, false)} />
               ) : null}
               {races && g.races.length ? (
                 <Pressable onPress={() => setOpen(isOpen ? null : g.grp)} accessibilityRole="button"
@@ -89,6 +93,19 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
       })}
     </>
   );
+}
+
+const ONLY_STAGES = ['TDF', 'GT', 'GT.A', 'GT.B'];        // grandes vueltas: nunca son clásicas
+
+/** Tipos de resultado de un grupo que tiene sentido mostrar, en orden */
+function kindsOf(g: { grp: string; rules?: Record<string, number[]> | null }): [string, number[]][] {
+  const rules = g.rules ?? {};
+  return Object.entries(rules)
+    // sin etapas (solo clásicas), la general no aplica (en la UCI repite la tabla de la clásica)
+    .filter(([k]) => !(k === 'gc' && !('stage' in rules)))
+    // el baremo UCI trae tabla de clásica también para Tour, Giro y Vuelta: no aplica
+    .filter(([k]) => !(k === 'oneday' && ONLY_STAGES.includes(g.grp)))
+    .sort(([a], [b]) => KIND_ORDER.indexOf(a) - KIND_ORDER.indexOf(b));
 }
 
 const PER_DAY = ['leader', 'points_jersey', 'kom_jersey'];        // un solo valor, por día: fuera de la tabla
