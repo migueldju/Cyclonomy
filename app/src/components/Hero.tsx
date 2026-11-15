@@ -14,19 +14,31 @@ export function StatTiles({ children, style }: { children: ReactNode; style?: Vi
   return <View style={[styles.tiles, style]}>{children}</View>;
 }
 
-export function StatTile({ label, value, color, icon, wide }: {
+export function StatTile({ label, value, color, icon, wide, onPress, open }: {
   label: string; value: string; color?: string; icon?: ComponentProps<typeof Ionicons>['name'];
   wide?: boolean;                 // ocupa toda la fila: para textos largos
+  /** baldosa que despliega algo al tocarla (`open`: si está desplegado) */
+  onPress?: () => void; open?: boolean;
 }) {
-  return (
-    <View style={[styles.tile, wide && { flexBasis: '100%' }]}>
-      <Txt variant="small" numberOfLines={2}>{label}</Txt>
+  const body = (
+    <>
+      <View style={styles.tileValue}>
+        <Txt variant="small" numberOfLines={2} style={{ flex: 1 }}>{label}</Txt>
+        {onPress ? <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={14} color={colors.inkSoft} /> : null}
+      </View>
       <View style={styles.tileValue}>
         {icon ? <Ionicons name={icon} size={17} color={color ?? colors.ink} /> : null}
         <Txt variant="title" numberOfLines={1} style={[{ flexShrink: 1 }, color ? { color } : null]}>{value}</Txt>
       </View>
-    </View>
+    </>
   );
+  const style = [styles.tile, wide && { flexBasis: '100%' as const }, open && styles.tileOpen];
+  return onPress ? (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value}`}
+               accessibilityState={{ expanded: !!open }} style={({ pressed }) => [...style, pressed && { opacity: 0.7 }]}>
+      {body}
+    </Pressable>
+  ) : <View style={style}>{body}</View>;
 }
 
 /** Selector de una opción entre pocas: pastilla con la elegida en negro */
@@ -58,6 +70,7 @@ const styles = StyleSheet.create({
     flexGrow: 1, flexBasis: '45%', backgroundColor: colors.road, borderRadius: 14, paddingHorizontal: space.m,
     paddingVertical: 10, gap: 2, justifyContent: 'space-between',
   },
+  tileOpen: { backgroundColor: '#FFF7D1' },
   tileValue: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   pills: { flexDirection: 'row', alignSelf: 'flex-start', backgroundColor: colors.line, borderRadius: 999, padding: 3 },
   pill: { paddingHorizontal: space.l, paddingVertical: 6, borderRadius: 999 },

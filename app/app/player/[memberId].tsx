@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { InfoButton } from '@/components/Info';
@@ -9,6 +9,7 @@ import { RiderRow, riderStatusNote } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
+import { ValueChart } from '@/components/ValueChart';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -26,6 +27,8 @@ export default function Jugador() {
   const standings = useLoader(() => api.standings(id), [id], !!leagueId);
   const [picked, setPicked] = useState<RosterRow | null>(null);
   const [offering, setOffering] = useState<RosterRow | null>(null);
+  const [chart, setChart] = useState(false);          // gráfica del valor, al tocar su baldosa
+  useEffect(() => { setChart(false); }, [picked?.ownership_id]);
   const player = standings.data?.find((s) => s.member_id === memberId);
   const rows = roster.data ?? [];
   const done = () => { roster.reload(); refresh(); };
@@ -71,7 +74,9 @@ export default function Jugador() {
           : t('player.pendingTransfer')) : undefined}
         header={picked ? (
           <StatTiles style={{ marginBottom: space.m }}>
-            <StatTile label={t('rider.marketValue')} value={moneyShort(picked.market_value)} icon="trending-up-outline" />
+            {chart ? <View style={styles.chart}><ValueHistory leagueId={id} riderId={picked.rider_id} /></View> : null}
+            <StatTile label={t('rider.marketValue')} value={moneyShort(picked.market_value)} icon="trending-up-outline"
+                      onPress={() => setChart((c) => !c)} open={chart} />
             <StatTile label={t('rider.clause')} value={moneyShort(picked.clause)}
                       icon={picked.locked_next ? 'lock-closed-outline' : 'flash-outline'} />
             <StatTile wide label={t('rider.seasonPoints')} value={points(picked.season_points)} icon="podium-outline" />
@@ -105,7 +110,16 @@ export default function Jugador() {
   );
 }
 
+/** Evolución del valor de un ciclista (se pide al abrirla) */
+function ValueHistory({ leagueId, riderId }: { leagueId: string; riderId: number }) {
+  const detail = useLoader(() => api.rider(leagueId, riderId), [leagueId, riderId]);
+  if (detail.error) return <ErrorText error={detail.error} />;
+  if (!detail.data) return <Txt variant="small" style={{ padding: space.l }}>{t('common.loading')}</Txt>;
+  return <ValueChart points={detail.data.values} />;
+}
+
 const styles = StyleSheet.create({
+  chart: { flexBasis: '100%', minHeight: 150, borderWidth: 1, borderColor: colors.line, borderRadius: 14, overflow: 'hidden' },
   crest: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.line },
   crestEmpty: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.asphaltSoft },
   crestInitial: { fontFamily: fonts.display, fontSize: type.display, color: colors.paper },
