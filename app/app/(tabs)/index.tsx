@@ -5,6 +5,7 @@ import { Button } from '@/components/Button';
 import { PositionJersey } from '@/components/PositionJersey';
 import { MoveRow } from '@/components/MoveRow';
 import { Flag } from '@/components/Flag';
+import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
 import { RiderAvatar } from '@/components/RiderAvatar';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -17,7 +18,7 @@ import { stageLabel } from '@/lib/stages';
 import { course, dateRange, dayMonth, moneyShort, points, time, todayISO } from '@/lib/format';
 import { inviteMessage } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
-import { categoryColor, categoryLabel, categoryRank, colors, space } from '@/theme';
+import { categoryColor, categoryRank, colors, space } from '@/theme';
 
 export default function Inicio() {
   const { leagueId, me } = useLeague();
@@ -123,9 +124,11 @@ export default function Inicio() {
 }
 
 function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entriesOpen: boolean }) {
-  const label = s.status === 'scored' ? t('home.pointsForYou', { points: points(s.my_points) })
-    : s.status === 'finished' ? t('home.scoring')
-    : s.start_at ? t('home.schedule', { start: time(s.start_at) }) : t('home.noSchedule');
+  // estado de la etapa: mis puntos (verde), calculando, o la hora de salida
+  const state = s.status === 'scored'
+    ? <MetaItem icon="podium-outline" text={t('home.pointsForYou', { points: points(s.my_points) })} color={colors.green} strong />
+    : s.status === 'finished' ? <MetaItem icon="hourglass-outline" text={t('home.scoring')} />
+    : <MetaItem icon="time-outline" text={s.start_at ? time(s.start_at) : t('home.noSchedule')} />;
   return (
     <Row last={last}>
       <View style={[styles.swatch, { backgroundColor: categoryColor[s.category] ?? colors.line }]} />
@@ -133,8 +136,12 @@ function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entrie
       <View style={styles.flagCol}><Flag code={s.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{s.race_name}</Txt>
-        <Txt variant="small" numberOfLines={1}>{[stageLabel(s.is_stage_race, s.number, s.last_stage), course(s.distance_km, s.vertical_m), label]
-          .filter(Boolean).join(' · ')}</Txt>
+        <MetaLine>
+          <CategoryBadge code={s.category} stageRace={s.is_stage_race} />
+          <MetaItem icon="flag-outline" text={stageLabel(s.is_stage_race, s.number, s.last_stage)} />
+          <MetaItem icon="trending-up-outline" text={course(s.distance_km, s.vertical_m)} />
+          {state}
+        </MetaLine>
       </View>
       {/* antes de la salida: inscribirse; en carrera: en curso; con los puntos ya calculados: puntuaciones */}
       {s.status === 'scored' ? (
@@ -157,10 +164,13 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
       <View style={styles.flagCol}><Flag code={r.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
-        <Txt variant="small">
-          {dateRange(r.start_date, r.end_date)} · {categoryLabel(r.category, r.is_stage_race)} ·{' '}
-          {r.my_entry_count ? t('race.entered', { n: r.my_entry_count, max: r.max_entries }) : t('race.notEntered')}
-        </Txt>
+        <MetaLine>
+          <CategoryBadge code={r.category} stageRace={r.is_stage_race} />
+          <MetaItem icon="calendar-outline" text={dateRange(r.start_date, r.end_date)} />
+          {r.my_entry_count
+            ? <MetaItem icon="checkmark-circle" text={t('race.entered', { n: r.my_entry_count, max: r.max_entries })} color={colors.green} />
+            : <MetaItem icon="ellipse-outline" text={t('race.notEntered')} />}
+        </MetaLine>
       </View>
       <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/race/${r.race_id}`)} />
     </Row>

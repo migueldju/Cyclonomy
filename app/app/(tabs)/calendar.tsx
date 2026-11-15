@@ -12,9 +12,10 @@ import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
+import { CategoryBadge, MetaDot, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { cardShadow, categoryColor, categoryLabel, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
+import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -177,9 +178,12 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
         <View style={styles.flagCol}><Flag code={r.country} /></View>
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
-          <Txt variant="small" numberOfLines={1}>
-            {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryLabel(r.category, r.is_stage_race)} · {status(r.status)}
-          </Txt>
+          <MetaLine>
+            <CategoryBadge code={r.category} stageRace={r.is_stage_race} />
+            <MetaItem icon="flag-outline" text={stageLabel(r.is_stage_race, stage?.number, last)} />
+            {r.status === 'live' ? <MetaDot text={status(r.status)} color={colors.red} />
+              : <MetaItem icon={r.status === 'finished' ? 'checkmark-circle-outline' : 'time-outline'} text={status(r.status)} />}
+          </MetaLine>
         </View>
         <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft}
                   accessibilityLabel={open ? t('common.close') : t('common.see')} />
