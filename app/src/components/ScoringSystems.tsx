@@ -5,7 +5,7 @@ import { useLoader } from '../hooks/useLoader';
 import { t } from '../i18n';
 import { api } from '../lib/api';
 import type { Category, ScoringScheme, ScoringSystem } from '../lib/types';
-import { categoryName, colors, fonts, space } from '../theme';
+import { categoryLabel, categoryName, colors, fonts, space } from '../theme';
 import { Button } from './Button';
 import { Sheet } from './Modal';
 import { Row } from './Section';
@@ -25,6 +25,10 @@ const UCI_AS_CATEGORY: Record<string, string> = {
 };
 const groupName = (scheme: ScoringScheme, grp: string) => scheme !== 'uci' ? categoryName(grp)
   : grp === 'C1' ? 'WorldTour 1' : grp === 'C2' ? 'WorldTour 2' : categoryName(UCI_AS_CATEGORY[grp] ?? grp);
+
+/** Nombre corto del tipo de carrera para la esquina de la tabla: TDF, GV, 1.MWT / 2.MWT, 1.Pro / 2.Pro… */
+const groupShort = (scheme: ScoringScheme, grp: string, stageRace: boolean) => scheme !== 'uci' ? categoryLabel(grp, stageRace)
+  : grp === 'C1' || grp === 'C2' ? `${stageRace ? 2 : 1}.WT${grp.slice(1)}` : categoryLabel(UCI_AS_CATEGORY[grp] ?? grp, stageRace);
 
 const KIND_ORDER = ['oneday', 'gc', 'stage', 'leader', 'points_jersey', 'kom_jersey', 'points_final', 'kom_final'];
 const kindLabel = (k: string) => {
@@ -64,8 +68,12 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
                 <Txt variant="small">{t('rules.maxEntries', { n: cat.get(g.grp)!.max_entries })}</Txt>
               ) : null}
               {/* clásicas y vueltas por etapas, cada una en su tabla aunque compartan categoría */}
-              {kinds.some(([k]) => k === 'oneday') ? <PointsTable kinds={kinds.filter(([k]) => k === 'oneday')} /> : null}
-              {kinds.some(([k]) => k !== 'oneday') ? <PointsTable kinds={kinds.filter(([k]) => k !== 'oneday')} /> : null}
+              {kinds.some(([k]) => k === 'oneday') ? (
+                <PointsTable kinds={kinds.filter(([k]) => k === 'oneday')} corner={groupShort(scheme, g.grp, false)} />
+              ) : null}
+              {kinds.some(([k]) => k !== 'oneday') ? (
+                <PointsTable kinds={kinds.filter(([k]) => k !== 'oneday')} corner={groupShort(scheme, g.grp, true)} />
+              ) : null}
               {races && g.races.length ? (
                 <Pressable onPress={() => setOpen(isOpen ? null : g.grp)} accessibilityRole="button"
                            accessibilityState={{ expanded: isOpen }}>
@@ -91,7 +99,7 @@ const CELL_W = 42;
  * Puntos de un grupo en tabla: una fila por tipo de resultado y una columna por puesto (se desliza a los lados; la
  * columna de nombres queda fija). Los premios por día (líder, maillots) van debajo, en pastillas.
  */
-export function PointsTable({ kinds }: { kinds: [string, number[]][] }) {
+export function PointsTable({ kinds, corner = '#' }: { kinds: [string, number[]][]; corner?: string }) {
   const rows = kinds.filter(([k]) => !PER_DAY.includes(k));
   const daily = kinds.filter(([k]) => PER_DAY.includes(k));
   const cols = Math.max(0, ...rows.map(([, pts]) => pts.length));
@@ -100,7 +108,7 @@ export function PointsTable({ kinds }: { kinds: [string, number[]][] }) {
       {rows.length ? (
         <View style={styles.table}>
           <View style={{ width: LABEL_W }}>
-            <View style={[styles.cell, styles.head]}><Txt style={styles.headText}>#</Txt></View>
+            <View style={[styles.cell, styles.head]}><Txt numberOfLines={1} style={[styles.headText, { color: colors.ink }]}>{corner}</Txt></View>
             {rows.map(([kind], i) => (
               <View key={kind} style={[styles.cell, i % 2 === 1 && styles.zebra]}>
                 <Txt variant="small" numberOfLines={1} style={styles.rowLabel}>{kindLabel(kind)}</Txt>
