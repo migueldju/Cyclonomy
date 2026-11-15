@@ -15,5 +15,7 @@ const styles: Record<Variant, object> = {
 };
 
 export function Txt({ variant = 'body', style, ...rest }: TextProps & { variant?: Variant }) {
-  return <Text {...rest} style={[styles[variant], style]} />;
+  // Android: con el reparto de líneas por defecto («highQuality») el ancho medido y el pintado no siempre coinciden y
+  // la última palabra («€», «pts») salta a una segunda línea que no se ve; «simple» mide y pinta igual
+  return <Text textBreakStrategy="simple" {...rest} style={[styles[variant], style]} />;
 }

@@ -119,7 +119,7 @@ const en: Partial<Dict> = {
   "fmt.months": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
   "fmt.now": "now",
   "fmt.ordinal": "#{n}",
-  "fmt.points": "{n} pts",
+  "fmt.points": "{n} pts",
   "fmt.thousands": ",",
   "fmt.weekdays": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
   "home.live": "In progress",
