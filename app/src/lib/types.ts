@@ -98,6 +98,7 @@ export interface RosterRow {
   game_offer_expires: string | null;
   transferable: boolean;
   photo_url: string | null;
+  trend: -1 | 0 | 1;          // valor respecto a hace 7 días
 }
 
 /** Movimiento de la liga: fichaje del mercado, compra a otro jugador, clausulazo, oferta aceptada o venta al juego */

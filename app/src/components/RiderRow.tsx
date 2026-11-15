@@ -1,17 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
 import { moneyShort } from '../lib/format';
 import type { RiderStatus } from '../lib/types';
-import { colors, space } from '../theme';
+import { colors, fonts, space, type } from '../theme';
 import { Flag } from './Flag';
 import { RiderAvatar } from './RiderAvatar';
 import { StatusDot } from './StatusDot';
 import { Txt } from './Txt';
 
 /** Fila de ciclista: foto, nombre con bandera y equipo a la izquierda; valor y dato secundario a la derecha. */
-export function RiderRow({ name, team, value, detail, status = 'ok', note, onPress, last, right, photo, nationality, sub }: {
+export function RiderRow({ name, team, value, detail, status = 'ok', note, onPress, last, right, photo, nationality, sub, pointsBox, trend }: {
   sub?: ReactNode;            // segunda línea propia (en vez de «equipo · nota»)
+  pointsBox?: string;         // puntos en un recuadro al principio de la segunda línea (como en el mercado)
+  trend?: -1 | 0 | 1;         // flecha de tendencia junto al valor
   name: string; team?: string | null; value: number; detail?: string; status?: RiderStatus; note?: string;
   onPress?: () => void; last?: boolean; right?: ReactNode; photo?: string | null; nationality?: string | null;
 }) {
@@ -25,11 +28,22 @@ export function RiderRow({ name, team, value, detail, status = 'ok', note, onPre
             <Flag code={nationality} />
             <StatusDot status={status} />
           </View>
-          {sub ?? <Txt variant="small" numberOfLines={1}>{[team, note].filter(Boolean).join(' · ')}</Txt>}
+          {sub ?? (pointsBox ? (
+            <View style={styles.sub}>
+              <View style={styles.pts}><Txt style={styles.ptsText}>{pointsBox}</Txt></View>
+              <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>{[team, note].filter(Boolean).join(' · ')}</Txt>
+            </View>
+          ) : <Txt variant="small" numberOfLines={1}>{[team, note].filter(Boolean).join(' · ')}</Txt>)}
         </View>
         {right ?? (
           <View style={styles.side}>
-            <Txt variant="number">{moneyShort(value)}</Txt>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              {trend != null ? (
+                <Ionicons name={trend > 0 ? 'arrow-up' : trend < 0 ? 'arrow-down' : 'remove'} size={16}
+                          color={trend > 0 ? colors.green : trend < 0 ? colors.red : colors.inkSoft} />
+              ) : null}
+              <Txt variant="number">{moneyShort(value)}</Txt>
+            </View>
             {detail ? <Txt variant="small">{detail}</Txt> : null}
           </View>
         )}
@@ -47,6 +61,9 @@ const styles = StyleSheet.create({
   main: { flex: 1, gap: 2 },
   nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   side: { alignItems: 'flex-end' },
+  sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
+  ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
   line: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
 });
 

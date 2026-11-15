@@ -48,7 +48,9 @@ export default function Plantilla() {
                    r.locked ? t('squad.locked') : r.locked_next ? t('squad.lockedNext') : null,
                    r.game_offer_amount ? t('squad.gameOffers', { amount: moneyShort(r.game_offer_amount) }) : null].filter(Boolean).join(' · ')}
             value={r.market_value}
-            detail={`${points(r.league_points)} · ${t('squad.clause', { amount: moneyShort(r.clause) })}`}
+            pointsBox={points(r.season_points)}
+            trend={r.trend ?? 0}
+            detail={t('squad.clause', { amount: moneyShort(r.clause) })}
             onPress={() => router.push(`/rider/${r.rider_id}`)}
             last={i === rows.length - 1}
           />
