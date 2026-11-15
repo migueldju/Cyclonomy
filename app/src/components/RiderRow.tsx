@@ -14,7 +14,7 @@ export type RiderTag = { icon: ComponentProps<typeof Ionicons>['name']; text: st
 
 /** Fila de ciclista: foto, nombre con bandera y equipo a la izquierda; valor y dato secundario a la derecha. */
 export function RiderRow({ name, team, value, detail, note, onPress, last, right, photo, nationality, sub, pointsBox, trend, tags }: {
-  tags?: RiderTag[];          // avisos como iconos, al final de la segunda línea
+  tags?: RiderTag[];          // avisos como iconos, junto al nombre
   sub?: ReactNode;            // segunda línea propia (en vez de «equipo · nota»)
   pointsBox?: string;         // puntos en un recuadro al principio de la segunda línea (como en el mercado)
   trend?: -1 | 0 | 1;         // flecha de tendencia junto al valor
@@ -29,16 +29,16 @@ export function RiderRow({ name, team, value, detail, note, onPress, last, right
           <View style={styles.nameLine}>
             <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</Txt>
             <Flag code={nationality} />
+            {tags?.map((g) => (
+              <View key={g.text} accessibilityLabel={g.text} style={[styles.tag, { backgroundColor: g.color + '1F' }]}>
+                <Ionicons name={g.icon} size={12} color={g.color} />
+              </View>
+            ))}
           </View>
           {sub ?? (
             <View style={styles.sub}>
               {pointsBox ? <View style={styles.pts}><Txt style={styles.ptsText}>{pointsBox}</Txt></View> : null}
               <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>{[team, note].filter(Boolean).join(' · ')}</Txt>
-              {tags?.map((g) => (
-                <View key={g.text} accessibilityLabel={g.text} style={[styles.tag, { backgroundColor: g.color + '1F' }]}>
-                  <Ionicons name={g.icon} size={12} color={g.color} />
-                </View>
-              ))}
             </View>
           )}
         </View>
