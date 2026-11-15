@@ -114,7 +114,6 @@ const sl: Partial<Dict> = {
   "fmt.inDays": "čez {d} d",
   "fmt.inHours": "čez {h} h {m} min",
   "fmt.inMinutes": "čez {m} min",
-  "fmt.millions": "{n} mio €",
   "fmt.money": "{n} €",
   "fmt.months": "jan.,feb.,mar.,apr.,maj,jun.,jul.,avg.,sep.,okt.,nov.,dec.",
   "fmt.now": "zdaj",

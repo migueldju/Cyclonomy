@@ -114,7 +114,6 @@ const nl: Partial<Dict> = {
   "fmt.inDays": "over {d} dagen",
   "fmt.inHours": "over {h} u {m} min",
   "fmt.inMinutes": "over {m} min",
-  "fmt.millions": "€ {n} mln",
   "fmt.money": "€ {n}",
   "fmt.months": "jan,feb,mrt,apr,mei,jun,jul,aug,sep,okt,nov,dec",
   "fmt.now": "nu",

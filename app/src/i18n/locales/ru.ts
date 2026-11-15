@@ -114,7 +114,6 @@ const ru: Partial<Dict> = {
   "fmt.inDays": "через {d} дн.",
   "fmt.inHours": "через {h} ч {m} мин",
   "fmt.inMinutes": "через {m} мин",
-  "fmt.millions": "{n} млн €",
   "fmt.money": "{n} €",
   "fmt.months": "янв,фев,мар,апр,мая,июн,июл,авг,сен,окт,ноя,дек",
   "fmt.now": "сейчас",

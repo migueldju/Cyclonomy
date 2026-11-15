@@ -114,7 +114,6 @@ const ar: Partial<Dict> = {
   "fmt.inDays": "بعد {d} يوم",
   "fmt.inHours": "بعد {h} س {m} د",
   "fmt.inMinutes": "بعد {m} د",
-  "fmt.millions": "{n} مليون €",
   "fmt.money": "{n} €",
   "fmt.months": "يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر",
   "fmt.now": "الآن",

@@ -114,7 +114,6 @@ const da: Partial<Dict> = {
   "fmt.inDays": "om {d} dage",
   "fmt.inHours": "om {h} t {m} min",
   "fmt.inMinutes": "om {m} min",
-  "fmt.millions": "{n} mio. €",
   "fmt.money": "{n} €",
   "fmt.months": "jan.,feb.,mar.,apr.,maj,jun.,jul.,aug.,sep.,okt.,nov.,dec.",
   "fmt.now": "nu",

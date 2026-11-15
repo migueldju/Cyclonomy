@@ -11,15 +11,8 @@ export function money(v: number | null | undefined): string {
   return v == null ? '—' : t('fmt.money', { n: thousands(v) });
 }
 
-/** 1,25 M € · 850.000 € */
-export function moneyShort(v: number | null | undefined): string {
-  if (v == null) return '—';
-  if (Math.abs(v) >= 1_000_000) {
-    const m = (Math.abs(v) / 1_000_000).toFixed(2).replace(/0$/, '').replace('.', t('fmt.decimal'));
-    return `${v < 0 ? '−' : ''}${t('fmt.millions', { n: m })}`;
-  }
-  return money(v);
-}
+/** Antes abreviaba los millones (1,25 M €); ahora siempre el importe completo */
+export const moneyShort = money;
 
 export function points(v: number | null | undefined): string {
   return v == null ? '—' : t('fmt.points', { n: thousands(v) });

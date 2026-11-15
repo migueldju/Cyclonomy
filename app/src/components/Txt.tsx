@@ -1,4 +1,4 @@
-import { Text, TextProps } from 'react-native';
+import { Platform, Text, TextProps } from 'react-native';
 import { colors, fonts, type } from '../theme';
 
 type Variant = 'body' | 'small' | 'lead' | 'title' | 'display' | 'hero' | 'number' | 'label';
@@ -14,8 +14,10 @@ const styles: Record<Variant, object> = {
   label: { fontFamily: fonts.bodyMedium, fontSize: type.small, lineHeight: 18, color: colors.inkSoft, letterSpacing: 0.2 },
 };
 
-export function Txt({ variant = 'body', style, ...rest }: TextProps & { variant?: Variant }) {
-  // Android: con el reparto de líneas por defecto («highQuality») el ancho medido y el pintado no siempre coinciden y
-  // la última palabra («€», «pts») salta a una segunda línea que no se ve; «simple» mide y pinta igual
-  return <Text textBreakStrategy="simple" {...rest} style={[styles[variant], style]} />;
+export function Txt({ variant = 'body', style, children, ...rest }: TextProps & { variant?: Variant }) {
+  // Android: en algunos móviles el ancho medido se queda un píxel corto y el final del texto («€», «pts») salta a una
+  // segunda línea que no se ve. Con un espacio de no separación al final, lo que salta es ese espacio; y con el
+  // reparto de líneas «simple» se mide y se pinta igual.
+  const text = Platform.OS === 'android' && typeof children === 'string' && children ? children + '\u00A0' : children;
+  return <Text textBreakStrategy="simple" {...rest} style={[styles[variant], style]}>{text}</Text>;
 }

@@ -114,7 +114,6 @@ const ca: Partial<Dict> = {
   "fmt.inDays": "d'aquí a {d} dies",
   "fmt.inHours": "d'aquí a {h} h {m} min",
   "fmt.inMinutes": "d'aquí a {m} min",
-  "fmt.millions": "{n} M €",
   "fmt.money": "{n} €",
   "fmt.months": "gen.,febr.,març,abr.,maig,juny,jul.,ag.,set.,oct.,nov.,des.",
   "fmt.now": "ja",

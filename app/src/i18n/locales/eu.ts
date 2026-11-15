@@ -114,7 +114,6 @@ const eu: Partial<Dict> = {
   "fmt.inDays": "{d} egun barru",
   "fmt.inHours": "{h} h {m} min barru",
   "fmt.inMinutes": "{m} min barru",
-  "fmt.millions": "{n} M €",
   "fmt.money": "{n} €",
   "fmt.months": "urt.,ots.,mar.,api.,mai.,eka.,uzt.,abu.,ira.,urr.,aza.,abe.",
   "fmt.now": "orain",

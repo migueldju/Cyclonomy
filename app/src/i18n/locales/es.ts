@@ -113,7 +113,6 @@ const es = {
   "fmt.inDays": "en {d} días",
   "fmt.inHours": "en {h} h {m} min",
   "fmt.inMinutes": "en {m} min",
-  "fmt.millions": "{n} M €",
   "fmt.money": "{n} €",
   "fmt.months": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic",
   "fmt.now": "ya",

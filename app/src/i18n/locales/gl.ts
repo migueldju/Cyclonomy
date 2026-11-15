@@ -114,7 +114,6 @@ const gl: Partial<Dict> = {
   "fmt.inDays": "en {d} días",
   "fmt.inHours": "en {h} h {m} min",
   "fmt.inMinutes": "en {m} min",
-  "fmt.millions": "{n} M €",
   "fmt.money": "{n} €",
   "fmt.months": "xan,feb,mar,abr,mai,xuñ,xul,ago,set,out,nov,dec",
   "fmt.now": "xa",
