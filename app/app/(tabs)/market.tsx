@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { AdSlot, InfoButton } from '@/components/Info';
@@ -16,7 +17,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { countdown, dateTime, money, moneyShort, points } from '@/lib/format';
 import type { MarketRow } from '@/lib/types';
-import { colors, space } from '@/theme';
+import { colors, fonts, space, type } from '@/theme';
 
 export default function Mercado() {
   const { leagueId, me, refresh } = useLeague();
@@ -120,6 +121,12 @@ export default function Mercado() {
   );
 }
 
+const TREND = {
+  1: { icon: 'arrow-up', color: colors.green },
+  0: { icon: 'remove', color: colors.inkSoft },
+  [-1]: { icon: 'arrow-down', color: colors.red },
+} as const;
+
 const bids = (n: number) => t(n === 1 ? 'market.bids.one' : 'market.bids.other', { n });
 
 function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress: () => void }) {
@@ -133,15 +140,26 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
       team={r.pro_team}
       photo={r.photo_url}
       nationality={r.nationality}
-      // los puntos de la temporada, lo primero tras el equipo
-      note={[points(r.season_points), who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null,
-             !r.seller_member_id && r.age ? t('rider.age', { n: r.age }) : null].filter(Boolean).join(' · ')}
+      // segunda línea: los puntos de la temporada en un recuadro y, después, equipo y datos de la venta
+      sub={(
+        <View style={styles.sub}>
+          <View style={styles.pts}><Txt style={styles.ptsText}>{points(r.season_points)}</Txt></View>
+          <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>
+            {[r.pro_team, who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null].filter(Boolean).join(' · ')}
+          </Txt>
+        </View>
+      )}
       value={r.base_value}
       last={last}
       onPress={onPress}
       right={
         <View style={{ alignItems: 'flex-end' }}>
-          <Txt variant="number">{moneyShort(r.base_value)}</Txt>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            {/* tendencia del valor en la última semana: sube, estable o baja */}
+            <Ionicons name={TREND[r.trend ?? 0].icon} size={16} color={TREND[r.trend ?? 0].color}
+                      accessibilityLabel={TREND[r.trend ?? 0].icon} />
+            <Txt variant="number">{moneyShort(r.base_value)}</Txt>
+          </View>
           <Txt variant="small" style={r.my_bid || (r.is_mine && r.game_offer_amount) ? { color: colors.green } : undefined}>
             {status}
           </Txt>
@@ -151,3 +169,8 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
   );
 }
 
+const styles = StyleSheet.create({
+  sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
+  ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
+});

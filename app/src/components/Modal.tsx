@@ -28,7 +28,7 @@ export function Sheet({ visible, onClose, title, children, above, onTitlePress }
             <Pressable onPress={() => { onClose(); onTitlePress(); }} accessibilityRole="link" accessibilityLabel={title}
                        style={({ pressed }) => [styles.titleLink, pressed && { opacity: 0.6 }]}>
               <Txt variant="title" style={{ flexShrink: 1 }}>{title}</Txt>
-              <Ionicons name="chevron-forward" size={20} color={colors.inkSoft} />
+              <Ionicons name="eye-outline" size={20} color={colors.ink} />
             </Pressable>
           ) : <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>}
           {children}
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
-  titleLink: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
+  titleLink: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
   above: { flex: 1, justifyContent: 'flex-end', padding: space.l },
   sheet: {
     backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,

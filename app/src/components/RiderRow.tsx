@@ -10,7 +10,8 @@ import { StatusDot } from './StatusDot';
 import { Txt } from './Txt';
 
 /** Fila de ciclista: foto, nombre con bandera y equipo a la izquierda; valor y dato secundario a la derecha. */
-export function RiderRow({ name, team, value, detail, status = 'ok', note, onPress, last, right, photo, nationality }: {
+export function RiderRow({ name, team, value, detail, status = 'ok', note, onPress, last, right, photo, nationality, sub }: {
+  sub?: ReactNode;            // segunda línea propia (en vez de «equipo · nota»)
   name: string; team?: string | null; value: number; detail?: string; status?: RiderStatus; note?: string;
   onPress?: () => void; last?: boolean; right?: ReactNode; photo?: string | null; nationality?: string | null;
 }) {
@@ -24,7 +25,7 @@ export function RiderRow({ name, team, value, detail, status = 'ok', note, onPre
             <Flag code={nationality} />
             <StatusDot status={status} />
           </View>
-          <Txt variant="small" numberOfLines={1}>{[team, note].filter(Boolean).join(' · ')}</Txt>
+          {sub ?? <Txt variant="small" numberOfLines={1}>{[team, note].filter(Boolean).join(' · ')}</Txt>}
         </View>
         {right ?? (
           <View style={styles.side}>
