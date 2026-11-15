@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { AdSlot, InfoButton } from '@/components/Info';
-import { RiderRow, riderStatusNote } from '@/components/RiderRow';
+import { RiderRow, riderTags } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { useLeague } from '@/context/LeagueContext';
@@ -43,10 +43,7 @@ export default function Plantilla() {
             team={r.pro_team}
             photo={r.photo_url}
             nationality={r.nationality}
-            status={r.status}
-            note={[riderStatusNote(r.status), r.for_sale ? t('squad.forSale') : null,
-                   r.locked ? t('squad.locked') : r.locked_next ? t('squad.lockedNext') : null,
-                   r.game_offer_amount ? t('squad.gameOffers', { amount: moneyShort(r.game_offer_amount) }) : null].filter(Boolean).join(' · ')}
+            tags={riderTags({ ...r, gameOffer: r.game_offer_amount ? moneyShort(r.game_offer_amount) : null })}
             value={r.market_value}
             pointsBox={points(r.season_points)}
             trend={r.trend ?? 0}

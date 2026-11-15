@@ -5,7 +5,7 @@ import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { InfoButton } from '@/components/Info';
 import { Flag } from '@/components/Flag';
 import { ActionSheet, AmountSheet } from '@/components/Modal';
-import { RiderRow, riderStatusNote } from '@/components/RiderRow';
+import { RiderRow, riderTags } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { Txt } from '@/components/Txt';
@@ -56,9 +56,9 @@ export default function Jugador() {
       </HeroCard>
       <Section style={{ marginTop: space.l }}>
         {rows.length ? rows.map((r, i) => (
-          <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team} status={r.status}
+          <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team}
                     photo={r.photo_url} nationality={r.nationality}
-                    note={[riderStatusNote(r.status), r.locked_next ? t('squad.lockedNext') : null].filter(Boolean).join(' · ') || undefined}
+                    tags={riderTags({ status: r.status, locked_next: r.locked_next })}
                     value={r.market_value}
                     detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={i === rows.length - 1} />
         )) : <Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
