@@ -80,12 +80,6 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
                  options={depthOptions().filter((o) => o.value !== 1 || initial.calendar_depth === 1)}
                  onChange={(v) => set('calendar_depth', v)} />
       <Txt variant="small" style={{ marginTop: -space.s, marginBottom: space.l }}>{depthHint(s.calendar_depth)}</Txt>
-      {/* dividir el WorldTour: solo en el sistema de Cyclonomy y, como él, solo al crear la liga */}
-      {creating && s.scoring_system === 'cyclonomy' ? (
-        <Toggle label={t('scoring.split')} value={s.wt_split} onChange={(v) => set('wt_split', v)} icon="git-branch-outline"
-                extra={<InfoButton compact title={t('scoring.split')} items={[t('scoring.splitHint'), t('scoring.fixed')]}
-                                   style={{ backgroundColor: colors.paper }} />} />
-      ) : null}
       <Stepper label={t('settings.maxRiders')} value={s.max_riders} min={16} max={40} icon="people-outline"
                onChange={(v) => set('max_riders', v)} />
       <Stepper label={t('settings.marketSize')} value={s.market_size} min={1} max={30} icon="pricetags-outline"

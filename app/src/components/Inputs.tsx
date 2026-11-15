@@ -74,9 +74,13 @@ export function Toggle({ label, value, onChange, hint, icon, extra }: {
       <View style={styles.stepRow}>
         {icon ? <TileIcon name={icon} /> : null}
         <Txt style={{ flex: 1 }}>{label}</Txt>
-        {extra}
-        <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.jersey, false: colors.line }}
-                thumbColor={colors.paper} accessibilityLabel={label} />
+        {/* mismas columnas que un Stepper (− · número · +): el extra donde el −, el interruptor centrado bajo los números */}
+        <View style={styles.stepSlot}>{extra}</View>
+        <View style={styles.valueSlot}>
+          <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.jersey, false: colors.line }}
+                  thumbColor={colors.paper} accessibilityLabel={label} />
+        </View>
+        <View style={styles.stepSlot} />
       </View>
       {hint ? <Txt variant="small" style={{ marginTop: 4 }}>{hint}</Txt> : null}
     </View>
@@ -102,6 +106,8 @@ const styles = StyleSheet.create({
   tileIcon: {
     width: 34, height: 34, borderRadius: 17, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center',
   },
+  stepSlot: { width: 36, alignItems: 'center' },
+  valueSlot: { width: 52, alignItems: 'center' },
   stepBtn: {
     width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.paper,
   },
