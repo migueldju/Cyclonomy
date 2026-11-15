@@ -100,7 +100,7 @@ export default function Ciclista() {
 
       <View>
         {mine ? (
-          <Button kind="secondary" label={t('rider.manage')} onPress={() => setManaging(true)} disabled={!rosterRow} />
+          <Button label={t('rider.manage')} onPress={() => setManaging(true)} disabled={!rosterRow} />
         ) : d.owner ? (
           <Button kind="secondary" label={t('rider.seeSquad', { team: d.owner.team_name })}
                   onPress={() => router.push(`/player/${d.owner!.member_id}`)} />
