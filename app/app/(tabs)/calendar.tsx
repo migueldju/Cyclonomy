@@ -12,7 +12,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
-import { CategoryBadge, MetaDot, MetaItem, MetaLine } from '@/components/Meta';
+import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
 import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
@@ -181,8 +181,8 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
           <MetaLine>
             <CategoryBadge code={r.category} stageRace={r.is_stage_race} />
             <MetaItem icon="flag-outline" text={stageLabel(r.is_stage_race, stage?.number, last)} />
-            {r.status === 'live' ? <MetaDot text={status(r.status)} color={colors.red} />
-              : <MetaItem icon={r.status === 'finished' ? 'checkmark-circle-outline' : 'time-outline'} text={status(r.status)} />}
+            {/* solo se marca la que ya ha terminado */}
+            {r.status === 'finished' ? <MetaItem icon="checkmark-circle-outline" text={status(r.status)} /> : null}
           </MetaLine>
         </View>
         <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft}
