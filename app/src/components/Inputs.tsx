@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, StyleSheet, Switch, TextInput, TextInputProps, View } from 'react-native';
 import { colors, fonts, space, type } from '../theme';
 import { t } from '../i18n';
@@ -65,14 +65,16 @@ export function Stepper({ label, value, onChange, min, max, step = 1, format, ic
   );
 }
 
-export function Toggle({ label, value, onChange, hint, icon }: {
+export function Toggle({ label, value, onChange, hint, icon, extra }: {
   label: string; value: boolean; onChange: (v: boolean) => void; hint?: string; icon?: IconName;
+  extra?: ReactNode;          // algo más junto al interruptor (p. ej. el botón de información)
 }) {
   return (
     <View style={styles.tile}>
       <View style={styles.stepRow}>
         {icon ? <TileIcon name={icon} /> : null}
         <Txt style={{ flex: 1 }}>{label}</Txt>
+        {extra}
         <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.jersey, false: colors.line }}
                 thumbColor={colors.paper} accessibilityLabel={label} />
       </View>

@@ -7,7 +7,6 @@ import { api } from '../lib/api';
 import type { Category, ScoringScheme, ScoringSystem } from '../lib/types';
 import { categoryName, colors, fonts, space } from '../theme';
 import { Button } from './Button';
-import { Toggle } from './Inputs';
 import { Sheet } from './Modal';
 import { Row } from './Section';
 import { Txt } from './Txt';
@@ -113,11 +112,6 @@ export function ScoringSystemPicker({ system, wtSplit, onChange }: {
         {option('cyclonomy', t('scoring.cyclonomy'), t('scoring.cyclonomyHint'))}
         {option('uci', t('scoring.uci'), t('scoring.uciHint'))}
       </View>
-      {system === 'cyclonomy' ? (
-        <View style={{ marginTop: space.m, marginBottom: -space.m }}>
-          <Toggle label={t('scoring.split')} value={wtSplit} onChange={(v) => onChange(system, v)} icon="git-branch-outline" />
-        </View>
-      ) : null}
 
       <Sheet visible={how != null} onClose={() => setHow(null)}
              title={how === 'uci' ? t('scoring.uci') : t('scoring.cyclonomy')}>
