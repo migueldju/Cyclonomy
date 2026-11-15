@@ -486,6 +486,10 @@ const en: Partial<Dict> = {
   "auth.alreadyRegistered": "There's already an account with that email. Sign in or reset your password.",
   "auth.invalidEmail": "That email doesn't look valid.",
   "auth.samePassword": "The new password must be different from the old one.",
+  "chart.range.3d": "3D",
+  "chart.range.1w": "1W",
+  "chart.range.1m": "1M",
+  "chart.range.3m": "3M",
   "topbar.profile": "My profile",
 };
 

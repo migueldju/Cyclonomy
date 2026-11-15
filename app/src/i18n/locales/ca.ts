@@ -486,6 +486,10 @@ const ca: Partial<Dict> = {
   "auth.alreadyRegistered": "Ja hi ha un compte amb aquest correu. Entra o recupera la contrasenya.",
   "auth.invalidEmail": "Aquest correu no sembla vàlid.",
   "auth.samePassword": "La contrasenya nova ha de ser diferent de l'anterior.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 setm",
+  "chart.range.1m": "1 mes",
+  "chart.range.3m": "3 mesos",
   "topbar.profile": "El meu perfil",
 };
 

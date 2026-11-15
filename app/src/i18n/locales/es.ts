@@ -485,6 +485,10 @@ const es = {
   "auth.alreadyRegistered": "Ya existe una cuenta con ese correo. Entra o recupera la contraseña.",
   "auth.invalidEmail": "Ese correo no parece válido.",
   "auth.samePassword": "La contraseña nueva tiene que ser distinta de la anterior.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 sem",
+  "chart.range.1m": "1 mes",
+  "chart.range.3m": "3 meses",
   "topbar.profile": "Mi perfil",
 } as const;
 

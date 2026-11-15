@@ -486,6 +486,10 @@ const cs: Partial<Dict> = {
   "auth.alreadyRegistered": "Účet s tímto e-mailem už existuje. Přihlas se, nebo si obnov heslo.",
   "auth.invalidEmail": "Tento e-mail nevypadá platně.",
   "auth.samePassword": "Nové heslo se musí lišit od starého.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 týd",
+  "chart.range.1m": "1 měs",
+  "chart.range.3m": "3 měs",
   "topbar.profile": "Můj profil",
 };
 

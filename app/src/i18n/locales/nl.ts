@@ -486,6 +486,10 @@ const nl: Partial<Dict> = {
   "auth.alreadyRegistered": "Er bestaat al een account met dat e-mailadres. Log in of herstel je wachtwoord.",
   "auth.invalidEmail": "Dat e-mailadres lijkt niet geldig.",
   "auth.samePassword": "Het nieuwe wachtwoord moet anders zijn dan het oude.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 w",
+  "chart.range.1m": "1 mnd",
+  "chart.range.3m": "3 mnd",
   "topbar.profile": "Mijn profiel",
 };
 

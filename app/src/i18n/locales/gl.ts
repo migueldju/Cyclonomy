@@ -486,6 +486,10 @@ const gl: Partial<Dict> = {
   "auth.alreadyRegistered": "Xa existe unha conta con ese correo. Entra ou recupera o contrasinal.",
   "auth.invalidEmail": "Ese correo non parece válido.",
   "auth.samePassword": "O novo contrasinal ten que ser distinto do anterior.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 sem",
+  "chart.range.1m": "1 mes",
+  "chart.range.3m": "3 meses",
   "topbar.profile": "O meu perfil",
 };
 

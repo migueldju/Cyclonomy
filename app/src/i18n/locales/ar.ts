@@ -486,6 +486,10 @@ const ar: Partial<Dict> = {
   "auth.alreadyRegistered": "يوجد حساب بهذا البريد بالفعل. ادخل أو استعد كلمة المرور.",
   "auth.invalidEmail": "هذا البريد لا يبدو صالحًا.",
   "auth.samePassword": "يجب أن تختلف كلمة المرور الجديدة عن السابقة.",
+  "chart.range.3d": "3 أيام",
+  "chart.range.1w": "أسبوع",
+  "chart.range.1m": "شهر",
+  "chart.range.3m": "3 أشهر",
   "topbar.profile": "ملفي الشخصي",
 };
 

@@ -486,6 +486,10 @@ const eu: Partial<Dict> = {
   "auth.alreadyRegistered": "Badago kontu bat helbide horrekin. Sartu edo berreskuratu pasahitza.",
   "auth.invalidEmail": "Helbide horrek ez dirudi baliozkoa.",
   "auth.samePassword": "Pasahitz berriak aurrekoaren desberdina izan behar du.",
+  "chart.range.3d": "3 egun",
+  "chart.range.1w": "1 aste",
+  "chart.range.1m": "1 hil",
+  "chart.range.3m": "3 hil",
   "topbar.profile": "Nire profila",
 };
 

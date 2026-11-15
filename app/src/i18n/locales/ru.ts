@@ -486,6 +486,10 @@ const ru: Partial<Dict> = {
   "auth.alreadyRegistered": "Аккаунт с такой почтой уже есть. Войди или восстанови пароль.",
   "auth.invalidEmail": "Похоже, это недействительный адрес.",
   "auth.samePassword": "Новый пароль должен отличаться от старого.",
+  "chart.range.3d": "3 д",
+  "chart.range.1w": "1 нед",
+  "chart.range.1m": "1 мес",
+  "chart.range.3m": "3 мес",
   "topbar.profile": "Мой профиль",
 };
 

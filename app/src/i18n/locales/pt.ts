@@ -486,6 +486,10 @@ const pt: Partial<Dict> = {
   "auth.alreadyRegistered": "Já existe uma conta com esse email. Entra ou recupera a palavra-passe.",
   "auth.invalidEmail": "Esse email não parece válido.",
   "auth.samePassword": "A nova palavra-passe tem de ser diferente da anterior.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 sem",
+  "chart.range.1m": "1 mês",
+  "chart.range.3m": "3 meses",
   "topbar.profile": "O meu perfil",
 };
 

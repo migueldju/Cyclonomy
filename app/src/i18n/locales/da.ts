@@ -486,6 +486,10 @@ const da: Partial<Dict> = {
   "auth.alreadyRegistered": "Der findes allerede en konto med den e-mail. Log ind, eller nulstil din adgangskode.",
   "auth.invalidEmail": "Den e-mail ser ikke gyldig ud.",
   "auth.samePassword": "Den nye adgangskode skal være forskellig fra den gamle.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 uge",
+  "chart.range.1m": "1 md",
+  "chart.range.3m": "3 mdr",
   "topbar.profile": "Min profil",
 };
 

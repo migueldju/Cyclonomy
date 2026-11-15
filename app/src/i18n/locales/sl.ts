@@ -486,6 +486,10 @@ const sl: Partial<Dict> = {
   "auth.alreadyRegistered": "Račun s to e-pošto že obstaja. Prijavi se ali obnovi geslo.",
   "auth.invalidEmail": "Ta e-pošta ni videti veljavna.",
   "auth.samePassword": "Novo geslo se mora razlikovati od prejšnjega.",
+  "chart.range.3d": "3 d",
+  "chart.range.1w": "1 ted",
+  "chart.range.1m": "1 mes",
+  "chart.range.3m": "3 mes",
   "topbar.profile": "Moj profil",
 };
 

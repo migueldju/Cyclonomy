@@ -486,6 +486,10 @@ const ja: Partial<Dict> = {
   "auth.alreadyRegistered": "そのメールアドレスのアカウントは既に存在します。ログインするかパスワードを再設定してください。",
   "auth.invalidEmail": "そのメールアドレスは正しくないようです。",
   "auth.samePassword": "新しいパスワードは以前と異なるものにしてください。",
+  "chart.range.3d": "3日",
+  "chart.range.1w": "1週",
+  "chart.range.1m": "1か月",
+  "chart.range.3m": "3か月",
   "topbar.profile": "プロフィール",
 };
 
