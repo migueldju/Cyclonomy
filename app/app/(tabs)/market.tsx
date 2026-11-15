@@ -88,6 +88,7 @@ export default function Mercado() {
         visible={!!picked}
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
+        onTitlePress={picked ? () => router.push(`/rider/${picked.rider_id}`) : undefined}
         subtitle={!picked ? undefined : picked.is_mine
           ? `${t('market.yourSale')} · ${t('market.closes', { when: dateTime(picked.closes_at) })} · ${bids(picked.bid_count)}`
             + '\n' + (picked.game_offer_amount ? t('market.gameOffersYou', { amount: money(picked.game_offer_amount) })
@@ -100,6 +101,7 @@ export default function Mercado() {
         visible={!!bidding}
         onClose={() => setBidding(null)}
         title={bidding ? t('market.bidFor', { name: bidding.rider_name }) : ''}
+        onTitlePress={bidding ? () => router.push(`/rider/${bidding.rider_id}`) : undefined}
         chips={bidding ? [
           ...(bidding.pro_team ? [{ icon: 'shirt-outline' as const, text: bidding.pro_team }] : []),
           ...(bidding.seller_team ? [{ icon: 'person-outline' as const, text: bidding.seller_team }] : []),

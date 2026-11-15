@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
@@ -69,6 +69,7 @@ export default function Jugador() {
         visible={!!picked}
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
+        onTitlePress={picked ? () => router.push(`/rider/${picked.rider_id}`) : undefined}
         // sin frases: las cifras en baldosas, las acciones con icono y la explicación en «Cómo funciona»
         subtitle={picked ? (picked.transferable ? (picked.locked_next ? t('player.lockedClause') : undefined)
           : t('player.pendingTransfer')) : undefined}
@@ -101,6 +102,7 @@ export default function Jugador() {
         visible={!!offering}
         onClose={() => setOffering(null)}
         title={offering ? t('player.offerFor', { name: offering.rider_name }) : ''}
+        onTitlePress={offering ? () => router.push(`/rider/${offering.rider_id}`) : undefined}
         chips={offering ? [{ icon: 'trending-up-outline' as const, text: money(offering.market_value) },
                            { icon: 'time-outline' as const, text: '48 h' }] : undefined}
         initial={offering?.market_value}

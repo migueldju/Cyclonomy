@@ -10,8 +10,9 @@ import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
 /** Hoja inferior genérica */
-export function Sheet({ visible, onClose, title, children, above }: {
+export function Sheet({ visible, onClose, title, children, above, onTitlePress }: {
   visible: boolean; onClose: () => void; title: string; children: ReactNode;
+  onTitlePress?: () => void;  // título pulsable (p. ej. ir a la ficha del ciclista): cierra la hoja y lo ejecuta
   above?: ReactNode;          // tarjeta flotante en el hueco libre, pegada encima de la hoja
 }) {
   return (
@@ -23,7 +24,13 @@ export function Sheet({ visible, onClose, title, children, above }: {
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
           <View style={styles.handle} />
-          <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>
+          {onTitlePress ? (
+            <Pressable onPress={() => { onClose(); onTitlePress(); }} accessibilityRole="link" accessibilityLabel={title}
+                       style={({ pressed }) => [styles.titleLink, pressed && { opacity: 0.6 }]}>
+              <Txt variant="title" style={{ flexShrink: 1 }}>{title}</Txt>
+              <Ionicons name="chevron-forward" size={20} color={colors.inkSoft} />
+            </Pressable>
+          ) : <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>}
           {children}
         </View>
       </KeyboardAvoidingView>
@@ -44,7 +51,8 @@ export interface SheetAction {
 }
 
 /** Lista de acciones; ejecuta la elegida y muestra el error del servidor si lo hay */
-export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer, above }: {
+export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer, above, onTitlePress }: {
+  onTitlePress?: () => void;  // ver Sheet
   above?: ReactNode;          // ver Sheet
   visible: boolean; onClose: () => void; title: string; subtitle?: string; actions: SheetAction[]; onDone?: () => void;
   /** contenido propio sobre las acciones (cifras) y junto a «Cerrar» (botón de información) */
@@ -70,7 +78,7 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title} above={above}>
+    <Sheet visible={visible} onClose={onClose} title={title} above={above} onTitlePress={onTitlePress}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
       {header}
       {actions.length === 0 && !subtitle ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
@@ -108,7 +116,8 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
 }
 
 /** Pide una cantidad en euros (pujas y ofertas) */
-export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done, quick = true }: {
+export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done, quick = true, onTitlePress }: {
+  onTitlePress?: () => void;  // ver Sheet
   quick?: boolean;            // atajos +5 %, +10 % y +25 %
   visible: boolean; onClose: () => void; title: string; subtitle?: string; min?: number; initial?: number;
   /** datos cortos con icono (equipo, cierre…), en vez de una frase */
@@ -143,7 +152,7 @@ export function AmountSheet({ visible, onClose, title, subtitle, chips, min, ini
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title}>
+    <Sheet visible={visible} onClose={onClose} title={title} onTitlePress={onTitlePress}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
       {chips?.length ? (
         <View style={styles.chips}>
@@ -198,6 +207,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
+  titleLink: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
   above: { flex: 1, justifyContent: 'flex-end', padding: space.l },
   sheet: {
     backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
