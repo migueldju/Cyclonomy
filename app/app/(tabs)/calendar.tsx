@@ -14,7 +14,7 @@ import { api } from '@/lib/api';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
+import { cardShadow, categoryColor, categoryLabel, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -178,7 +178,7 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
           <Txt variant="small" numberOfLines={1}>
-            {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryName(r.category)} · {status(r.status)}
+            {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryLabel(r.category, r.is_stage_race)} · {status(r.status)}
           </Txt>
         </View>
         <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft}

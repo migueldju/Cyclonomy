@@ -16,7 +16,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, dateTime, moneyShort, points } from '@/lib/format';
-import { categoryName, colors, space } from '@/theme';
+import { categoryLabel, colors, space } from '@/theme';
 
 /** Inscripción de una carrera: hasta el máximo de su categoría, hasta la salida de la 1.ª etapa */
 export default function Inscripcion() {
@@ -79,7 +79,8 @@ export default function Inscripcion() {
           <Txt variant="display" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
           <Flag code={data.race.country} height={16} />
         </View>
-        <Txt variant="small">{categoryName(data.race.category)} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
+        <Txt variant="small">{/* vuelta por etapas si dura más de un día */}
+          {categoryLabel(data.race.category, data.race.start_date !== data.race.end_date)} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
         <Txt>
           {data.open ? t('entry.open', { max, when: dateTime(data.race.entries_close_at) }) : t('entry.closed')}
           {data.auto ? ` ${t('entry.auto')}` : ''}
