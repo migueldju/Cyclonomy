@@ -44,14 +44,14 @@ export function RiderRow({ name, team, value, detail, note, onPress, last, right
         </View>
         {right ?? (
           <View style={styles.side}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <View style={styles.sideTop}>
               {trend != null ? (
                 <Ionicons name={trend > 0 ? 'arrow-up' : trend < 0 ? 'arrow-down' : 'remove'} size={16}
                           color={trend > 0 ? colors.green : trend < 0 ? colors.red : colors.inkSoft} />
               ) : null}
               <Txt variant="number">{moneyShort(value)}</Txt>
             </View>
-            {detail ? <Txt variant="small">{detail}</Txt> : null}
+            {detail ? <View style={styles.sideSub}><Txt variant="small">{detail}</Txt></View> : null}
           </View>
         )}
       </View>
@@ -66,9 +66,12 @@ export function RiderRow({ name, team, value, detail, note, onPress, last, right
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l, paddingVertical: space.m, gap: space.m },
   main: { flex: 1, gap: 2 },
-  nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s },
-  side: { alignItems: 'flex-end' },
-  sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  // las dos líneas de cada lado miden lo mismo, para que equipo y cláusula queden a la misma altura
+  nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, height: 24 },
+  side: { alignItems: 'flex-end', gap: 2 },
+  sideTop: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 24 },
+  sideSub: { height: 22, justifyContent: 'center' },
+  sub: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 22 },
   pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
   ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
   tag: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
