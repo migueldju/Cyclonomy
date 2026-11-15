@@ -24,7 +24,7 @@ export function StatTile({ label, value, color, icon, wide, onPress, open }: {
     <>
       <View style={styles.tileValue}>
         <Txt variant="small" numberOfLines={2} style={{ flex: 1 }}>{label}</Txt>
-        {onPress ? <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={14} color={colors.inkSoft} /> : null}
+        {onPress ? <Ionicons name={open ? 'eye-off-outline' : 'eye-outline'} size={17} color={colors.ink} /> : null}
       </View>
       <View style={styles.tileValue}>
         {icon ? <Ionicons name={icon} size={17} color={color ?? colors.ink} /> : null}
