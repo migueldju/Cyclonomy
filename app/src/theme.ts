@@ -25,6 +25,7 @@ export const fonts = {
   bodyBold: 'FiraSans_600SemiBold',
   display: 'BebasNeue_400Regular',         // títulos: condensada y en mayúsculas
   number: 'FiraSansCondensed_700Bold',
+  password: 'PasswordDisc',                // todos los caracteres se dibujan como un punto
 };
 
 // Escala tipográfica (1,2): 13 · 15 · 18 · 24 · 30 · 38 (los títulos, en Bebas Neue, algo mayores: es más estrecha)

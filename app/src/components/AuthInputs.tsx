@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, TextInputProps, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 import { t } from '../i18n';
 import { passwordStrength } from '../lib/auth';
 import { colors, fonts, space, type } from '../theme';
 import { Button } from './Button';
 import { Txt } from './Txt';
+
+const DOTS = Platform.OS === 'android';
 
 const METER = [colors.red, colors.orange, '#C9A12A', colors.green];
 
@@ -18,8 +20,17 @@ export function PasswordInput({ label, hint, meter, ...rest }: TextInputProps & 
     <View style={{ marginBottom: space.l }}>
       <Txt variant="label" style={{ marginBottom: 4 }}>{label}</Txt>
       <View style={styles.box}>
-        <TextInput {...rest} secureTextEntry={!visible} autoCapitalize="none" autoCorrect={false} accessibilityLabel={label}
-                   placeholderTextColor={colors.inkSoft} style={styles.input} />
+        {DOTS ? (
+          // Android enseña un instante cada letra en los campos seguros (ajuste del sistema). Aquí el campo no es
+          // «seguro»: la contraseña se oculta con una fuente que lo dibuja todo como puntos, así nunca se ve la letra.
+          // El teclado «visible-password» no aprende ni sugiere lo escrito, y oculta no se puede copiar.
+          <TextInput {...rest} keyboardType="visible-password" autoCapitalize="none" autoCorrect={false} spellCheck={false}
+                     contextMenuHidden={!visible} accessibilityLabel={label} placeholderTextColor={colors.inkSoft}
+                     style={[styles.input, !visible && value ? styles.dots : null]} />
+        ) : (
+          <TextInput {...rest} secureTextEntry={!visible} autoCapitalize="none" autoCorrect={false} accessibilityLabel={label}
+                     placeholderTextColor={colors.inkSoft} style={styles.input} />
+        )}
         <Pressable onPress={() => setVisible((v) => !v)} hitSlop={8} accessibilityRole="button"
                    accessibilityLabel={visible ? t('auth.hidePassword') : t('auth.showPassword')} style={styles.eye}>
           <Ionicons name={visible ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.inkSoft} />
@@ -74,6 +85,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1, paddingHorizontal: space.l, paddingVertical: 13, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
   },
+  dots: { fontFamily: fonts.password, letterSpacing: 1 },
   eye: { paddingHorizontal: space.m, paddingVertical: 10 },
   meter: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 },
   bar: { flex: 1, height: 4, borderRadius: 2 },

@@ -32,6 +32,8 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     FiraSans_400Regular, FiraSans_500Medium, FiraSans_600SemiBold, FiraSansCondensed_600SemiBold, FiraSansCondensed_700Bold,
     BebasNeue_400Regular,
+    // todos los caracteres como puntos: oculta la contraseña en Android sin el destello de la última letra
+    PasswordDisc: require('../assets/fonts/password-disc.ttf'),
   });
   // la pantalla de arranque nativa se quita enseguida: la de carga (el logo) la pinta la app, también en Expo Go
   useEffect(() => { SplashScreen.hideAsync(); }, []);
