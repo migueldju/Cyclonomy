@@ -489,6 +489,7 @@ const es = {
   "chart.range.1w": "1 sem",
   "chart.range.1m": "1 mes",
   "chart.range.3m": "3 meses",
+  "chart.range.all": "Total",
   "topbar.profile": "Mi perfil",
 } as const;
 

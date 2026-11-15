@@ -490,6 +490,7 @@ const ca: Partial<Dict> = {
   "chart.range.1w": "1 setm",
   "chart.range.1m": "1 mes",
   "chart.range.3m": "3 mesos",
+  "chart.range.all": "Total",
   "topbar.profile": "El meu perfil",
 };
 

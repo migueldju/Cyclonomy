@@ -490,6 +490,7 @@ const ar: Partial<Dict> = {
   "chart.range.1w": "أسبوع",
   "chart.range.1m": "شهر",
   "chart.range.3m": "3 أشهر",
+  "chart.range.all": "الكل",
   "topbar.profile": "ملفي الشخصي",
 };
 

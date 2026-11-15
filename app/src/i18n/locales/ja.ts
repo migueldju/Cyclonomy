@@ -490,6 +490,7 @@ const ja: Partial<Dict> = {
   "chart.range.1w": "1週",
   "chart.range.1m": "1か月",
   "chart.range.3m": "3か月",
+  "chart.range.all": "全期間",
   "topbar.profile": "プロフィール",
 };
 

@@ -490,6 +490,7 @@ const nl: Partial<Dict> = {
   "chart.range.1w": "1 w",
   "chart.range.1m": "1 mnd",
   "chart.range.3m": "3 mnd",
+  "chart.range.all": "Alles",
   "topbar.profile": "Mijn profiel",
 };
 

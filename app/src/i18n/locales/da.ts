@@ -490,6 +490,7 @@ const da: Partial<Dict> = {
   "chart.range.1w": "1 uge",
   "chart.range.1m": "1 md",
   "chart.range.3m": "3 mdr",
+  "chart.range.all": "Alt",
   "topbar.profile": "Min profil",
 };
 

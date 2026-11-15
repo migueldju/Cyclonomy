@@ -490,6 +490,7 @@ const cs: Partial<Dict> = {
   "chart.range.1w": "1 týd",
   "chart.range.1m": "1 měs",
   "chart.range.3m": "3 měs",
+  "chart.range.all": "Vše",
   "topbar.profile": "Můj profil",
 };
 

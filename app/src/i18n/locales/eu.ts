@@ -490,6 +490,7 @@ const eu: Partial<Dict> = {
   "chart.range.1w": "1 aste",
   "chart.range.1m": "1 hil",
   "chart.range.3m": "3 hil",
+  "chart.range.all": "Dena",
   "topbar.profile": "Nire profila",
 };
 

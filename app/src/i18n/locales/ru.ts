@@ -490,6 +490,7 @@ const ru: Partial<Dict> = {
   "chart.range.1w": "1 нед",
   "chart.range.1m": "1 мес",
   "chart.range.3m": "3 мес",
+  "chart.range.all": "Всё",
   "topbar.profile": "Мой профиль",
 };
 

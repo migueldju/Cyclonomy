@@ -20,21 +20,22 @@ const RANGES = [
   { value: '1w', days: 7, label: 'chart.range.1w' },
   { value: '1m', days: 30, label: 'chart.range.1m' },
   { value: '3m', days: 90, label: 'chart.range.3m' },
+  { value: 'all', days: null, label: 'chart.range.all' },          // todo el historial
 ] as const;
 type Range = (typeof RANGES)[number]['value'];
 
-/** Evolución del valor de mercado, con selector de periodo: 3 días, 1 semana, 1 mes o 3 meses. */
+/** Evolución del valor de mercado, con selector de periodo: 3 días, 1 semana, 1 mes, 3 meses o todo (por defecto). */
 export function ValueChart({ points }: { points: Point[] }) {
-  const [range, setRange] = useState<Range>('1m');
+  const [range, setRange] = useState<Range>('all');
   if (points.length < 2) return <Chart points={points} />;
   // desde N días antes del último dato (incluido, para que el cambio abarque los N días)
   const days = RANGES.find((r) => r.value === range)!.days;
-  const from = new Date(new Date(`${points[points.length - 1].day}T00:00:00Z`).getTime() - days * 86400000)
+  const from = days == null ? '' : new Date(new Date(`${points[points.length - 1].day}T00:00:00Z`).getTime() - days * 86400000)
     .toISOString().slice(0, 10);
   const shown = points.filter((p) => p.day >= from);
   return (
     <View>
-      <Pills options={RANGES.map((r) => ({ value: r.value, label: t(r.label) }))} value={range} onChange={setRange}
+      <Pills options={RANGES.map((r) => ({ value: r.value, label: t(r.label) }))} value={range} onChange={setRange} compact
              style={{ marginHorizontal: space.l, marginTop: space.l, alignSelf: 'center' }} />
       {/* key: al cambiar de periodo se olvida el día señalado */}
       <Chart key={range} points={shown.length >= 2 ? shown : points.slice(-2)} />
