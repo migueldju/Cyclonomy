@@ -490,6 +490,7 @@ const ru: Partial<Dict> = {
   "chart.range.1m": "1 мес",
   "chart.range.3m": "3 мес",
   "chart.range.all": "Всё",
+  "profile.photoError": "Не удалось прочитать фото. Попробуй другое.",
   "topbar.profile": "Мой профиль",
 };
 

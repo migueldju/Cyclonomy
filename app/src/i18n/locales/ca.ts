@@ -490,6 +490,7 @@ const ca: Partial<Dict> = {
   "chart.range.1m": "1 mes",
   "chart.range.3m": "3 mesos",
   "chart.range.all": "Total",
+  "profile.photoError": "No s'ha pogut llegir la foto. Prova'n una altra.",
   "topbar.profile": "El meu perfil",
 };
 

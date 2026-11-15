@@ -490,6 +490,7 @@ const ja: Partial<Dict> = {
   "chart.range.1m": "1か月",
   "chart.range.3m": "3か月",
   "chart.range.all": "全期間",
+  "profile.photoError": "写真を読み込めませんでした。別の写真をお試しください。",
   "topbar.profile": "プロフィール",
 };
 

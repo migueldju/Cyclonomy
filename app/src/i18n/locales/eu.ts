@@ -490,6 +490,7 @@ const eu: Partial<Dict> = {
   "chart.range.1m": "1 hil",
   "chart.range.3m": "3 hil",
   "chart.range.all": "Dena",
+  "profile.photoError": "Ezin izan da argazkia irakurri. Saiatu beste batekin.",
   "topbar.profile": "Nire profila",
 };
 

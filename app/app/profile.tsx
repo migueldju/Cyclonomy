@@ -71,11 +71,15 @@ export default function Perfil() {
   }
 
   async function pickPhoto() {
-    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.6 });
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.6, base64: true });
     if (res.canceled || !userId) return;
     const asset = res.assets[0];
     await run('photo', async () => {
-      const body = await fetch(asset.uri).then((r) => r.arrayBuffer());
+      // En Android, fetch(uri).arrayBuffer() devuelve un fichero vacío: se usan los bytes en base64 del selector
+      const body = asset.base64
+        ? Uint8Array.from(atob(asset.base64), (ch) => ch.charCodeAt(0)).buffer
+        : await fetch(asset.uri).then((r) => r.arrayBuffer());
+      if (body.byteLength < 100) throw new Error(t('profile.photoError'));
       const ext = (asset.mimeType ?? 'image/jpeg').split('/')[1] ?? 'jpg';
       const path = `${userId}/avatar-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from('avatars').upload(path, body, {

@@ -490,6 +490,7 @@ const sl: Partial<Dict> = {
   "chart.range.1m": "1 mes",
   "chart.range.3m": "3 mes",
   "chart.range.all": "Vse",
+  "profile.photoError": "Fotografije ni bilo mogoče prebrati. Poskusi drugo.",
   "topbar.profile": "Moj profil",
 };
 
