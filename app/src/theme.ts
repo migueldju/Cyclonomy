@@ -48,10 +48,30 @@ export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 };
 
 // Categorías: un color por tipo de carrera, para reconocerlas de un vistazo en el calendario
 export const categoryColor: Record<string, string> = {
-  TDF: '#F4C63F', GT: '#E8578A', MON: '#7A4BC2', WC: '#2F6FDB', WC_ITT: '#2F6FDB',
-  MWT: '#1E272C', SWT: '#6B7A82', WT: '#1E272C', CC: '#2A9BB8', CC_ITT: '#2A9BB8', NC: '#C0613A', NC_ITT: '#C0613A',
+  TDF: '#F4C63F', GT: '#E8578A', MON: '#7A4BC2', WC: '#0073CF', WC_ITT: '#0073CF',
+  MWT: '#1E272C', SWT: '#6B7A82', WT: '#1E272C', CC: '#003399', CC_ITT: '#003399', NC: '#C0613A', NC_ITT: '#C0613A',
   PRO: '#17834A', C1: '#9AA5AA',
 };
+
+const GIRO = '#E8578A';      // maglia rosa
+const VUELTA = '#D8232A';    // maillot rojo
+// arcoíris de la UCI: azul, rojo, negro, amarillo y verde
+const UCI_RAINBOW = ['#0073CF', '#E4002B', '#111111', '#FFD100', '#00A651'];
+
+/**
+ * Colores de una carrera, en franjas: casi todas uno solo, el de su categoría. Las grandes vueltas, mitad rosa y
+ * mitad roja como categoría, y cada una el suyo si se sabe cuál es (Giro, rosa; Vuelta, roja); los mundiales, el
+ * arcoíris de la UCI.
+ */
+export function raceColors(category: string, name?: string | null): string[] {
+  if (category === 'GT') {
+    if (name && /giro/i.test(name)) return [GIRO];
+    if (name && /vuelta/i.test(name)) return [VUELTA];
+    return [GIRO, VUELTA];
+  }
+  if (category === 'WC' || category === 'WC_ITT') return UCI_RAINBOW;
+  return [categoryColor[category] ?? colors.inkSoft];
+}
 
 // Clases UCI de las categorías WT, .Pro y .1 (las demás tienen nombre corto traducido)
 const CATEGORY_CLASS: Record<string, string> = { MWT: 'WT A', SWT: 'WT B', PRO: 'Pro', C1: '1' };

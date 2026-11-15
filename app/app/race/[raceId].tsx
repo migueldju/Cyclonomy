@@ -82,7 +82,7 @@ export default function Inscripcion() {
         </View>
         <MetaLine style={{ marginBottom: space.xs }}>
           {/* vuelta por etapas si dura más de un día */}
-          <CategoryBadge code={data.race.category} stageRace={data.race.start_date !== data.race.end_date} />
+          <CategoryBadge code={data.race.category} stageRace={data.race.start_date !== data.race.end_date} name={data.race.name} />
           <MetaItem icon="calendar-outline" text={dateRange(data.race.start_date, data.race.end_date)} />
         </MetaLine>
         <Txt>

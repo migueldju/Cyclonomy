@@ -5,7 +5,7 @@ import { Button } from '@/components/Button';
 import { PositionJersey } from '@/components/PositionJersey';
 import { MoveRow } from '@/components/MoveRow';
 import { Flag } from '@/components/Flag';
-import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
+import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { RiderAvatar } from '@/components/RiderAvatar';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -131,13 +131,13 @@ function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entrie
     : <MetaItem icon="time-outline" text={s.start_at ? time(s.start_at) : t('home.noSchedule')} />;
   return (
     <Row last={last}>
-      <View style={[styles.swatch, { backgroundColor: categoryColor[s.category] ?? colors.line }]} />
+      <ColorBar category={s.category} name={s.race_name} style={styles.swatch} />
       {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
       <View style={styles.flagCol}><Flag code={s.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{s.race_name}</Txt>
         <MetaLine>
-          <CategoryBadge code={s.category} stageRace={s.is_stage_race} />
+          <CategoryBadge code={s.category} stageRace={s.is_stage_race} name={s.race_name} />
           <MetaItem icon="flag-outline" text={stageLabel(s.is_stage_race, s.number, s.last_stage)} />
           <MetaItem icon="trending-up-outline" text={course(s.distance_km, s.vertical_m)} />
           {state}
@@ -159,13 +159,13 @@ function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entrie
 function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
   return (
     <Row last={last}>
-      <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+      <ColorBar category={r.category} name={r.name} style={styles.swatch} />
       {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
       <View style={styles.flagCol}><Flag code={r.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
         <MetaLine>
-          <CategoryBadge code={r.category} stageRace={r.is_stage_race} />
+          <CategoryBadge code={r.category} stageRace={r.is_stage_race} name={r.name} />
           <MetaItem icon="calendar-outline" text={dateRange(r.start_date, r.end_date)} />
           {r.my_entry_count
             ? <MetaItem icon="checkmark-circle" text={t('race.entered', { n: r.my_entry_count, max: r.max_entries })} color={colors.green} />

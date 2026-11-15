@@ -12,7 +12,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
-import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
+import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
 import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
@@ -150,7 +150,7 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
               <Txt style={[styles.dayNum, on && styles.dayNumOn]}>{d}</Txt>
               <View style={styles.bars}>
                 {here.slice(0, 3).map((r) => (
-                  <View key={r.race_id} style={[styles.bar, { backgroundColor: categoryColor[r.category] ?? colors.inkSoft }]} />
+                  <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.bar} />
                 ))}
                 {here.length > 3 ? <Txt style={styles.more}>+{here.length - 3}</Txt> : null}
               </View>
@@ -173,13 +173,13 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
   return (
     <View style={styles.item}>
       <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.itemHead}>
-        <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+        <ColorBar category={r.category} name={r.name} style={styles.swatch} />
         {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
         <View style={styles.flagCol}><Flag code={r.country} /></View>
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
           <MetaLine>
-            <CategoryBadge code={r.category} stageRace={r.is_stage_race} />
+            <CategoryBadge code={r.category} stageRace={r.is_stage_race} name={r.name} />
             <MetaItem icon="flag-outline" text={stageLabel(r.is_stage_race, stage?.number, last)} />
             {/* solo se marca la que ya ha terminado */}
             {r.status === 'finished' ? <MetaItem icon="checkmark-circle-outline" text={status(r.status)} /> : null}

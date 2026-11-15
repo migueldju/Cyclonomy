@@ -20,7 +20,8 @@ import { api } from '@/lib/api';
 import { dateRange, money, moneyShort, ordinal, points, todayISO } from '@/lib/format';
 import { actionsFor } from '@/lib/rosterActions';
 import type { RiderResult } from '@/lib/types';
-import { categoryColor, colors, space } from '@/theme';
+import { ColorBar } from '@/components/Meta';
+import { colors, space } from '@/theme';
 
 type Filter = 'recent' | 'top';
 const PAGE = 5;
@@ -197,7 +198,7 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
       <Pressable onPress={onPress} disabled={!onPress} accessibilityRole="button"
                  accessibilityState={oneDay ? undefined : { expanded: open }}
                  style={({ pressed }) => [styles.raceHead, pressed && { backgroundColor: colors.road }]}>
-        <View style={[styles.swatch, { backgroundColor: categoryColor[g.category] ?? colors.line }]} />
+        <ColorBar category={g.category} name={g.name} style={styles.swatch} />
         <View style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
             <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{g.name}</Txt>

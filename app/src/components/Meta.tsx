@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps, ReactNode } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { categoryColor, categoryLabel, colors, fonts } from '../theme';
+import { categoryLabel, colors, fonts, raceColors } from '../theme';
 import { Txt } from './Txt';
 
 /** Segunda línea de una fila: datos cortos con icono y pastillas, en vez de una frase separada por puntos */
@@ -15,12 +15,37 @@ const darkText = (hex: string) => {
   return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) > 150;
 };
 
-/** Categoría de la carrera en una pastilla de su color: 1.1, 2.WT A, Monumento… */
-export function CategoryBadge({ code, stageRace }: { code: string; stageRace: boolean }) {
-  const bg = categoryColor[code] ?? colors.inkSoft;
+/** Franjas de color de una carrera: a lo alto (barra lateral de una fila) o a lo ancho (marca en el mes) */
+export function ColorBar({ category, name, horizontal, style }: {
+  category: string; name?: string | null; horizontal?: boolean; style?: ViewStyle;
+}) {
+  const list = raceColors(category, name);
   return (
-    <View style={[styles.badge, { backgroundColor: bg }]}>
-      <Txt style={[styles.badgeText, { color: darkText(bg) ? colors.ink : colors.paper }]}>{categoryLabel(code, stageRace)}</Txt>
+    <View style={[{ flexDirection: horizontal ? 'row' : 'column', overflow: 'hidden' }, style]}>
+      {list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}
+    </View>
+  );
+}
+
+/**
+ * Categoría de la carrera en una pastilla de su color: 1.1, 2.WT A, Monumento… Con dos colores (gran vuelta sin
+ * concretar), mitad y mitad; con el arcoíris de los mundiales, pastilla blanca con las franjas debajo del texto.
+ */
+export function CategoryBadge({ code, stageRace, name }: { code: string; stageRace: boolean; name?: string | null }) {
+  const list = raceColors(code, name);
+  const rainbow = list.length > 2;
+  const dark = rainbow || darkText(list[0]);
+  return (
+    <View style={[styles.badge, rainbow && styles.badgeRainbow]}>
+      {rainbow ? null : (
+        <View style={[StyleSheet.absoluteFill, { flexDirection: 'row' }]}>
+          {list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}
+        </View>
+      )}
+      <Txt style={[styles.badgeText, { color: dark ? colors.ink : colors.paper }]}>{categoryLabel(code, stageRace)}</Txt>
+      {rainbow ? (
+        <View style={styles.rainbow}>{list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}</View>
+      ) : null}
     </View>
   );
 }
@@ -51,7 +76,9 @@ export function MetaDot({ text, color }: { text: string; color: string }) {
 
 const styles = StyleSheet.create({
   line: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: 8, rowGap: 2, marginTop: 3 },
-  badge: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1 },
+  badge: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
+  badgeRainbow: { backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, paddingBottom: 4 },
+  rainbow: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 3, flexDirection: 'row' },
   badgeText: { fontFamily: fonts.bodyBold, fontSize: 11, lineHeight: 16, letterSpacing: 0.2 },
   item: { flexDirection: 'row', alignItems: 'center', gap: 3, flexShrink: 1 },
   dot: { width: 7, height: 7, borderRadius: 4 },
