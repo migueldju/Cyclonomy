@@ -10,12 +10,16 @@ import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
 /** Hoja inferior genérica */
-export function Sheet({ visible, onClose, title, children }: {
+export function Sheet({ visible, onClose, title, children, above }: {
   visible: boolean; onClose: () => void; title: string; children: ReactNode;
+  above?: ReactNode;          // tarjeta flotante en el hueco libre, pegada encima de la hoja
 }) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
+      <View style={{ flex: 1 }}>
+        <Pressable style={[styles.backdrop, StyleSheet.absoluteFill]} onPress={onClose} accessibilityLabel={t('common.close')} />
+        {above ? <View style={styles.above} pointerEvents="box-none">{above}</View> : null}
+      </View>
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
           <View style={styles.handle} />
@@ -40,7 +44,8 @@ export interface SheetAction {
 }
 
 /** Lista de acciones; ejecuta la elegida y muestra el error del servidor si lo hay */
-export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer }: {
+export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer, above }: {
+  above?: ReactNode;          // ver Sheet
   visible: boolean; onClose: () => void; title: string; subtitle?: string; actions: SheetAction[]; onDone?: () => void;
   /** contenido propio sobre las acciones (cifras) y junto a «Cerrar» (botón de información) */
   header?: ReactNode; footer?: ReactNode;
@@ -65,7 +70,7 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title}>
+    <Sheet visible={visible} onClose={onClose} title={title} above={above}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
       {header}
       {actions.length === 0 && !subtitle ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
@@ -193,6 +198,7 @@ const styles = StyleSheet.create({
   },
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
+  above: { flex: 1, justifyContent: 'flex-end', padding: space.l },
   sheet: {
     backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
     borderTopLeftRadius: 28, borderTopRightRadius: 28,

@@ -16,7 +16,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { money, moneyShort, ordinal, points } from '@/lib/format';
 import type { RosterRow } from '@/lib/types';
-import { colors, fonts, space, type } from '@/theme';
+import { cardShadow, colors, fonts, space, type } from '@/theme';
 
 /** Plantilla de otro jugador: desde aquí se hacen ofertas y se pagan cláusulas */
 export default function Jugador() {
@@ -72,9 +72,12 @@ export default function Jugador() {
         // sin frases: las cifras en baldosas, las acciones con icono y la explicación en «Cómo funciona»
         subtitle={picked ? (picked.transferable ? (picked.locked_next ? t('player.lockedClause') : undefined)
           : t('player.pendingTransfer')) : undefined}
+        // la gráfica del valor, en el hueco libre sobre la hoja
+        above={picked && chart ? (
+          <View style={styles.chart}><ValueHistory leagueId={id} riderId={picked.rider_id} /></View>
+        ) : undefined}
         header={picked ? (
           <StatTiles style={{ marginBottom: space.m }}>
-            {chart ? <View style={styles.chart}><ValueHistory leagueId={id} riderId={picked.rider_id} /></View> : null}
             <StatTile label={t('rider.marketValue')} value={moneyShort(picked.market_value)} icon="trending-up-outline"
                       onPress={() => setChart((c) => !c)} open={chart} />
             <StatTile label={t('rider.clause')} value={moneyShort(picked.clause)}
@@ -119,7 +122,7 @@ function ValueHistory({ leagueId, riderId }: { leagueId: string; riderId: number
 }
 
 const styles = StyleSheet.create({
-  chart: { flexBasis: '100%', minHeight: 150, borderWidth: 1, borderColor: colors.line, borderRadius: 14, overflow: 'hidden' },
+  chart: { minHeight: 150, backgroundColor: colors.paper, borderRadius: 20, overflow: 'hidden', ...cardShadow },
   crest: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.line },
   crestEmpty: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.asphaltSoft },
   crestInitial: { fontFamily: fonts.display, fontSize: type.display, color: colors.paper },
