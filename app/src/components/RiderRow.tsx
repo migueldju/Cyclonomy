@@ -14,7 +14,7 @@ export type RiderTag = { icon: ComponentProps<typeof Ionicons>['name']; text: st
 
 /** Fila de ciclista: foto, nombre con bandera y equipo a la izquierda; valor y dato secundario a la derecha. */
 export function RiderRow({ name, team, value, detail, note, onPress, last, right, photo, nationality, sub, pointsBox, trend, tags }: {
-  tags?: RiderTag[];          // avisos en pastillas, debajo de la segunda línea
+  tags?: RiderTag[];          // avisos como iconos, al final de la segunda línea
   sub?: ReactNode;            // segunda línea propia (en vez de «equipo · nota»)
   pointsBox?: string;         // puntos en un recuadro al principio de la segunda línea (como en el mercado)
   trend?: -1 | 0 | 1;         // flecha de tendencia junto al valor
@@ -30,22 +30,17 @@ export function RiderRow({ name, team, value, detail, note, onPress, last, right
             <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</Txt>
             <Flag code={nationality} />
           </View>
-          {sub ?? (pointsBox ? (
+          {sub ?? (
             <View style={styles.sub}>
-              <View style={styles.pts}><Txt style={styles.ptsText}>{pointsBox}</Txt></View>
+              {pointsBox ? <View style={styles.pts}><Txt style={styles.ptsText}>{pointsBox}</Txt></View> : null}
               <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>{[team, note].filter(Boolean).join(' · ')}</Txt>
-            </View>
-          ) : <Txt variant="small" numberOfLines={1}>{[team, note].filter(Boolean).join(' · ')}</Txt>)}
-          {tags?.length ? (
-            <View style={styles.tags}>
-              {tags.map((g) => (
-                <View key={g.text} style={[styles.tag, { backgroundColor: g.color + '1F' }]}>
+              {tags?.map((g) => (
+                <View key={g.text} accessibilityLabel={g.text} style={[styles.tag, { backgroundColor: g.color + '1F' }]}>
                   <Ionicons name={g.icon} size={12} color={g.color} />
-                  <Txt numberOfLines={1} style={[styles.tagText, { color: g.color }]}>{g.text}</Txt>
                 </View>
               ))}
             </View>
-          ) : null}
+          )}
         </View>
         {right ?? (
           <View style={styles.side}>
@@ -76,9 +71,7 @@ const styles = StyleSheet.create({
   sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
   ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 3 },
-  tag: { flexDirection: 'row', alignItems: 'center', gap: 3, borderRadius: 999, paddingHorizontal: 7, paddingVertical: 2, maxWidth: '100%' },
-  tagText: { fontFamily: fonts.bodyMedium, fontSize: type.small - 2, lineHeight: 15, flexShrink: 1 },
+  tag: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   line: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
 });
 
