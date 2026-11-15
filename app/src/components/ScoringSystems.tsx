@@ -63,12 +63,7 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
               {cat.get(g.grp) && scheme !== 'uci' ? (
                 <Txt variant="small">{t('rules.maxEntries', { n: cat.get(g.grp)!.max_entries })}</Txt>
               ) : null}
-              {kinds.map(([kind, pts]) => (
-                <Txt key={kind} variant="small">
-                  {kindLabel(kind)}: {pts.slice(0, 5).join(' · ')}
-                  {pts.length > 5 ? ` … ${t('rules.upToPos', { n: pts.length })}` : ''}
-                </Txt>
-              ))}
+              <PointsTable kinds={kinds} />
               {races && g.races.length ? (
                 <Pressable onPress={() => setOpen(isOpen ? null : g.grp)} accessibilityRole="button"
                            accessibilityState={{ expanded: isOpen }}>
@@ -83,6 +78,64 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
         );
       })}
     </>
+  );
+}
+
+const PER_DAY = ['leader', 'points_jersey', 'kom_jersey'];        // un solo valor, por día: fuera de la tabla
+const LABEL_W = 122;
+const CELL_W = 42;
+
+/**
+ * Puntos de un grupo en tabla: una fila por tipo de resultado y una columna por puesto (se desliza a los lados; la
+ * columna de nombres queda fija). Los premios por día (líder, maillots) van debajo, en pastillas.
+ */
+export function PointsTable({ kinds }: { kinds: [string, number[]][] }) {
+  const rows = kinds.filter(([k]) => !PER_DAY.includes(k));
+  const daily = kinds.filter(([k]) => PER_DAY.includes(k));
+  const cols = Math.max(0, ...rows.map(([, pts]) => pts.length));
+  return (
+    <View style={{ gap: space.s, marginTop: space.xs }}>
+      {rows.length ? (
+        <View style={styles.table}>
+          <View style={{ width: LABEL_W }}>
+            <View style={[styles.cell, styles.head]}><Txt style={styles.headText}>#</Txt></View>
+            {rows.map(([kind], i) => (
+              <View key={kind} style={[styles.cell, i % 2 === 1 && styles.zebra]}>
+                <Txt variant="small" numberOfLines={1} style={styles.rowLabel}>{kindLabel(kind)}</Txt>
+              </View>
+            ))}
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }}>
+            <View>
+              <View style={[styles.row, styles.head]}>
+                {Array.from({ length: cols }, (_, n) => (
+                  <View key={n} style={styles.num}><Txt style={styles.headText}>{n + 1}</Txt></View>
+                ))}
+              </View>
+              {rows.map(([kind, pts], i) => (
+                <View key={kind} style={[styles.row, i % 2 === 1 && styles.zebra]}>
+                  {Array.from({ length: cols }, (_, n) => (
+                    <View key={n} style={styles.num}>
+                      <Txt style={[styles.numText, n === 0 && { fontFamily: fonts.bodyBold }]}>{pts[n] ?? ''}</Txt>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      ) : null}
+      {daily.length ? (
+        <View style={styles.daily}>
+          {daily.map(([kind, pts]) => (
+            <View key={kind} style={styles.dailyChip}>
+              <Txt variant="small" style={{ flexShrink: 1 }}>{kindLabel(kind)}</Txt>
+              <Txt style={styles.dailyPts}>{pts[0]}</Txt>
+            </View>
+          ))}
+        </View>
+      ) : null}
+    </View>
   );
 }
 
@@ -135,5 +188,23 @@ const styles = StyleSheet.create({
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.line },
   radioOn: { borderColor: colors.asphalt, borderWidth: 6 },
+  table: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
+  row: { flexDirection: 'row', height: 30 },
+  cell: { height: 30, justifyContent: 'center', paddingHorizontal: space.s, borderRightWidth: 1, borderRightColor: colors.line },
+  head: { backgroundColor: colors.road },
+  zebra: { backgroundColor: '#F7F9F8' },
+  headText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.inkSoft, textAlign: 'center' },
+  rowLabel: { fontFamily: fonts.bodyMedium, color: colors.ink },
+  num: { width: CELL_W, height: 30, alignItems: 'center', justifyContent: 'center' },
+  numText: { fontFamily: fonts.body, fontSize: 13, color: colors.ink },
+  daily: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s },
+  dailyChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%', backgroundColor: colors.road, borderRadius: 999,
+    paddingLeft: 10, paddingRight: 4, paddingVertical: 3,
+  },
+  dailyPts: {
+    fontFamily: fonts.bodyBold, fontSize: 12, color: colors.jerseyInk, backgroundColor: colors.jersey, borderRadius: 999,
+    paddingHorizontal: 8, paddingVertical: 2, overflow: 'hidden',
+  },
   link: { fontFamily: fonts.bodyMedium, color: colors.ink, textDecorationLine: 'underline' },
 });
