@@ -93,7 +93,9 @@ export function LeagueSettingsForm({ initial, initialName, submitLabel, onSubmit
       <Stepper label={t('settings.marketHour')} value={s.market_hour} min={0} max={23} icon="time-outline"
                onChange={(v) => set('market_hour', v)} format={(v) => `${String(v).padStart(2, '0')}:00`} />
       <Toggle label={t('settings.clauses')} value={s.clauses_enabled} onChange={(v) => set('clauses_enabled', v)}
-              icon="flash-outline" />
+              icon="flash-outline"
+              extra={<InfoButton compact title={t('settings.clauses')} items={[t('settings.clausesHint'), t('rules.r5'), t('rules.r6')]}
+                                 style={{ backgroundColor: colors.paper }} />} />
       <ErrorText error={error} />
       <Button label={submitLabel} onPress={submit} busy={busy} />
     </View>
