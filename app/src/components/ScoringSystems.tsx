@@ -63,7 +63,9 @@ export function ScoringGroups({ scheme, cats, depth, races = true }: {
               {cat.get(g.grp) && scheme !== 'uci' ? (
                 <Txt variant="small">{t('rules.maxEntries', { n: cat.get(g.grp)!.max_entries })}</Txt>
               ) : null}
-              <PointsTable kinds={kinds} />
+              {/* clásicas y vueltas por etapas, cada una en su tabla aunque compartan categoría */}
+              {kinds.some(([k]) => k === 'oneday') ? <PointsTable kinds={kinds.filter(([k]) => k === 'oneday')} /> : null}
+              {kinds.some(([k]) => k !== 'oneday') ? <PointsTable kinds={kinds.filter(([k]) => k !== 'oneday')} /> : null}
               {races && g.races.length ? (
                 <Pressable onPress={() => setOpen(isOpen ? null : g.grp)} accessibilityRole="button"
                            accessibilityState={{ expanded: isOpen }}>
