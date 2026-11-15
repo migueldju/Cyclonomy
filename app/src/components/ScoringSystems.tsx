@@ -28,11 +28,9 @@ const UCI_AS_CATEGORY: Record<string, string> = {
 const groupName = (scheme: ScoringScheme, grp: string) => scheme !== 'uci' ? categoryName(grp)
   : categoryName(UCI_AS_CATEGORY[grp] ?? grp);
 
-/** Nombre corto del tipo de carrera para la esquina de la tabla: Tour, Gran Vuelta, WT A, WT B, 1.Pro / 2.Pro… */
-const groupShort = (scheme: ScoringScheme, grp: string, stageRace: boolean) => {
-  const code = scheme !== 'uci' ? grp : UCI_AS_CATEGORY[grp] ?? grp;
-  return code === 'MWT' || code === 'SWT' ? categoryName(code) : categoryLabel(code, stageRace);
-};
+/** Nombre corto del tipo de carrera para la esquina de la tabla: Tour, Gran Vuelta, 1.WT A / 2.WT A, 1.Pro / 2.Pro… */
+const groupShort = (scheme: ScoringScheme, grp: string, stageRace: boolean) =>
+  categoryLabel(scheme !== 'uci' ? grp : UCI_AS_CATEGORY[grp] ?? grp, stageRace);
 
 const KIND_ORDER = ['oneday', 'gc', 'stage', 'leader', 'points_jersey', 'kom_jersey', 'points_final', 'kom_final'];
 const kindLabel = (k: string) => {

@@ -53,7 +53,7 @@ export const categoryColor: Record<string, string> = {
 };
 
 // Clases UCI de las categorías WT, .Pro y .1 (las demás tienen nombre corto traducido)
-const CATEGORY_CLASS: Record<string, string> = { MWT: 'WT.A', SWT: 'WT.B', PRO: 'Pro', C1: '1' };
+const CATEGORY_CLASS: Record<string, string> = { MWT: 'WT A', SWT: 'WT B', PRO: 'Pro', C1: '1' };
 
 /** Nombre completo de la categoría en el idioma actual (la base de datos lo guarda en español) */
 export function categoryName(code: string): string {
@@ -62,7 +62,7 @@ export function categoryName(code: string): string {
   return s === key ? code : s;
 }
 
-/** Nombre corto; en WT, .Pro y .1 la clase: 1.WT.A / 2.WT.A, 1.WT.B / 2.WT.B, 1.Pro / 2.Pro, 1.1 / 2.1 (clásica / vuelta) */
+/** Nombre corto; en WT, .Pro y .1 la clase: 1.WT A / 2.WT A, 1.WT B / 2.WT B, 1.Pro / 2.Pro, 1.1 / 2.1 (clásica / vuelta) */
 export function categoryLabel(code: string, isStageRace: boolean): string {
   if (CATEGORY_CLASS[code]) return `${isStageRace ? 2 : 1}.${CATEGORY_CLASS[code]}`;
   const key = `catShort.${code}` as Key;
