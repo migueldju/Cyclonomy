@@ -124,9 +124,8 @@ export default function Inicio() {
 }
 
 function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entriesOpen: boolean }) {
-  // estado de la etapa: mis puntos (verde), calculando, o la hora de salida
-  const state = s.status === 'scored'
-    ? <MetaItem icon="podium-outline" text={t('home.pointsForYou', { points: points(s.my_points) })} color={colors.green} strong />
+  // estado de la etapa: calculando puntos o la hora de salida (ya puntuada, nada: los puntos se ven en «puntuaciones»)
+  const state = s.status === 'scored' ? null
     : s.status === 'finished' ? <MetaItem icon="hourglass-outline" text={t('home.scoring')} />
     : <MetaItem icon="time-outline" text={s.start_at ? time(s.start_at) : t('home.noSchedule')} />;
   return (
