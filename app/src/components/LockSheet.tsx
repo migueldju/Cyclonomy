@@ -5,7 +5,7 @@ import { t } from '../i18n';
 import { api } from '../lib/api';
 import { dayMonth, money, todayISO } from '../lib/format';
 import type { RosterRow } from '../lib/types';
-import { colors, space } from '../theme';
+import { colors, space, themed } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
 import { Sheet } from './Modal';
@@ -68,9 +68,9 @@ export function LockSheet({ row, available, visible, onClose, onDone }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   week: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.road, borderRadius: 12,
     padding: space.m, marginBottom: space.m,
   },
-});
+}));

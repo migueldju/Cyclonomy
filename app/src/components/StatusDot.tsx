@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import type { RiderStatus } from '../lib/types';
 import { t } from '../i18n';
-import { colors } from '../theme';
+import { colors, themed } from '../theme';
 
 /** Naranja: llega el lunes (no se puede inscribir aún). Rojo: se va el lunes. */
 export function StatusDot({ status }: { status: RiderStatus }) {
@@ -14,4 +14,4 @@ export function StatusDot({ status }: { status: RiderStatus }) {
   );
 }
 
-const styles = StyleSheet.create({ dot: { width: 10, height: 10, borderRadius: 5 } });
+const styles = themed(() => StyleSheet.create({ dot: { width: 10, height: 10, borderRadius: 5 } }));

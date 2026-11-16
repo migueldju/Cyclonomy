@@ -5,7 +5,7 @@
     "scheme": "cyclonomy",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.tuempresa.cyclonomy",
       "supportsTablet": false
@@ -16,6 +16,10 @@
       "navigationBar": {
         "backgroundColor": "#1E272C",
         "barStyle": "light-content"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F4C63F"
       }
     },
     "plugins": [
@@ -27,12 +31,31 @@
           "photosPermission": "La app usa tus fotos para la imagen de tu perfil."
         }
       ],
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/logo-horizontal.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ],
       "expo-status-bar",
       "expo-web-browser",
       "expo-localization",
       "expo-system-ui"
     ],
-    "backgroundColor": "#1E272C"
+    "backgroundColor": "#1E272C",
+    "icon": "./assets/icon.png",
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "Cyclonomy",
+      "shortName": "Cyclonomy",
+      "lang": "es",
+      "themeColor": "#1E272C",
+      "backgroundColor": "#1E272C"
+    }
   }
 }

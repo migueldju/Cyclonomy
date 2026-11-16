@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 
 let listener: ((message: string) => void) | null = null;
 
@@ -42,11 +42,11 @@ export function ToastHost() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   toast: {
     position: 'absolute', left: space.l, right: space.l, flexDirection: 'row', alignItems: 'center', gap: space.s,
     backgroundColor: colors.asphalt, borderRadius: 14, paddingVertical: space.m, paddingHorizontal: space.l,
     shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
-  text: { flex: 1, color: colors.paper, fontFamily: fonts.bodyBold, fontSize: type.body },
-});
+  text: { flex: 1, color: colors.onDark, fontFamily: fonts.bodyBold, fontSize: type.body },
+}));

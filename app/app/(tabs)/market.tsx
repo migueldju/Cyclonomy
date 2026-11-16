@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
+import { AdSlot, InfoButton } from '@/components/Info';
 import { Button } from '@/components/Button';
 import { ActionSheet, AmountSheet, SheetAction } from '@/components/Modal';
 import { OffersSection } from '@/components/OffersSection';
@@ -12,9 +15,9 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
-import { countdown, dateTime, money, moneyShort, time } from '@/lib/format';
+import { countdown, dateTime, money, moneyShort, points } from '@/lib/format';
 import type { MarketRow } from '@/lib/types';
-import { colors, space } from '@/theme';
+import { colors, fonts, space, themed, type } from '@/theme';
 
 export default function Mercado() {
   const { leagueId, me, refresh } = useLeague();
@@ -55,21 +58,16 @@ export default function Mercado() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <View style={styles.head}>
-        <View>
-          <Txt variant="small">{t('market.nextUpdate')}</Txt>
-          <Txt variant="title">{countdown(me?.next_market_at ?? null)} · {time(me?.next_market_at ?? null)}</Txt>
-        </View>
-        <View style={{ alignItems: 'flex-end' }}>
-          <Txt variant="small">{t('market.canSpend')}</Txt>
-          <Txt variant="title" style={{ color: (me?.available ?? 0) >= 0 ? colors.green : colors.red }}>
-            {moneyShort(me?.available)}
-          </Txt>
-        </View>
-      </View>
-      <Txt variant="small" style={styles.note}>
-        {t('market.note')}
-      </Txt>
+      <HeroCard>
+        <StatTiles>
+          <StatTile label={t('market.nextUpdate')} icon="time-outline" value={countdown(me?.next_market_at ?? null)} />
+          <StatTile label={t('market.canSpend')} value={moneyShort(me?.available)}
+                    color={(me?.available ?? 0) >= 0 ? colors.green : colors.red} />
+        </StatTiles>
+        <InfoButton title={t('tabs.market')} style={{ marginTop: space.m }}
+                    items={[t('market.note'), t('rules.r8'), t('rules.r2')]} />
+      </HeroCard>
+      <AdSlot />
 
       <OffersSection />
 
@@ -91,6 +89,7 @@ export default function Mercado() {
         visible={!!picked}
         onClose={() => setPicked(null)}
         title={picked?.rider_name ?? ''}
+        onTitlePress={picked ? () => router.push(`/rider/${picked.rider_id}`) : undefined}
         subtitle={!picked ? undefined : picked.is_mine
           ? `${t('market.yourSale')} · ${t('market.closes', { when: dateTime(picked.closes_at) })} · ${bids(picked.bid_count)}`
             + '\n' + (picked.game_offer_amount ? t('market.gameOffersYou', { amount: money(picked.game_offer_amount) })
@@ -103,11 +102,17 @@ export default function Mercado() {
         visible={!!bidding}
         onClose={() => setBidding(null)}
         title={bidding ? t('market.bidFor', { name: bidding.rider_name }) : ''}
-        subtitle={bidding ? [bidding.pro_team, bidding.seller_team ? t('market.soldBy', { team: bidding.seller_team }) : null,
-                             t('market.closes', { when: countdown(bidding.closes_at) })].filter(Boolean).join(' · ') : undefined}
+        onTitlePress={bidding ? () => router.push(`/rider/${bidding.rider_id}`) : undefined}
+        chips={bidding ? [
+          ...(bidding.pro_team ? [{ icon: 'shirt-outline' as const, text: bidding.pro_team }] : []),
+          ...(bidding.seller_team ? [{ icon: 'person-outline' as const, text: bidding.seller_team }] : []),
+          { icon: 'podium-outline' as const, text: points(bidding.season_points) },
+          { icon: 'time-outline' as const, text: countdown(bidding.closes_at) },
+        ] : undefined}
         min={bidding?.base_value}
         initial={bidding?.my_bid ?? bidding?.base_value}
         confirmLabel={t('market.bid')}
+        quick={false}
         onConfirm={(amount) => api.placeBid(bidding!.listing_id, amount)}
         done={(amount) => t('toast.bid', { name: bidding!.rider_name, amount: money(amount) })}
         onDone={done}
@@ -115,6 +120,12 @@ export default function Mercado() {
     </Screen>
   );
 }
+
+const TREND = themed(() => ({
+  1: { icon: 'arrow-up', color: colors.green },
+  0: { icon: 'remove', color: colors.inkSoft },
+  [-1]: { icon: 'arrow-down', color: colors.red },
+} as const));
 
 const bids = (n: number) => t(n === 1 ? 'market.bids.one' : 'market.bids.other', { n });
 
@@ -129,14 +140,26 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
       team={r.pro_team}
       photo={r.photo_url}
       nationality={r.nationality}
-      note={[who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null,
-             !r.seller_member_id && r.age ? t('rider.age', { n: r.age }) : null].filter(Boolean).join(' · ')}
+      // segunda línea: los puntos de la temporada en un recuadro y, después, equipo y datos de la venta
+      sub={(
+        <View style={styles.sub}>
+          <View style={styles.pts}><Txt style={styles.ptsText}>{points(r.season_points)}</Txt></View>
+          <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>
+            {[r.pro_team, who, r.seller_member_id ? t('market.closes', { when: countdown(r.closes_at) }) : null].filter(Boolean).join(' · ')}
+          </Txt>
+        </View>
+      )}
       value={r.base_value}
       last={last}
       onPress={onPress}
       right={
         <View style={{ alignItems: 'flex-end' }}>
-          <Txt variant="number">{moneyShort(r.base_value)}</Txt>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            {/* tendencia del valor en la última semana: sube, estable o baja */}
+            <Ionicons name={TREND[r.trend ?? 0].icon} size={16} color={TREND[r.trend ?? 0].color}
+                      accessibilityLabel={TREND[r.trend ?? 0].icon} />
+            <Txt variant="number">{moneyShort(r.base_value)}</Txt>
+          </View>
           <Txt variant="small" style={r.my_bid || (r.is_mine && r.game_offer_amount) ? { color: colors.green } : undefined}>
             {status}
           </Txt>
@@ -146,7 +169,8 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
   );
 }
 
-const styles = StyleSheet.create({
-  head: { flexDirection: 'row', justifyContent: 'space-between', padding: space.l, paddingTop: space.xl },
-  note: { paddingHorizontal: space.l },
-});
+const styles = themed(() => StyleSheet.create({
+  sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
+  pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
+  ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
+}));

@@ -2,6 +2,8 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { HeroCard } from '@/components/Hero';
+import { InfoButton } from '@/components/Info';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
@@ -14,7 +16,8 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, dateTime, moneyShort, points } from '@/lib/format';
-import { categoryName, colors, space } from '@/theme';
+import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
+import { colors, space, themed } from '@/theme';
 
 /** Inscripción de una carrera: hasta el máximo de su categoría, hasta la salida de la 1.ª etapa */
 export default function Inscripcion() {
@@ -72,22 +75,23 @@ export default function Inscripcion() {
 
   return (
     <Screen onRefresh={reload} refreshing={loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl, gap: 4 }}>
+      <HeroCard style={{ gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
-          <Txt variant="hero" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
+          <Txt variant="display" style={{ flexShrink: 1 }}>{data.race.name}</Txt>
           <Flag code={data.race.country} height={16} />
         </View>
-        <Txt variant="small">{categoryName(data.race.category)} · {dateRange(data.race.start_date, data.race.end_date)}</Txt>
+        <MetaLine style={{ marginBottom: space.xs }}>
+          {/* vuelta por etapas si dura más de un día */}
+          <CategoryBadge code={data.race.category} stageRace={data.race.start_date !== data.race.end_date} name={data.race.name} />
+          <MetaItem icon="calendar-outline" text={dateRange(data.race.start_date, data.race.end_date)} />
+        </MetaLine>
         <Txt>
           {data.open ? t('entry.open', { max, when: dateTime(data.race.entries_close_at) }) : t('entry.closed')}
           {data.auto ? ` ${t('entry.auto')}` : ''}
         </Txt>
-        {data.open ? (
-          <Txt variant="small">
-            {t('entry.autoHint')}
-          </Txt>
-        ) : null}
-      </View>
+        <InfoButton title={t('race.enter')} style={{ marginTop: space.s }}
+                    items={[t('rules.r9'), t('entry.autoHint'), t('rules.r4')]} />
+      </HeroCard>
 
       <Section title={t('entry.yourRiders', { n: chosen.size, max })}>
         {riders.length ? riders.map((r, i) => {
@@ -96,8 +100,9 @@ export default function Inscripcion() {
           return (
             <Pressable key={r.rider_id} onPress={() => toggle(r.rider_id)} disabled={disabled}
                        accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled }}
-                       style={[styles.row, i < riders.length - 1 && styles.line, disabled && !on && { opacity: 0.5 }]}>
-              <Ionicons name={on ? 'checkbox' : 'square-outline'} size={24} color={on ? colors.ink : colors.inkSoft} />
+                       style={[styles.row, i < riders.length - 1 && styles.line, on && { backgroundColor: colors.highlight },
+                               disabled && !on && { opacity: 0.5 }]}>
+              <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={26} color={on ? colors.ink : colors.line} />
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>
                   <Txt variant="lead" numberOfLines={1} style={{ flexShrink: 1 }}>{r.name}</Txt>
@@ -127,7 +132,7 @@ export default function Inscripcion() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-});
+}));

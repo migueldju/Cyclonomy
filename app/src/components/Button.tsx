@@ -1,17 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, ViewStyle } from 'react-native';
-import { colors, fonts, type } from '../theme';
+import { colors, fonts, themed, type } from '../theme';
 import { Txt } from './Txt';
 
 type Kind = 'primary' | 'secondary' | 'dark' | 'danger' | 'quiet';
 
 export function Button({
-  label, onPress, kind = 'primary', disabled, busy, style, small, icon,
+  label, onPress, kind = 'primary', disabled, busy, style, small, icon, leftIcon,
 }: {
   label: string; onPress: () => void; kind?: Kind; disabled?: boolean; busy?: boolean; style?: ViewStyle; small?: boolean;
   /** solo el icono (el texto queda para los lectores de pantalla) */
   icon?: ComponentProps<typeof Ionicons>['name'];
+  /** icono delante del texto */
+  leftIcon?: ComponentProps<typeof Ionicons>['name'];
 }) {
   const k = kinds[kind];
   return (
@@ -30,24 +32,27 @@ export function Button({
       {busy ? <ActivityIndicator color={k.fg} /> : icon ? (
         <Ionicons name={icon} size={small ? 18 : 22} color={k.fg} />
       ) : (
-        <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg, letterSpacing: 0.3 }}>{label}</Txt>
+        <>
+          {leftIcon ? <Ionicons name={leftIcon} size={small ? 16 : 18} color={k.fg} /> : null}
+          <Txt style={{ fontFamily: fonts.bodyBold, fontSize: small ? type.small : type.body, color: k.fg, letterSpacing: 0.3 }}>{label}</Txt>
+        </>
       )}
     </Pressable>
   );
 }
 
-const kinds: Record<Kind, { bg: string; fg: string; border: string }> = {
+const kinds = themed((): Record<Kind, { bg: string; fg: string; border: string }> => ({
   primary: { bg: colors.jersey, fg: colors.jerseyInk, border: colors.jersey },
   secondary: { bg: colors.paper, fg: colors.ink, border: colors.ink },
   dark: { bg: colors.ink, fg: colors.paper, border: colors.ink },              // llamativo: negro, letra blanca
   danger: { bg: colors.paper, fg: colors.red, border: colors.red },
   quiet: { bg: 'transparent', fg: colors.ink, border: 'transparent' },
-};
+}));
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   base: {
-    minHeight: 46, paddingHorizontal: 20, borderRadius: 12, borderWidth: 1.5,
-    alignItems: 'center', justifyContent: 'center',
+    minHeight: 48, paddingHorizontal: 20, borderRadius: 14, borderWidth: 1.5,
+    flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center',
   },
   small: { minHeight: 34, paddingHorizontal: 14, borderRadius: 999 },
   icon: { width: 46, paddingHorizontal: 0 },
@@ -57,4 +62,4 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 3, shadowOffset: { width: 0, height: 2 }, elevation: 2,
   },
   disabled: { opacity: 0.45 },
-});
+}));

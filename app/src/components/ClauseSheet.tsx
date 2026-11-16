@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
@@ -5,8 +6,10 @@ import { api } from '../lib/api';
 import { money, moneyShort } from '../lib/format';
 import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '../lib/rosterActions';
 import type { RosterRow } from '../lib/types';
-import { colors, space } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
+import { StatTile, StatTiles } from './Hero';
+import { InfoButton } from './Info';
 import { showToast } from './Toast';
 import { Sheet } from './Modal';
 import { RangeSlider } from './RangeSlider';
@@ -57,18 +60,21 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
     <Sheet visible={visible} onClose={onClose} title={t('clause.title', { name: row.rider_name })}>
       <View style={styles.headline}>
         <Txt variant="title" style={{ color: colors.inkSoft }}>{moneyShort(row.clause)}</Txt>
-        <Txt variant="title" style={{ color: colors.inkSoft }}>→</Txt>
+        <Ionicons name="arrow-forward" size={20} color={colors.inkSoft} />
         <Txt variant="display">{moneyShort(target)}</Txt>
-        <Txt variant="small">({pct}{' '}%)</Txt>
+        <View style={styles.pct}><Txt style={styles.pctText}>{pct}{' '}%</Txt></View>
       </View>
-      <Txt style={{ marginBottom: space.m }}>
-        {same ? t('clause.hint')
-          : change > 0 ? <>{t('clause.pay')} <Txt variant="number">{money(change)}</Txt></>
-          : <>{t('clause.receive')} <Txt variant="number" style={{ color: colors.green }}>{money(-change)}</Txt></>}
-        {!same && after != null ? (
-          <Txt variant="small" style={short ? { color: colors.red } : undefined}>{'  ·  '}{t('clause.balanceAfter', { amount: money(after) })}</Txt>
-        ) : null}
-      </Txt>
+      {same ? null : (
+        <StatTiles style={{ marginBottom: space.m }}>
+          <StatTile label={change > 0 ? t('clause.pay') : t('clause.receive')} value={money(Math.abs(change))}
+                    icon={change > 0 ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'}
+                    color={change > 0 ? undefined : colors.green} />
+          {after != null ? (
+            <StatTile label={t('squad.balance')} value={money(after)} icon="wallet-outline"
+                      color={short ? colors.red : undefined} />
+          ) : null}
+        </StatTiles>
+      )}
 
       <View style={styles.sliderRow}>
         <Pressable onPress={() => move(-1)} style={styles.step} accessibilityRole="button" accessibilityLabel="−1 %">
@@ -92,20 +98,26 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
               label={same ? t('clause.chooseOther') : change > 0
                 ? t('clause.raiseTo', { clause: moneyShort(target), amount: money(change) })
                 : t('clause.lowerTo', { clause: moneyShort(target), amount: money(-change) })} />
-      <Txt variant="small" style={{ marginTop: space.s }}>
-        {t('clause.rule', { base: moneyShort(row.clause_base) })}
-      </Txt>
-      <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
+      <View style={styles.foot}>
+        <InfoButton title={t('clause.title', { name: row.rider_name })}
+                    items={[t('clause.rule', { base: moneyShort(row.clause_base) }), t('clause.hint')]} />
+        <Button label={t('common.cancel')} kind="quiet" onPress={onClose} />
+      </View>
     </Sheet>
   );
 }
 
-const styles = StyleSheet.create({
-  headline: { flexDirection: 'row', alignItems: 'baseline', gap: space.s, marginBottom: space.xs, flexWrap: 'wrap' },
+const styles = themed(() => StyleSheet.create({
+  headline: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, flexWrap: 'wrap',
+    backgroundColor: colors.road, borderRadius: 18, paddingVertical: space.m, paddingHorizontal: space.l, marginBottom: space.m,
+  },
+  pct: { backgroundColor: colors.jersey, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  pctText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.jerseyInk },
+  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.m },
   sliderRow: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   step: {
-    width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.line, alignItems: 'center',
-    justifyContent: 'center', backgroundColor: colors.paper,
+    width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.road,
   },
   ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 44 },
-});
+}));

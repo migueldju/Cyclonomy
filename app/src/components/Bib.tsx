@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { colors, fonts } from '../theme';
+import { colors, fonts, themed } from '../theme';
 import { t } from '../i18n';
 import { Txt } from './Txt';
 
@@ -23,7 +23,7 @@ const pins = {
   tl: { top: 3, left: 3 }, tr: { top: 3, right: 3 }, bl: { bottom: 3, left: 3 }, br: { bottom: 3, right: 3 },
 };
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   bib: {
     backgroundColor: colors.paper,
     borderRadius: 3,
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
   dark: { borderColor: colors.asphaltSoft },
   pin: { position: 'absolute', width: 4, height: 4, borderRadius: 2, backgroundColor: '#B9C1BD' },
   pinL: { width: 6, height: 6, borderRadius: 3 },
-});
+}));

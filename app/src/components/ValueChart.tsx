@@ -3,7 +3,8 @@ import { GestureResponderEvent, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { t } from '../i18n';
 import { dayMonth, moneyShort } from '../lib/format';
-import { colors, space } from '../theme';
+import { colors, space, themed } from '../theme';
+import { Pills } from './Hero';
 import { Txt } from './Txt';
 
 const HEIGHT = 150;
@@ -11,8 +12,39 @@ const PAD_TOP = 8;
 const PAD_BOTTOM = 8;
 const AXIS_W = 64;          // columna de etiquetas del eje Y, a la derecha
 
-/** Evolución del valor de mercado: una línea, rejilla discreta y lectura del día al tocar o arrastrar. */
-export function ValueChart({ points }: { points: { day: string; value: number }[] }) {
+type Point = { day: string; value: number };
+
+// Periodos de la gráfica, en días
+const RANGES = [
+  { value: '3d', days: 3, label: 'chart.range.3d' },
+  { value: '1w', days: 7, label: 'chart.range.1w' },
+  { value: '1m', days: 30, label: 'chart.range.1m' },
+  { value: '3m', days: 90, label: 'chart.range.3m' },
+  { value: 'all', days: null, label: 'chart.range.all' },          // todo el historial
+] as const;
+type Range = (typeof RANGES)[number]['value'];
+
+/** Evolución del valor de mercado, con selector de periodo: 3 días, 1 semana, 1 mes, 3 meses o todo (por defecto). */
+export function ValueChart({ points }: { points: Point[] }) {
+  const [range, setRange] = useState<Range>('all');
+  if (points.length < 2) return <Chart points={points} />;
+  // desde N días antes del último dato (incluido, para que el cambio abarque los N días)
+  const days = RANGES.find((r) => r.value === range)!.days;
+  const from = days == null ? '' : new Date(new Date(`${points[points.length - 1].day}T00:00:00Z`).getTime() - days * 86400000)
+    .toISOString().slice(0, 10);
+  const shown = points.filter((p) => p.day >= from);
+  return (
+    <View>
+      <Pills options={RANGES.map((r) => ({ value: r.value, label: t(r.label) }))} value={range} onChange={setRange} compact
+             style={{ marginHorizontal: space.l, marginTop: space.l, alignSelf: 'center' }} />
+      {/* key: al cambiar de periodo se olvida el día señalado */}
+      <Chart key={range} points={shown.length >= 2 ? shown : points.slice(-2)} />
+    </View>
+  );
+}
+
+/** Una línea, rejilla discreta y lectura del día al tocar o arrastrar. */
+function Chart({ points }: { points: Point[] }) {
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<number | null>(null);
 
@@ -95,8 +127,8 @@ export function ValueChart({ points }: { points: { day: string; value: number }[
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   readout: { flexDirection: 'row', alignItems: 'baseline', gap: space.s, flexWrap: 'wrap' },
   tick: { position: 'absolute', fontSize: 11, lineHeight: 18 },
   xAxis: { flexDirection: 'row', justifyContent: 'space-between' },
-});
+}));

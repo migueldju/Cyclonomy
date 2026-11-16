@@ -29,6 +29,7 @@ export const api = {
   renameTeam: (leagueId: string, name: string) => rpc<void>('rename_team', { p_league: leagueId, p_team_name: name }),
   updateProfile: (displayName: string | null, avatarUrl: string | null) =>
     rpc<void>('update_profile', { p_display_name: displayName, p_avatar_url: avatarUrl }),
+  deleteAccount: () => rpc<void>('delete_my_account'),
 
   // lecturas
   gameNow: () => rpc<string>('get_game_now'),

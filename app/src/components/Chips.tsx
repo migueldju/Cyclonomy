@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Txt } from './Txt';
 
 /** Fila de filtros que se desliza en horizontal: se elige una opción. */
@@ -28,11 +28,11 @@ export function Chips<T extends string>({ label, items, value, onChange }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   chip: {
     paddingHorizontal: space.l, paddingVertical: 8, borderRadius: 999, borderWidth: 1,
     borderColor: colors.line, backgroundColor: colors.paper,
   },
   chipOn: { backgroundColor: colors.ink, borderColor: colors.ink },
   chipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
-});
+}));

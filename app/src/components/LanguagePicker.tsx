@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import type { Lang } from '../i18n';
-import { colors, fonts, space } from '../theme';
+import { colors, fonts, space, themed } from '../theme';
 import { Flag } from './Flag';
 import { Sheet } from './Modal';
 import { Txt } from './Txt';
@@ -87,7 +87,7 @@ export function LanguagePicker({ label, hideLabel, languages, value, onChange }:
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   field: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.paper, borderWidth: 1,
     borderColor: colors.line, borderRadius: 6, paddingHorizontal: space.m, paddingVertical: 12,
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
   option: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: 10, paddingHorizontal: space.s,
             borderRadius: 6 },
   flag: { borderRadius: 2, overflow: 'hidden' },
-});
+}));

@@ -1,0 +1,20 @@
+# Web de Cyclonomy (cyclonomy.app): exportación estática de la app de Expo
+[build]
+  base = "app"
+  command = "npx expo export --platform web"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Los ficheros con huella en el nombre no cambian nunca: caché larga
+[[headers]]
+  for = "/_expo/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cualquier ruta (/join/CÓDIGO, /auth/callback…) la resuelve la app
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

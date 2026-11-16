@@ -98,6 +98,7 @@ export interface RosterRow {
   game_offer_expires: string | null;
   transferable: boolean;
   photo_url: string | null;
+  trend: -1 | 0 | 1;          // valor respecto a hace 7 días
 }
 
 /** Movimiento de la liga: fichaje del mercado, compra a otro jugador, clausulazo, oferta aceptada o venta al juego */
@@ -137,6 +138,7 @@ export interface MarketRow {
   game_offer_id: number | null;         // oferta del juego por mi venta (12 h antes del cierre)
   game_offer_amount: number | null;
   game_offer_expires: string | null;
+  trend: -1 | 0 | 1;                    // valor respecto a hace 7 días: sube, igual o baja
 }
 
 export interface OfferRow {

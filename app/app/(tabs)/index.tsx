@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
-import { Share, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { PositionJersey } from '@/components/PositionJersey';
 import { MoveRow } from '@/components/MoveRow';
 import { Flag } from '@/components/Flag';
+import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { RiderAvatar } from '@/components/RiderAvatar';
 import { Screen } from '@/components/Screen';
 import { Empty, ErrorText, Row, Section } from '@/components/Section';
@@ -14,9 +16,9 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { stageLabel } from '@/lib/stages';
 import { course, dateRange, dayMonth, moneyShort, points, time, todayISO } from '@/lib/format';
-import { inviteMessage } from '@/lib/invite';
+import { shareInvite } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
-import { categoryColor, categoryLabel, colors, space } from '@/theme';
+import { categoryColor, categoryRank, colors, space, themed } from '@/theme';
 
 export default function Inicio() {
   const { leagueId, me } = useLeague();
@@ -29,10 +31,21 @@ export default function Inicio() {
 
   const upcoming = (calendar.data ?? []).filter((r) => r.status === 'upcoming' && r.start_date >= todayISO()).slice(0, 5);
 
+  // las de hoy: primero las carreras que empiezan hoy (clásicas y primeras etapas); después, por categoría (la más
+  // importante arriba) y, dentro de la misma, por hora de salida
+  const startsToday = (s: TodayRow) => {
+    const race = calendar.data?.find((r) => r.race_id === s.race_id);
+    // con prólogo la primera etapa es la 0: manda la fecha de inicio de la carrera
+    return (race ? race.start_date === todayISO() : !s.is_stage_race || s.number <= 1) ? 0 : 1;
+  };
+  const todayRows = [...(today.data ?? [])].sort((a, b) =>
+    startsToday(a) - startsToday(b) || categoryRank(a.category) - categoryRank(b.category)
+    || (a.start_at ?? '').localeCompare(b.start_at ?? ''));
+
   return (
     <Screen onRefresh={reload} refreshing={today.loading}>
       {/* Mi puesto */}
-      <View style={styles.hero}>
+      <HeroCard style={styles.hero}>
         <PositionJersey position={me?.position} size={56} />
         <View style={{ flex: 1 }}>
           <Txt variant="small">{t('home.of', { n: me?.members ?? '—', league: me?.league_name ?? '' })}</Txt>
@@ -40,7 +53,7 @@ export default function Inicio() {
           <Txt variant="small">{t('home.thisWeek', { points: points(me?.points_week) })}</Txt>
         </View>
         <Button small kind="dark" icon="book-outline" label={t('home.rules')} onPress={() => router.push('/rules')} />
-      </View>
+      </HeroCard>
 
       {me?.sanctioned_this_week ? (
         <Txt style={styles.warning}>
@@ -53,13 +66,13 @@ export default function Inicio() {
           <View style={{ padding: space.l, gap: space.m }}>
             <Txt>{t('home.shareCodeA')} <Txt variant="number">{me.invite_code}</Txt> {t('home.shareCodeB')}</Txt>
             <Button kind="dark" label={t('home.shareInvite')}
-                    onPress={() => Share.share({ message: inviteMessage(me.league_name, me.invite_code) })} />
+                    onPress={() => shareInvite(me.league_name, me.invite_code)} />
           </View>
         </Section>
       ) : null}
 
       {/* noticias: los últimos movimientos de la liga */}
-      <Section title={t('news.title')} style={{ marginTop: space.s }}>
+      <Section title={t('news.title')}>
         {news.data?.length ? news.data.map((m, i) => (
           <MoveRow key={m.id} m={m} last={i === news.data!.length - 1} myId={me?.member_id} />
         )) : <Empty text={news.loading ? t('common.loading') : t('moves.empty')} />}
@@ -91,8 +104,8 @@ export default function Inicio() {
 
 
       <Section title={`${t('home.today')} · ${dayMonth(todayISO())}`}>
-        {today.data?.length ? today.data.map((s, i) => (
-          <StageRow key={s.stage_id} s={s} last={i === today.data!.length - 1}
+        {todayRows.length ? todayRows.map((s, i) => (
+          <StageRow key={s.stage_id} s={s} last={i === todayRows.length - 1}
                     entriesOpen={!!calendar.data?.find((r) => r.race_id === s.race_id)?.entries_open} />
         )) : <Empty text={today.loading ? t('common.loading') : t('home.noToday')} />}
       </Section>
@@ -111,18 +124,23 @@ export default function Inicio() {
 }
 
 function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entriesOpen: boolean }) {
-  const label = s.status === 'scored' ? t('home.pointsForYou', { points: points(s.my_points) })
-    : s.status === 'finished' ? t('home.scoring')
-    : s.start_at ? t('home.schedule', { start: time(s.start_at) }) : t('home.noSchedule');
+  // estado de la etapa: calculando puntos o la hora de salida (ya puntuada, nada: los puntos se ven en «puntuaciones»)
+  const state = s.status === 'scored' ? null
+    : s.status === 'finished' ? <MetaItem icon="hourglass-outline" text={t('home.scoring')} />
+    : <MetaItem icon="time-outline" text={s.start_at ? time(s.start_at) : t('home.noSchedule')} />;
   return (
     <Row last={last}>
-      <View style={[styles.swatch, { backgroundColor: categoryColor[s.category] ?? colors.line }]} />
+      <ColorBar category={s.category} name={s.race_name} style={styles.swatch} />
       {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
       <View style={styles.flagCol}><Flag code={s.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{s.race_name}</Txt>
-        <Txt variant="small" numberOfLines={1}>{[stageLabel(s.is_stage_race, s.number, s.last_stage), course(s.distance_km, s.vertical_m), label]
-          .filter(Boolean).join(' · ')}</Txt>
+        <MetaLine>
+          <CategoryBadge code={s.category} stageRace={s.is_stage_race} name={s.race_name} />
+          <MetaItem icon="flag-outline" text={stageLabel(s.is_stage_race, s.number, s.last_stage)} />
+          <MetaItem icon="trending-up-outline" text={course(s.distance_km, s.vertical_m)} />
+          {state}
+        </MetaLine>
       </View>
       {/* antes de la salida: inscribirse; en carrera: en curso; con los puntos ya calculados: puntuaciones */}
       {s.status === 'scored' ? (
@@ -140,24 +158,27 @@ function StageRow({ s, last, entriesOpen }: { s: TodayRow; last: boolean; entrie
 function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
   return (
     <Row last={last}>
-      <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+      <ColorBar category={r.category} name={r.name} style={styles.swatch} />
       {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
       <View style={styles.flagCol}><Flag code={r.country} /></View>
       <View style={{ flex: 1 }}>
         <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
-        <Txt variant="small">
-          {dateRange(r.start_date, r.end_date)} · {categoryLabel(r.category, r.is_stage_race)} ·{' '}
-          {r.my_entry_count ? t('race.entered', { n: r.my_entry_count, max: r.max_entries }) : t('race.notEntered')}
-        </Txt>
+        <MetaLine>
+          <CategoryBadge code={r.category} stageRace={r.is_stage_race} name={r.name} />
+          <MetaItem icon="calendar-outline" text={dateRange(r.start_date, r.end_date)} />
+          {r.my_entry_count
+            ? <MetaItem icon="checkmark-circle" text={t('race.entered', { n: r.my_entry_count, max: r.max_entries })} color={colors.green} />
+            : <MetaItem icon="ellipse-outline" text={t('race.notEntered')} />}
+        </MetaLine>
       </View>
       <Button small icon="create-outline" label={t('race.enter')} onPress={() => router.push(`/race/${r.race_id}`)} />
     </Row>
   );
 }
 
-const styles = StyleSheet.create({
-  hero: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
-  warning: { color: colors.red, paddingHorizontal: space.l },
+const styles = themed(() => StyleSheet.create({
+  hero: { flexDirection: 'row', alignItems: 'center', gap: space.m },
+  warning: { color: colors.red, paddingHorizontal: space.l + 4, paddingTop: space.m },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
-});
+}));

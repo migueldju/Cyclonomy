@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
-import { cardShadow, colors, radius, space } from '../theme';
+import { cardShadow, colors, radius, space, themed } from '../theme';
 import { Txt } from './Txt';
 
 /** Bloque con su título encima y el contenido en una tarjeta blanca redondeada. */
@@ -20,8 +20,10 @@ export function Section({ title, action, children, style }: {
   );
 }
 
-export function Row({ children, onPress, last }: { children: ReactNode; onPress?: () => void; last?: boolean }) {
-  const content = <View style={[styles.row, !last && styles.rowLine]}>{children}</View>;
+export function Row({ children, onPress, last, highlight }: {
+  children: ReactNode; onPress?: () => void; last?: boolean; highlight?: boolean;      // highlight: la fila propia
+}) {
+  const content = <View style={[styles.row, !last && styles.rowLine, highlight && styles.rowMine]}>{children}</View>;
   return onPress ? (
     <Pressable onPress={onPress} style={({ pressed }) => pressed && { backgroundColor: colors.road }}>
       {content}
@@ -38,7 +40,7 @@ export function ErrorText({ error }: { error: string | null | undefined }) {
   return <Txt style={styles.error} accessibilityRole="alert">{error}</Txt>;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   section: { marginTop: space.xl },
   head: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -49,6 +51,7 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l, paddingVertical: space.m, gap: space.m },
   rowLine: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  rowMine: { backgroundColor: colors.highlight },
   empty: { padding: space.l },
   error: { color: colors.red, paddingHorizontal: space.l, paddingVertical: space.s },
-});
+}));

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Chips } from '@/components/Chips';
 import { MoveRow } from '@/components/MoveRow';
 import { Screen } from '@/components/Screen';
@@ -23,11 +23,11 @@ export default function Movimientos() {
 
   return (
     <Screen onRefresh={moves.reload} refreshing={moves.loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl, gap: space.m }}>
-        <Txt variant="hero">{t('moves.title')}</Txt>
+      <HeroCard style={{ gap: space.m }}>
+        <Txt variant="display">{t('moves.title')}</Txt>
         <Chips label={t('moves.player')} items={chips} value={player} onChange={setPlayer} />
-      </View>
-      <Section style={{ marginTop: 0 }}>
+      </HeroCard>
+      <Section style={{ marginTop: space.l }}>
         {moves.data?.length ? moves.data.map((m, i) => (
           <MoveRow key={m.id} m={m} last={i === moves.data!.length - 1} myId={me?.member_id} />
         )) : <Empty text={moves.loading ? t('common.loading') : t('moves.empty')} />}

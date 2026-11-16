@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
+import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { DEFAULT_SETTINGS, depthHint, depthOptions, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
@@ -12,7 +13,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { money } from '@/lib/format';
-import { inviteMessage } from '@/lib/invite';
+import { shareInvite } from '@/lib/invite';
 import type { League } from '@/lib/types';
 import { space } from '@/theme';
 
@@ -29,10 +30,10 @@ export default function Normativa() {
 
   return (
     <Screen onRefresh={league.reload} refreshing={league.loading}>
-      <View style={{ padding: space.l, paddingTop: space.xl }}>
-        <Txt variant="hero">{t('home.rules')}</Txt>
+      <HeroCard>
+        <Txt variant="display">{t('home.rules')}</Txt>
         <Txt variant="small">{lg?.name ?? ''}</Txt>
-      </View>
+      </HeroCard>
       <ErrorText error={league.error} />
 
       {lg && editing ? (
@@ -72,7 +73,7 @@ export default function Normativa() {
           <View style={{ padding: space.l, gap: space.m }}>
             <Txt>{t('rules.code')} <Txt variant="number">{lg.invite_code}</Txt></Txt>
             <Button kind="secondary" label={t('home.shareInvite')}
-                    onPress={() => Share.share({ message: inviteMessage(lg.name, lg.invite_code) })} />
+                    onPress={() => shareInvite(lg.name, lg.invite_code)} />
             <Button kind="quiet" label={t('rules.newCode')}
                     onPress={async () => {
                       setCodeError(null);
@@ -90,7 +91,7 @@ export default function Normativa() {
       </Section>
 
       <Section title={t('rules.pointsByCategory')}>
-        {lg ? <ScoringGroups scheme={schemeOf(lg.scoring_system, lg.wt_split)} cats={cats.data ?? []} depth={lg.calendar_depth} /> : null}
+        {lg ? <ScoringGroups scheme={schemeOf(lg.scoring_system, lg.wt_split)} cats={cats.data ?? []} depth={lg.calendar_depth} races={false} /> : null}
       </Section>
     </Screen>
   );

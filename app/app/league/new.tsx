@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { CountryPicker } from '@/components/CountryPicker';
 import { Input } from '@/components/Inputs';
 import { currentMarketHour, DEFAULT_SETTINGS, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
 import { Screen } from '@/components/Screen';
 import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
+import { Button } from '@/components/Button';
+import { SignOutButton } from '@/components/SignOutButton';
 import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
-import { space } from '@/theme';
+import { cardShadow, colors, space, themed } from '@/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function CrearLiga() {
@@ -21,10 +23,11 @@ export default function CrearLiga() {
 
   return (
     <Screen padded>
-      <Txt variant="hero" style={{ marginTop: insets.top + space.l }}>{t('create.title')}</Txt>
-      <Txt variant="small" style={{ marginBottom: space.xl }}>
-        {t('create.note')}
-      </Txt>
+      <View style={[styles.wrap, { paddingTop: insets.top + space.s }]}>
+      <View style={[styles.card, styles.head]}>
+        <Txt variant="display">{t('create.title')}</Txt>
+      </View>
+      <View style={styles.card}>
       <LeagueSettingsForm
         initial={{ ...DEFAULT_SETTINGS, market_hour: currentMarketHour() }}
         initialName=""
@@ -40,9 +43,19 @@ export default function CrearLiga() {
         }}>
         <View>
           <Input label={t('team.yourTeamName')} value={team} onChangeText={setTeam} maxLength={40} />
-          <CountryPicker value={country} onChange={setCountry} />
+          <CountryPicker value={country} onChange={setCountry} hint={false} />
         </View>
       </LeagueSettingsForm>
+      </View>
+      <Button kind="quiet" label={t('common.back')} onPress={() => resetTo('/leagues')} style={{ marginTop: space.m }} />
+      <SignOutButton />
+      </View>
     </Screen>
   );
 }
+
+const styles = themed(() => StyleSheet.create({
+  wrap: { width: '100%', maxWidth: 560, alignSelf: 'center' },
+  card: { backgroundColor: colors.paper, borderRadius: 20, padding: space.l, ...cardShadow },
+  head: { marginBottom: space.l },
+}));

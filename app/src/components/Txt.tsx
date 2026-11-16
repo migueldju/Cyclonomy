@@ -1,9 +1,9 @@
-import { Text, TextProps } from 'react-native';
-import { colors, fonts, type } from '../theme';
+import { Platform, Text, TextProps } from 'react-native';
+import { colors, fonts, themed, type } from '../theme';
 
 type Variant = 'body' | 'small' | 'lead' | 'title' | 'display' | 'hero' | 'number' | 'label';
 
-const styles: Record<Variant, object> = {
+const styles = themed((): Record<Variant, object> => ({
   body: { fontFamily: fonts.body, fontSize: type.body, lineHeight: 21, color: colors.ink },
   small: { fontFamily: fonts.body, fontSize: type.small, lineHeight: 18, color: colors.inkSoft },
   lead: { fontFamily: fonts.bodyBold, fontSize: type.lead, lineHeight: 24, color: colors.ink, letterSpacing: 0.2 },
@@ -12,8 +12,12 @@ const styles: Record<Variant, object> = {
   hero: { fontFamily: fonts.display, fontSize: type.hero, lineHeight: 42, color: colors.ink, letterSpacing: 0.8 },
   number: { fontFamily: fonts.number, fontSize: type.lead, lineHeight: 22, color: colors.ink },
   label: { fontFamily: fonts.bodyMedium, fontSize: type.small, lineHeight: 18, color: colors.inkSoft, letterSpacing: 0.2 },
-};
+}));
 
-export function Txt({ variant = 'body', style, ...rest }: TextProps & { variant?: Variant }) {
-  return <Text {...rest} style={[styles[variant], style]} />;
+export function Txt({ variant = 'body', style, children, ...rest }: TextProps & { variant?: Variant }) {
+  // Android: en algunos móviles el ancho medido se queda un píxel corto y el final del texto («€», «pts») salta a una
+  // segunda línea que no se ve. Con un espacio de no separación al final, lo que salta es ese espacio; y con el
+  // reparto de líneas «simple» se mide y se pinta igual.
+  const text = Platform.OS === 'android' && typeof children === 'string' && children ? children + '\u00A0' : children;
+  return <Text textBreakStrategy="simple" {...rest} style={[styles[variant], style]}>{text}</Text>;
 }

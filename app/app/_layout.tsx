@@ -10,30 +10,43 @@ import { Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastHost } from '@/components/Toast';
 import { TopBar } from '@/components/TopBar';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LeagueProvider, useLeague } from '@/context/LeagueContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { I18nProvider } from '@/i18n';
+import { MAX_WIDTH } from '@/lib/layout';
 import { resetTo } from '@/lib/nav';
-import { colors } from '@/theme';
+import { colors, themed } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 // fondo de la vista raíz: es lo que se ve en la franja del sistema bajo la barra de pestañas (asfalto, como la barra)
 SystemUI.setBackgroundColorAsync(colors.asphalt).catch(() => {});
 
 const AUTH_SCREENS = ['login', 'signup', 'reset-password', 'auth'];
-const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'admin'];
+const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin'];
 
 export default function RootLayout() {
+  return <ThemeProvider>{(scheme) => <Root scheme={scheme} />}</ThemeProvider>;
+}
+
+function Root({ scheme }: { scheme: string }) {
   const [fontsLoaded] = useFonts({
     FiraSans_400Regular, FiraSans_500Medium, FiraSans_600SemiBold, FiraSansCondensed_600SemiBold, FiraSansCondensed_700Bold,
     BebasNeue_400Regular,
+    // todos los caracteres como puntos: oculta la contraseña en Android sin el destello de la última letra
+    PasswordDisc: require('../assets/fonts/password-disc.ttf'),
   });
-  useEffect(() => { if (fontsLoaded) SplashScreen.hideAsync(); }, [fontsLoaded]);
-  if (!fontsLoaded) return null;
+  // la pantalla de arranque nativa se quita enseguida: la de carga (el logo) la pinta la app, también en Expo Go
+  useEffect(() => { SplashScreen.hideAsync(); }, []);
+  // el logo se ve al menos un momento, aunque todo cargue al instante
+  const [shown, setShown] = useState(false);
+  useEffect(() => { const id = setTimeout(() => setShown(true), 1200); return () => clearTimeout(id); }, []);
+  if (!fontsLoaded) return <LoadingScreen />;
 
   return (
     <SafeAreaProvider>
@@ -42,8 +55,13 @@ export default function RootLayout() {
           <AuthProvider>
             <LeagueProvider>
               <StatusBar style="light" />
-              <Gate key={lang} />
-              <ToastHost />
+              {/* en la web, con la ventana grande, la app va en una columna centrada sobre el asfalto */}
+              <View style={styles.page}>
+                <View style={styles.column}>
+                  <Gate key={lang + scheme} splash={!shown} />
+                  <ToastHost key={scheme} />
+                </View>
+              </View>
             </LeagueProvider>
           </AuthProvider>
         )}
@@ -53,7 +71,7 @@ export default function RootLayout() {
 }
 
 /** Redirige según haya sesión y liga elegida */
-function Gate() {
+function Gate({ splash }: { splash: boolean }) {
   const { session, loading } = useAuth();
   const { leagueId, ready, pendingInvite, setPendingInvite } = useLeague();
   const segments = useSegments();
@@ -79,6 +97,7 @@ function Gate() {
 
   const withBar = { headerShown: true, header: () => <TopBar back /> };
   return (
+    <>
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.road } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="player/[memberId]" options={withBar} />
@@ -86,7 +105,28 @@ function Gate() {
       <Stack.Screen name="stage/[stageId]" options={withBar} />
       <Stack.Screen name="rules" options={withBar} />
       <Stack.Screen name="profile" options={withBar} />
+      <Stack.Screen name="security" options={withBar} />
       <Stack.Screen name="admin" options={withBar} />
     </Stack>
+    {/* pantalla de carga, mientras se lee la sesión y la liga: el logo sobre el amarillo del icono */}
+    {loading || !ready || splash ? <LoadingScreen /> : null}
+    </>
   );
 }
+
+/** Pantalla de carga: el logo horizontal sobre blanco */
+function LoadingScreen() {
+  return (
+    <View style={styles.loading}>
+      <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain" tintColor={colors.ink}
+             accessibilityLabel="Cyclonomy" />
+    </View>
+  );
+}
+
+const styles = themed(() => StyleSheet.create({
+  page: { flex: 1, backgroundColor: colors.asphalt, alignItems: 'center' },
+  column: { flex: 1, width: '100%', maxWidth: MAX_WIDTH, backgroundColor: colors.road, overflow: 'hidden' },
+  loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 260, height: 44 },
+}));

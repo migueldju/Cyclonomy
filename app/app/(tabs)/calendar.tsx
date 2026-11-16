@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { BottomFill } from '@/components/Screen';
@@ -10,10 +11,12 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
+import { useContentWidth } from '@/lib/layout';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
+import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
+import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, themed, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -21,7 +24,7 @@ export default function Calendario() {
   const { data, error, loading, reload } = useLoader(() => api.calendar(id), [id], !!leagueId);
   const [open, setOpen] = useState<number | null>(null);
   const [day, setDay] = useState(todayISO());
-  const { width } = useWindowDimensions();
+  const width = useContentWidth();
   const pager = useRef<FlatList<string>>(null);
 
   const rows = data ?? [];
@@ -61,7 +64,7 @@ export default function Calendario() {
                      onNext={index < months.length - 1 ? () => pager.current?.scrollToIndex({ index: index + 1 }) : undefined} />
         )}
       />
-      <Txt variant="label" style={styles.dayTitle}>{dayTitle(day)}</Txt>
+      <Txt variant="title" style={styles.dayTitle}>{dayTitle(day)}</Txt>
       <ErrorText error={error} />
     </>
   );
@@ -75,7 +78,7 @@ export default function Calendario() {
       ListFooterComponent={<BottomFill />}
       contentContainerStyle={{ flexGrow: 1 }}
       refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
-      ListEmptyComponent={<Txt variant="small" style={{ paddingHorizontal: space.l }}>
+      ListEmptyComponent={<Txt variant="small" style={{ paddingHorizontal: space.l + 4 }}>
         {loading ? t('common.loading') : t('calendar.noRacesDay')}
       </Txt>}
       renderItem={({ item }) => (
@@ -119,16 +122,19 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
   const wd = t('fmt.weekdays').split(',');
   const weekdays = [...wd.slice(1), wd[0]];
   const today = todayISO();
-  const cell = (width - space.l * 2) / 7;
+  const cell = (width - space.l * 2 - space.s * 2) / 7;
   return (
-    <View style={{ width, paddingHorizontal: space.l }}>
+    <View style={{ width, paddingHorizontal: space.l, paddingTop: space.l, paddingBottom: space.m }}>
+      <View style={styles.month}>
       <View style={styles.monthHead}>
-        <Pressable onPress={onPrev} disabled={!onPrev} hitSlop={10} accessibilityRole="button">
-          <Txt variant="title" style={!onPrev && { opacity: 0.25 }}>‹</Txt>
+        <Pressable onPress={onPrev} disabled={!onPrev} hitSlop={10} accessibilityRole="button"
+                   style={[styles.monthBtn, !onPrev && { opacity: 0.3 }]}>
+          <Ionicons name="chevron-back" size={18} color={colors.ink} />
         </Pressable>
         <Txt variant="title">{monthTitle(month)}</Txt>
-        <Pressable onPress={onNext} disabled={!onNext} hitSlop={10} accessibilityRole="button">
-          <Txt variant="title" style={!onNext && { opacity: 0.25 }}>›</Txt>
+        <Pressable onPress={onNext} disabled={!onNext} hitSlop={10} accessibilityRole="button"
+                   style={[styles.monthBtn, !onNext && { opacity: 0.3 }]}>
+          <Ionicons name="chevron-forward" size={18} color={colors.ink} />
         </Pressable>
       </View>
       <View style={styles.grid}>
@@ -142,16 +148,17 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
           return (
             <Pressable key={date} onPress={() => onSelect(date)} accessibilityRole="button" accessibilityState={{ selected: on }}
                        style={[styles.day, { width: cell }, on && styles.dayOn, date === today && !on && styles.dayToday]}>
-              <Txt style={[styles.dayNum, on && { color: colors.paper }]}>{d}</Txt>
+              <Txt style={[styles.dayNum, on && styles.dayNumOn]}>{d}</Txt>
               <View style={styles.bars}>
                 {here.slice(0, 3).map((r) => (
-                  <View key={r.race_id} style={[styles.bar, { backgroundColor: categoryColor[r.category] ?? colors.inkSoft }]} />
+                  <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.bar} />
                 ))}
-                {here.length > 3 ? <Txt style={[styles.more, on && { color: colors.paper }]}>+{here.length - 3}</Txt> : null}
+                {here.length > 3 ? <Txt style={styles.more}>+{here.length - 3}</Txt> : null}
               </View>
             </Pressable>
           );
         })}
+      </View>
       </View>
     </View>
   );
@@ -167,16 +174,20 @@ function RaceItem({ r, day, open, onToggle, leagueId }: {
   return (
     <View style={styles.item}>
       <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.itemHead}>
-        <View style={[styles.swatch, { backgroundColor: categoryColor[r.category] ?? colors.line }]} />
+        <ColorBar category={r.category} name={r.name} style={styles.swatch} />
         {/* bandera en una columna fija, a la altura del nombre: todas alineadas */}
         <View style={styles.flagCol}><Flag code={r.country} /></View>
         <View style={{ flex: 1 }}>
           <Txt variant="lead" numberOfLines={1}>{r.name}</Txt>
-          <Txt variant="small" numberOfLines={1}>
-            {stageLabel(r.is_stage_race, stage?.number, last)} · {categoryName(r.category)} · {status(r.status)}
-          </Txt>
+          <MetaLine>
+            <CategoryBadge code={r.category} stageRace={r.is_stage_race} name={r.name} />
+            <MetaItem icon="flag-outline" text={stageLabel(r.is_stage_race, stage?.number, last)} />
+            {/* solo se marca la que ya ha terminado */}
+            {r.status === 'finished' ? <MetaItem icon="checkmark-circle-outline" text={status(r.status)} /> : null}
+          </MetaLine>
         </View>
-        <Txt variant="label">{open ? t('common.close') : t('common.see')}</Txt>
+        <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={colors.inkSoft}
+                  accessibilityLabel={open ? t('common.close') : t('common.see')} />
       </Pressable>
       {open ? <RaceDetailView r={r} leagueId={leagueId} /> : null}
     </View>
@@ -301,15 +312,19 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   stageCol: { width: 116 },
   winner: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: space.m, paddingBottom: space.xs },
+  month: { backgroundColor: colors.paper, borderRadius: 20, padding: space.s, paddingBottom: space.m, ...cardShadow },
+  monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: space.s, paddingBottom: space.m },
+  monthBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.road, alignItems: 'center', justifyContent: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
   weekday: { textAlign: 'center', paddingBottom: space.xs, textTransform: 'capitalize' },
-  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 8 },
-  dayOn: { backgroundColor: colors.ink },
-  dayToday: { borderWidth: 1.5, borderColor: colors.ink },
+  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 12 },
+  // el día elegido, con borde y sin relleno: las rayas de las carreras (también las negras del WorldTour) se ven igual
+  dayOn: { borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.paper, paddingTop: 3 },
+  dayToday: { backgroundColor: colors.road },
+  dayNumOn: { fontFamily: fonts.bodyBold },
   dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
   bars: {
     flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 2, marginTop: 4,
@@ -317,12 +332,15 @@ const styles = StyleSheet.create({
   },
   bar: { width: 9, height: 4, borderRadius: 2 },
   more: { fontFamily: fonts.bodyMedium, fontSize: 9, color: colors.inkSoft },
-  dayTitle: { paddingHorizontal: space.l, paddingTop: space.xs, paddingBottom: space.xs },
-  item: { backgroundColor: colors.paper, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  dayTitle: { paddingHorizontal: space.l + 4, paddingTop: space.xs, paddingBottom: space.s },
+  item: {
+    backgroundColor: colors.paper, marginHorizontal: space.l, marginBottom: space.s, borderRadius: 16, overflow: 'hidden',
+    ...cardShadow,
+  },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
-  detail: { paddingHorizontal: space.l, paddingBottom: space.l, paddingLeft: space.l + 16 },
+  detail: { paddingHorizontal: space.l, paddingBottom: space.l },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 6 },
   subhead: { marginTop: space.m, marginBottom: 2 },
   scoredFor: { color: colors.green, fontFamily: fonts.bodyMedium },
@@ -333,9 +351,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   trLast: { borderBottomWidth: 0 },
   th: { backgroundColor: colors.asphalt, paddingVertical: 7, borderBottomWidth: 0 },
-  thText: { color: colors.paper },
+  thText: { color: colors.onDark },
   posCol: { width: 34 },
   flagCell: { width: 18, alignItems: 'center' },
   numCol: { width: 64, textAlign: 'right' },
   teamCol: { width: 104, textAlign: 'right' },
-});
+}));

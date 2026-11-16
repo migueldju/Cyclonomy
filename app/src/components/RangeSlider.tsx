@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { GestureResponderEvent, PanResponder, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
-import { colors } from '../theme';
+import { colors, themed } from '../theme';
 
 const THUMB = 26;
 
@@ -73,7 +73,7 @@ export function RangeSlider({ steps, low, high, onChange, label, single }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { height: THUMB + 8, justifyContent: 'center' },
   rail: { position: 'absolute', left: THUMB / 2, right: THUMB / 2, height: 4, borderRadius: 2, backgroundColor: colors.line },
   fill: { position: 'absolute', height: 4, borderRadius: 2, backgroundColor: colors.ink },
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
     position: 'absolute', width: THUMB, height: THUMB, borderRadius: THUMB / 2, backgroundColor: colors.paper,
     borderWidth: 2, borderColor: colors.ink,
   },
-});
+}));

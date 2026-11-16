@@ -3,22 +3,35 @@ import { type ComponentProps, ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
-import { colors, fonts, space, type } from '../theme';
+import { MAX_WIDTH } from '../lib/layout';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
 import { ErrorText } from './Section';
 import { Txt } from './Txt';
 
 /** Hoja inferior genérica */
-export function Sheet({ visible, onClose, title, children }: {
+export function Sheet({ visible, onClose, title, children, above, onTitlePress }: {
   visible: boolean; onClose: () => void; title: string; children: ReactNode;
+  onTitlePress?: () => void;  // título pulsable (p. ej. ir a la ficha del ciclista): cierra la hoja y lo ejecuta
+  above?: ReactNode;          // tarjeta flotante en el hueco libre, pegada encima de la hoja
 }) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
+      <View style={{ flex: 1 }}>
+        <Pressable style={[styles.backdrop, StyleSheet.absoluteFill]} onPress={onClose} accessibilityLabel={t('common.close')} />
+        {above ? <View style={styles.above} pointerEvents="box-none">{above}</View> : null}
+      </View>
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
-          <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>
+          <View style={styles.handle} />
+          {onTitlePress ? (
+            <Pressable onPress={() => { onClose(); onTitlePress(); }} accessibilityRole="link" accessibilityLabel={title}
+                       style={({ pressed }) => [styles.titleLink, pressed && { opacity: 0.6 }]}>
+              <Txt variant="title" style={{ flexShrink: 1 }}>{title}</Txt>
+              <Ionicons name="eye-outline" size={20} color={colors.ink} />
+            </Pressable>
+          ) : <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>}
           {children}
         </View>
       </KeyboardAvoidingView>
@@ -39,8 +52,12 @@ export interface SheetAction {
 }
 
 /** Lista de acciones; ejecuta la elegida y muestra el error del servidor si lo hay */
-export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone }: {
+export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone, header, footer, above, onTitlePress }: {
+  onTitlePress?: () => void;  // ver Sheet
+  above?: ReactNode;          // ver Sheet
   visible: boolean; onClose: () => void; title: string; subtitle?: string; actions: SheetAction[]; onDone?: () => void;
+  /** contenido propio sobre las acciones (cifras) y junto a «Cerrar» (botón de información) */
+  header?: ReactNode; footer?: ReactNode;
 }) {
   const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -62,9 +79,10 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title}>
+    <Sheet visible={visible} onClose={onClose} title={title} above={above} onTitlePress={onTitlePress}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
-      {actions.length === 0 ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
+      {header}
+      {actions.length === 0 && !subtitle ? <Txt variant="small">{t('sheet.noActions')}</Txt> : null}
       {actions.map((a, i) => a.icon ? (
         <Pressable key={a.label} onPress={() => run(i)} disabled={busy !== null} accessibilityRole="button"
                    accessibilityLabel={a.label}
@@ -88,14 +106,23 @@ export function ActionSheet({ visible, onClose, title, subtitle, actions, onDone
         </View>
       ))}
       <ErrorText error={error} />
-      <Button label={t('common.close')} kind="quiet" onPress={onClose} />
+      {footer ? (
+        <View style={styles.foot}>
+          {footer}
+          <Button label={t('common.close')} kind="quiet" onPress={onClose} />
+        </View>
+      ) : <Button label={t('common.close')} kind="quiet" onPress={onClose} />}
     </Sheet>
   );
 }
 
 /** Pide una cantidad en euros (pujas y ofertas) */
-export function AmountSheet({ visible, onClose, title, subtitle, min, initial, confirmLabel, onConfirm, onDone, done }: {
+export function AmountSheet({ visible, onClose, title, subtitle, chips, min, initial, confirmLabel, onConfirm, onDone, done, quick = true, onTitlePress }: {
+  onTitlePress?: () => void;  // ver Sheet
+  quick?: boolean;            // atajos +5 %, +10 % y +25 %
   visible: boolean; onClose: () => void; title: string; subtitle?: string; min?: number; initial?: number;
+  /** datos cortos con icono (equipo, cierre…), en vez de una frase */
+  chips?: { icon: ComponentProps<typeof Ionicons>['name']; text: string }[];
   confirmLabel: string; onConfirm: (amount: number) => Promise<unknown>; onDone?: () => void;
   done?: (amount: number) => string;          // aviso momentáneo al terminar bien
 }) {
@@ -126,23 +153,43 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title={title}>
+    <Sheet visible={visible} onClose={onClose} title={title} onTitlePress={onTitlePress}>
       {subtitle ? <Txt variant="small" style={{ marginBottom: space.m }}>{subtitle}</Txt> : null}
-      <TextInput
-        value={amount != null ? money(amount).replace(' €', '') : ''}
-        onChangeText={setText}
-        keyboardType="number-pad"
-        style={styles.amount}
-        accessibilityLabel={t('sheet.amountLabel')}
-        placeholder="0"
-        placeholderTextColor={colors.inkSoft}
-      />
-      <View style={styles.quick}>
-        {[0.05, 0.1, 0.25].map((p) => (
-          <Button key={p} small kind="secondary" label={`+${p * 100} %`} onPress={() => bump(p)} />
-        ))}
+      {chips?.length ? (
+        <View style={styles.chips}>
+          {chips.map((c) => (
+            <View key={c.text} style={styles.chip}>
+              <Ionicons name={c.icon} size={14} color={colors.inkSoft} />
+              <Txt variant="small" numberOfLines={1} style={{ flexShrink: 1 }}>{c.text}</Txt>
+            </View>
+          ))}
+        </View>
+      ) : null}
+      <View style={styles.amountBox}>
+        <TextInput
+          value={amount != null ? money(amount).replace(' €', '') : ''}
+          onChangeText={setText}
+          keyboardType="number-pad"
+          style={styles.amount}
+          accessibilityLabel={t('sheet.amountLabel')}
+          placeholder="0"
+          placeholderTextColor={colors.inkSoft}
+        />
+        <Txt style={styles.euro}>€</Txt>
       </View>
-      {min != null ? <Txt variant="small" style={{ marginBottom: space.m }}>{t('sheet.minimum', { amount: money(min) })}</Txt> : null}
+      {min != null ? (
+        <Txt variant="small" style={[{ textAlign: 'center', marginBottom: space.m }, amount != null && amount < min && { color: colors.red }]}>
+          {t('sheet.minimum', { amount: money(min) })}
+        </Txt>
+      ) : null}
+      {quick ? <View style={styles.quick}>
+        {[0.05, 0.1, 0.25].map((p) => (
+          <Pressable key={p} onPress={() => bump(p)} accessibilityRole="button" accessibilityLabel={`+${p * 100} %`}
+                     style={({ pressed }) => [styles.bump, pressed && { opacity: 0.7 }]}>
+            <Txt style={styles.bumpText}>+{p * 100} %</Txt>
+          </Pressable>
+        ))}
+      </View> : null}
       <ErrorText error={error} />
       <Button label={confirmLabel} onPress={confirm} busy={busy} disabled={amount == null || (min != null && amount < min)} />
       <Button label={t('common.cancel')} kind="quiet" onPress={onClose} style={{ marginTop: space.s }} />
@@ -150,7 +197,7 @@ export function AmountSheet({ visible, onClose, title, subtitle, min, initial, c
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   action: {
     flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: space.m, paddingHorizontal: space.m,
     borderRadius: 14, backgroundColor: colors.road, marginBottom: space.s,
@@ -161,13 +208,30 @@ const styles = StyleSheet.create({
   },
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
+  titleLink: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
+  above: { flex: 1, justifyContent: 'flex-end', padding: space.l, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   sheet: {
-    backgroundColor: colors.paper, padding: space.xl, paddingBottom: space.xxl,
-    borderTopLeftRadius: 14, borderTopRightRadius: 14,
+    width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center',
+    backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
+    borderTopLeftRadius: 28, borderTopRightRadius: 28,
+  },
+  handle: { alignSelf: 'center', width: 40, height: 4, borderRadius: 2, backgroundColor: colors.line, marginBottom: space.l },
+  amountBox: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, backgroundColor: colors.road,
+    borderRadius: 18, paddingHorizontal: space.l, paddingVertical: space.m, marginBottom: space.s,
   },
   amount: {
-    fontFamily: fonts.number, fontSize: type.hero, color: colors.ink, borderBottomWidth: 2,
-    borderBottomColor: colors.ink, paddingVertical: space.s, marginBottom: space.m,
+    flexShrink: 1, minWidth: 60, textAlign: 'center', fontFamily: fonts.number, fontSize: type.hero, color: colors.ink,
+    paddingVertical: 0,
   },
-  quick: { flexDirection: 'row', gap: space.s, marginBottom: space.m },
-});
+  euro: { fontFamily: fonts.number, fontSize: type.title, color: colors.inkSoft },
+  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space.xs },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s, marginBottom: space.m },
+  chip: {
+    flexDirection: 'row', alignItems: 'center', gap: 5, maxWidth: '100%', backgroundColor: colors.road, borderRadius: 999,
+    paddingHorizontal: 10, paddingVertical: 5,
+  },
+  quick: { flexDirection: 'row', gap: space.s, marginBottom: space.l },
+  bump: { flex: 1, alignItems: 'center', backgroundColor: colors.road, borderRadius: 999, paddingVertical: 9 },
+  bumpText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.ink },
+}));
