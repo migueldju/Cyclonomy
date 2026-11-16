@@ -143,6 +143,7 @@ const cs: Partial<Dict> = {
   "input.less": "Méně: {label}",
   "input.more": "Více: {label}",
   "invite.message": "Přidej se do mé ligy „{league}“ v Cyclonomy.\nKód: {code}\nOdkaz: {link}",
+  "invite.copied": "Pozvánka zkopírována do schránky",
   "join.code": "Kód pozvánky: {code}",
   "join.signIn": "Přihlásit se",
   "join.signInFirst": "Přihlas se nebo si vytvoř účet, abys se mohl přidat.",

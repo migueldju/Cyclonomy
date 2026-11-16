@@ -143,6 +143,7 @@ const ca: Partial<Dict> = {
   "input.less": "Menys {label}",
   "input.more": "Més {label}",
   "invite.message": "Uneix-te a la meva lliga «{league}» a Cyclonomy.\nCodi: {code}\nEnllaç: {link}",
+  "invite.copied": "Invitació copiada al porta-retalls",
   "join.code": "Codi d'invitació: {code}",
   "join.signIn": "Iniciar sessió",
   "join.signInFirst": "Inicia sessió o crea un compte per unir-t'hi.",

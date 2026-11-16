@@ -1,5 +1,6 @@
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 import { t } from '../i18n';
 import { supabase } from './supabase';
 
@@ -45,6 +46,12 @@ export function authErrorText(message: string): string {
 
 /** Login con Google (OAuth con PKCE): abre el navegador y vuelve a la app con un código */
 export async function signInWithGoogle() {
+  // En la web se va a Google en la misma pestaña y se vuelve a /auth/callback, que canjea el código
+  if (Platform.OS === 'web') {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
+    if (error) throw new Error(error.message);
+    return;
+  }
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo, skipBrowserRedirect: true },

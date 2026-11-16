@@ -143,6 +143,7 @@ const eu: Partial<Dict> = {
   "input.less": "{label} gutxiago",
   "input.more": "{label} gehiago",
   "invite.message": "Batu nire «{league}» ligara Cyclonomy-n.\nKodea: {code}\nEsteka: {link}",
+  "invite.copied": "Gonbidapena arbelera kopiatu da",
   "join.code": "Gonbidapen-kodea: {code}",
   "join.signIn": "Saioa hasi",
   "join.signInFirst": "Hasi saioa edo sortu kontu bat batzeko.",

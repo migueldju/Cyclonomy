@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { BottomFill } from '@/components/Screen';
@@ -11,6 +11,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
+import { useContentWidth } from '@/lib/layout';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
 import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
@@ -23,7 +24,7 @@ export default function Calendario() {
   const { data, error, loading, reload } = useLoader(() => api.calendar(id), [id], !!leagueId);
   const [open, setOpen] = useState<number | null>(null);
   const [day, setDay] = useState(todayISO());
-  const { width } = useWindowDimensions();
+  const width = useContentWidth();
   const pager = useRef<FlatList<string>>(null);
 
   const rows = data ?? [];

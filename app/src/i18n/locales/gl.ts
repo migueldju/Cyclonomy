@@ -143,6 +143,7 @@ const gl: Partial<Dict> = {
   "input.less": "Menos {label}",
   "input.more": "Máis {label}",
   "invite.message": "Únete á miña liga «{league}» en Cyclonomy.\nCódigo: {code}\nLigazón: {link}",
+  "invite.copied": "Invitación copiada ao portapapeis",
   "join.code": "Código de invitación: {code}",
   "join.signIn": "Iniciar sesión",
   "join.signInFirst": "Inicia sesión ou crea unha conta para unirte.",

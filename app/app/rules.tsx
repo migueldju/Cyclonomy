@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
 import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { DEFAULT_SETTINGS, depthHint, depthOptions, LeagueSettingsForm } from '@/components/LeagueSettingsForm';
@@ -13,7 +13,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { money } from '@/lib/format';
-import { inviteMessage } from '@/lib/invite';
+import { shareInvite } from '@/lib/invite';
 import type { League } from '@/lib/types';
 import { space } from '@/theme';
 
@@ -73,7 +73,7 @@ export default function Normativa() {
           <View style={{ padding: space.l, gap: space.m }}>
             <Txt>{t('rules.code')} <Txt variant="number">{lg.invite_code}</Txt></Txt>
             <Button kind="secondary" label={t('home.shareInvite')}
-                    onPress={() => Share.share({ message: inviteMessage(lg.name, lg.invite_code) })} />
+                    onPress={() => shareInvite(lg.name, lg.invite_code)} />
             <Button kind="quiet" label={t('rules.newCode')}
                     onPress={async () => {
                       setCodeError(null);

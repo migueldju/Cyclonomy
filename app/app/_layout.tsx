@@ -19,6 +19,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LeagueProvider, useLeague } from '@/context/LeagueContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { I18nProvider } from '@/i18n';
+import { MAX_WIDTH } from '@/lib/layout';
 import { resetTo } from '@/lib/nav';
 import { colors, themed } from '@/theme';
 
@@ -54,8 +55,13 @@ function Root({ scheme }: { scheme: string }) {
           <AuthProvider>
             <LeagueProvider>
               <StatusBar style="light" />
-              <Gate key={lang + scheme} splash={!shown} />
-              <ToastHost key={scheme} />
+              {/* en la web, con la ventana grande, la app va en una columna centrada sobre el asfalto */}
+              <View style={styles.page}>
+                <View style={styles.column}>
+                  <Gate key={lang + scheme} splash={!shown} />
+                  <ToastHost key={scheme} />
+                </View>
+              </View>
             </LeagueProvider>
           </AuthProvider>
         )}
@@ -119,6 +125,8 @@ function LoadingScreen() {
 }
 
 const styles = themed(() => StyleSheet.create({
+  page: { flex: 1, backgroundColor: colors.asphalt, alignItems: 'center' },
+  column: { flex: 1, width: '100%', maxWidth: MAX_WIDTH, backgroundColor: colors.road, overflow: 'hidden' },
   loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 260, height: 44 },
 }));

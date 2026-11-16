@@ -48,7 +48,14 @@
     "backgroundColor": "#1E272C",
     "icon": "./assets/icon.png",
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "Cyclonomy",
+      "shortName": "Cyclonomy",
+      "lang": "es",
+      "themeColor": "#1E272C",
+      "backgroundColor": "#1E272C"
     }
   }
 }

@@ -143,6 +143,7 @@ const nl: Partial<Dict> = {
   "input.less": "Minder {label}",
   "input.more": "Meer {label}",
   "invite.message": "Doe mee met mijn competitie ‘{league}’ op Cyclonomy.\nCode: {code}\nLink: {link}",
+  "invite.copied": "Uitnodiging gekopieerd naar het klembord",
   "join.code": "Uitnodigingscode: {code}",
   "join.signIn": "Inloggen",
   "join.signInFirst": "Log in of maak een account aan om mee te doen.",

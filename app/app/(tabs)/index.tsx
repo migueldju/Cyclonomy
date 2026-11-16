@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Share, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
 import { PositionJersey } from '@/components/PositionJersey';
@@ -16,7 +16,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { stageLabel } from '@/lib/stages';
 import { course, dateRange, dayMonth, moneyShort, points, time, todayISO } from '@/lib/format';
-import { inviteMessage } from '@/lib/invite';
+import { shareInvite } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
 import { categoryColor, categoryRank, colors, space, themed } from '@/theme';
 
@@ -66,7 +66,7 @@ export default function Inicio() {
           <View style={{ padding: space.l, gap: space.m }}>
             <Txt>{t('home.shareCodeA')} <Txt variant="number">{me.invite_code}</Txt> {t('home.shareCodeB')}</Txt>
             <Button kind="dark" label={t('home.shareInvite')}
-                    onPress={() => Share.share({ message: inviteMessage(me.league_name, me.invite_code) })} />
+                    onPress={() => shareInvite(me.league_name, me.invite_code)} />
           </View>
         </Section>
       ) : null}

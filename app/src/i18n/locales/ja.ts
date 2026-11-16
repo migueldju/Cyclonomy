@@ -143,6 +143,7 @@ const ja: Partial<Dict> = {
   "input.less": "{label}を減らす",
   "input.more": "{label}を増やす",
   "invite.message": "Cyclonomyの私のリーグ「{league}」に参加しよう。\nコード：{code}\nリンク：{link}",
+  "invite.copied": "招待をクリップボードにコピーしました",
   "join.code": "招待コード：{code}",
   "join.signIn": "ログイン",
   "join.signInFirst": "参加するにはログインするか、アカウントを作成してください。",

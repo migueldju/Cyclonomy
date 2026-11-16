@@ -3,6 +3,7 @@ import { type ComponentProps, ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
+import { MAX_WIDTH } from '../lib/layout';
 import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
@@ -208,8 +209,9 @@ const styles = themed(() => StyleSheet.create({
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
   titleLink: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
-  above: { flex: 1, justifyContent: 'flex-end', padding: space.l },
+  above: { flex: 1, justifyContent: 'flex-end', padding: space.l, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   sheet: {
+    width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center',
     backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
     borderTopLeftRadius: 28, borderTopRightRadius: 28,
   },

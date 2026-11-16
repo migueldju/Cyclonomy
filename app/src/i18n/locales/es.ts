@@ -142,6 +142,7 @@ const es = {
   "input.less": "Menos {label}",
   "input.more": "Más {label}",
   "invite.message": "Únete a mi liga «{league}» en Cyclonomy.\nCódigo: {code}\nEnlace: {link}",
+  "invite.copied": "Invitación copiada al portapapeles",
   "join.code": "Código de invitación: {code}",
   "join.signIn": "Iniciar sesión",
   "join.signInFirst": "Inicia sesión o crea una cuenta para unirte.",
