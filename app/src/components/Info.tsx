@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { t } from '../i18n';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { Sheet } from './Modal';
 import { Txt } from './Txt';
@@ -43,7 +43,7 @@ export function AdSlot({ style }: { style?: ViewStyle }) {
   return <View style={[styles.ad, style]} />;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   button: {
     flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: colors.road,
     borderRadius: 999, paddingLeft: 9, paddingRight: 12, paddingVertical: 6,
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
   item: { flexDirection: 'row', gap: space.m },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 7 },
   ad: { height: 58, marginHorizontal: space.l, marginTop: space.l },
-});
+}));

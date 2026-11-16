@@ -17,9 +17,10 @@ import { ToastHost } from '@/components/Toast';
 import { TopBar } from '@/components/TopBar';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LeagueProvider, useLeague } from '@/context/LeagueContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { I18nProvider } from '@/i18n';
 import { resetTo } from '@/lib/nav';
-import { colors } from '@/theme';
+import { colors, themed } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 // fondo de la vista raíz: es lo que se ve en la franja del sistema bajo la barra de pestañas (asfalto, como la barra)
@@ -29,6 +30,10 @@ const AUTH_SCREENS = ['login', 'signup', 'reset-password', 'auth'];
 const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin'];
 
 export default function RootLayout() {
+  return <ThemeProvider>{(scheme) => <Root scheme={scheme} />}</ThemeProvider>;
+}
+
+function Root({ scheme }: { scheme: string }) {
   const [fontsLoaded] = useFonts({
     FiraSans_400Regular, FiraSans_500Medium, FiraSans_600SemiBold, FiraSansCondensed_600SemiBold, FiraSansCondensed_700Bold,
     BebasNeue_400Regular,
@@ -49,8 +54,8 @@ export default function RootLayout() {
           <AuthProvider>
             <LeagueProvider>
               <StatusBar style="light" />
-              <Gate key={lang} splash={!shown} />
-              <ToastHost />
+              <Gate key={lang + scheme} splash={!shown} />
+              <ToastHost key={scheme} />
             </LeagueProvider>
           </AuthProvider>
         )}
@@ -107,13 +112,13 @@ function Gate({ splash }: { splash: boolean }) {
 function LoadingScreen() {
   return (
     <View style={styles.loading}>
-      <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
+      <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain" tintColor={colors.ink}
              accessibilityLabel="Cyclonomy" />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 260, height: 44 },
-});
+}));

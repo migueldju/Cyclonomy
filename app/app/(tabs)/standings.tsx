@@ -13,7 +13,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, points } from '@/lib/format';
-import { colors, space } from '@/theme';
+import { colors, space, themed } from '@/theme';
 
 export default function Clasificacion() {
   const { leagueId, me } = useLeague();
@@ -63,7 +63,7 @@ export default function Clasificacion() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   avatar: { width: 36, height: 36, borderRadius: 18 },
   noAvatar: { backgroundColor: colors.line },
-});
+}));

@@ -491,6 +491,11 @@ const ca: Partial<Dict> = {
   "chart.range.3m": "3 mesos",
   "chart.range.all": "Total",
   "profile.photoError": "No s'ha pogut llegir la foto. Prova'n una altra.",
+  "profile.theme": "Aparença",
+  "profile.themeHint": "Tema de l'app",
+  "theme.system": "Sistema",
+  "theme.light": "Clar",
+  "theme.dark": "Fosc",
   "topbar.profile": "El meu perfil",
 };
 

@@ -491,6 +491,11 @@ const eu: Partial<Dict> = {
   "chart.range.3m": "3 hil",
   "chart.range.all": "Dena",
   "profile.photoError": "Ezin izan da argazkia irakurri. Saiatu beste batekin.",
+  "profile.theme": "Itxura",
+  "profile.themeHint": "Aplikazioaren gaia",
+  "theme.system": "Sistema",
+  "theme.light": "Argia",
+  "theme.dark": "Iluna",
   "topbar.profile": "Nire profila",
 };
 

@@ -491,6 +491,11 @@ const nl: Partial<Dict> = {
   "chart.range.3m": "3 mnd",
   "chart.range.all": "Alles",
   "profile.photoError": "De foto kon niet worden gelezen. Probeer een andere.",
+  "profile.theme": "Weergave",
+  "profile.themeHint": "App-thema",
+  "theme.system": "Systeem",
+  "theme.light": "Licht",
+  "theme.dark": "Donker",
   "topbar.profile": "Mijn profiel",
 };
 

@@ -491,6 +491,11 @@ const cs: Partial<Dict> = {
   "chart.range.3m": "3 měs",
   "chart.range.all": "Vše",
   "profile.photoError": "Fotku se nepodařilo načíst. Zkus jinou.",
+  "profile.theme": "Vzhled",
+  "profile.themeHint": "Motiv aplikace",
+  "theme.system": "Systém",
+  "theme.light": "Světlý",
+  "theme.dark": "Tmavý",
   "topbar.profile": "Můj profil",
 };
 

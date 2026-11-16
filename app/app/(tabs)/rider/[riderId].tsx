@@ -21,7 +21,7 @@ import { dateRange, money, moneyShort, ordinal, points, todayISO } from '@/lib/f
 import { actionsFor } from '@/lib/rosterActions';
 import type { RiderResult } from '@/lib/types';
 import { ColorBar } from '@/components/Meta';
-import { colors, space } from '@/theme';
+import { colors, space, themed } from '@/theme';
 
 type Filter = 'recent' | 'top';
 const PAGE = 5;
@@ -232,7 +232,7 @@ function RaceItem({ g, open, last, onToggle }: { g: RaceGroup; open: boolean; la
 }
 
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: space.m, marginBottom: space.l },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
@@ -240,4 +240,4 @@ const styles = StyleSheet.create({
   detail: { paddingLeft: space.l + 16, paddingRight: space.l, paddingBottom: space.m },
   detailLine: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 5 },
   more: { alignItems: 'center', paddingVertical: space.m, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.line },
-});
+}));

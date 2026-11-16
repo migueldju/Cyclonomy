@@ -15,7 +15,7 @@ import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from 
 import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
-import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, type } from '@/theme';
+import { cardShadow, categoryColor, categoryName, categoryRank, colors, fonts, space, themed, type } from '@/theme';
 
 export default function Calendario() {
   const { leagueId } = useLeague();
@@ -311,7 +311,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   stageCol: { width: 116 },
   winner: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   month: { backgroundColor: colors.paper, borderRadius: 20, padding: space.s, paddingBottom: space.m, ...cardShadow },
@@ -350,9 +350,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   trLast: { borderBottomWidth: 0 },
   th: { backgroundColor: colors.asphalt, paddingVertical: 7, borderBottomWidth: 0 },
-  thText: { color: colors.paper },
+  thText: { color: colors.onDark },
   posCol: { width: 34 },
   flagCell: { width: 18, alignItems: 'center' },
   numCol: { width: 64, textAlign: 'right' },
   teamCol: { width: 104, textAlign: 'right' },
-});
+}));

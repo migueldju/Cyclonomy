@@ -17,7 +17,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { countdown, dateTime, money, moneyShort, points } from '@/lib/format';
 import type { MarketRow } from '@/lib/types';
-import { colors, fonts, space, type } from '@/theme';
+import { colors, fonts, space, themed, type } from '@/theme';
 
 export default function Mercado() {
   const { leagueId, me, refresh } = useLeague();
@@ -121,11 +121,11 @@ export default function Mercado() {
   );
 }
 
-const TREND = {
+const TREND = themed(() => ({
   1: { icon: 'arrow-up', color: colors.green },
   0: { icon: 'remove', color: colors.inkSoft },
   [-1]: { icon: 'arrow-down', color: colors.red },
-} as const;
+} as const));
 
 const bids = (n: number) => t(n === 1 ? 'market.bids.one' : 'market.bids.other', { n });
 
@@ -169,8 +169,8 @@ function ListingRow({ r, last, onPress }: { r: MarketRow; last: boolean; onPress
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   sub: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
   pts: { backgroundColor: colors.road, borderRadius: 6, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 6, paddingVertical: 1 },
   ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
-});
+}));

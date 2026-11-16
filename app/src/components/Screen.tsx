@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { colors, space } from '../theme';
+import { colors, space, themed } from '../theme';
 
 /** Contenedor con scroll y "tirar para actualizar". Abajo, un poco de aire bajo la última tarjeta: la barra
  *  de pestañas no tapa la última tarjeta */
@@ -30,7 +30,7 @@ export function Field({ children }: { children: ReactNode }) {
   return <View style={{ marginBottom: space.l }}>{children}</View>;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.road },
   fill: { flexGrow: 1, minHeight: space.xl },           // aire bajo la última tarjeta
-});
+}));

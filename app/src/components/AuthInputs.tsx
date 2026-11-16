@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 import { t } from '../i18n';
 import { passwordStrength } from '../lib/auth';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { Txt } from './Txt';
 
 const DOTS = Platform.OS === 'android';
 
-const METER = [colors.red, colors.orange, '#C9A12A', colors.green];
+const METER = themed(() => [colors.red, colors.orange, '#C9A12A', colors.green]);
 
 /** Campo de contraseña con el ojo para verla y, si se pide, el medidor de seguridad */
 export function PasswordInput({ label, hint, meter, ...rest }: TextInputProps & { label: string; hint?: string; meter?: boolean }) {
@@ -77,7 +77,7 @@ export function ResendButton({ onResend, seconds = 60 }: { onResend: () => Promi
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   box: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line,
     borderRadius: 14,
@@ -93,4 +93,4 @@ const styles = StyleSheet.create({
     backgroundColor: colors.road, borderRadius: 16, paddingVertical: 14,
     textAlign: 'center', fontFamily: fonts.number, fontSize: 30, letterSpacing: 10, color: colors.ink,
   },
-});
+}));

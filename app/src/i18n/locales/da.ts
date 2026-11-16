@@ -491,6 +491,11 @@ const da: Partial<Dict> = {
   "chart.range.3m": "3 mdr",
   "chart.range.all": "Alt",
   "profile.photoError": "Billedet kunne ikke læses. Prøv et andet.",
+  "profile.theme": "Udseende",
+  "profile.themeHint": "Appens tema",
+  "theme.system": "System",
+  "theme.light": "Lyst",
+  "theme.dark": "Mørkt",
   "topbar.profile": "Min profil",
 };
 

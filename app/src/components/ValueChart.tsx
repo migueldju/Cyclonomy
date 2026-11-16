@@ -3,7 +3,7 @@ import { GestureResponderEvent, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { t } from '../i18n';
 import { dayMonth, moneyShort } from '../lib/format';
-import { colors, space } from '../theme';
+import { colors, space, themed } from '../theme';
 import { Pills } from './Hero';
 import { Txt } from './Txt';
 
@@ -127,8 +127,8 @@ function Chart({ points }: { points: Point[] }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   readout: { flexDirection: 'row', alignItems: 'baseline', gap: space.s, flexWrap: 'wrap' },
   tick: { position: 'absolute', fontSize: 11, lineHeight: 18 },
   xAxis: { flexDirection: 'row', justifyContent: 'space-between' },
-});
+}));

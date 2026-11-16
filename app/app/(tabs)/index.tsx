@@ -18,7 +18,7 @@ import { stageLabel } from '@/lib/stages';
 import { course, dateRange, dayMonth, moneyShort, points, time, todayISO } from '@/lib/format';
 import { inviteMessage } from '@/lib/invite';
 import type { CalendarRow, TodayRow } from '@/lib/types';
-import { categoryColor, categoryRank, colors, space } from '@/theme';
+import { categoryColor, categoryRank, colors, space, themed } from '@/theme';
 
 export default function Inicio() {
   const { leagueId, me } = useLeague();
@@ -176,9 +176,9 @@ function RaceRow({ r, last }: { r: CalendarRow; last: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   hero: { flexDirection: 'row', alignItems: 'center', gap: space.m },
   warning: { color: colors.red, paddingHorizontal: space.l + 4, paddingTop: space.m },
   swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
   flagCol: { width: 18, alignSelf: 'flex-start', marginTop: 6 },     // 6 = (alto de línea 24 − bandera 12) / 2
-});
+}));

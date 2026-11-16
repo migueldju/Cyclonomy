@@ -1,4 +1,5 @@
 import { Image, StyleSheet, View } from 'react-native';
+import { themed } from '../theme';
 
 /**
  * Bandera pequeña del país (código ISO de 2 letras, como lo da PCS). Imágenes de flagcdn.com (dominio público):
@@ -18,6 +19,6 @@ export function Flag({ code, height = 12 }: { code: string | null | undefined; h
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   box: { alignItems: 'center', justifyContent: 'center' },
-});
+}));

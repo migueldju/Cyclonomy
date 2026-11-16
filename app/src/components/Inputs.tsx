@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, StyleSheet, Switch, TextInput, TextInputProps, View } from 'react-native';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { t } from '../i18n';
 import { Txt } from './Txt';
 
@@ -78,7 +78,7 @@ export function Toggle({ label, value, onChange, hint, icon, extra }: {
         <View style={styles.stepSlot}>{extra}</View>
         <View style={styles.valueSlot}>
           <Switch value={value} onValueChange={onChange} trackColor={{ true: colors.jersey, false: colors.line }}
-                  thumbColor={colors.paper} accessibilityLabel={label} />
+                  thumbColor={colors.onDark} accessibilityLabel={label} />
         </View>
         <View style={styles.stepSlot} />
       </View>
@@ -87,7 +87,7 @@ export function Toggle({ label, value, onChange, hint, icon, extra }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   input: {
     backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, borderRadius: 14,
     paddingHorizontal: space.l, paddingVertical: 13, fontFamily: fonts.body, fontSize: type.body, color: colors.ink,
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   stepBtn: {
     width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.paper,
   },
-});
+}));

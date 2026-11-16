@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, ViewStyle } from 'react-native';
-import { colors, fonts, type } from '../theme';
+import { colors, fonts, themed, type } from '../theme';
 import { Txt } from './Txt';
 
 type Kind = 'primary' | 'secondary' | 'dark' | 'danger' | 'quiet';
@@ -41,15 +41,15 @@ export function Button({
   );
 }
 
-const kinds: Record<Kind, { bg: string; fg: string; border: string }> = {
+const kinds = themed((): Record<Kind, { bg: string; fg: string; border: string }> => ({
   primary: { bg: colors.jersey, fg: colors.jerseyInk, border: colors.jersey },
   secondary: { bg: colors.paper, fg: colors.ink, border: colors.ink },
   dark: { bg: colors.ink, fg: colors.paper, border: colors.ink },              // llamativo: negro, letra blanca
   danger: { bg: colors.paper, fg: colors.red, border: colors.red },
   quiet: { bg: 'transparent', fg: colors.ink, border: 'transparent' },
-};
+}));
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   base: {
     minHeight: 48, paddingHorizontal: 20, borderRadius: 14, borderWidth: 1.5,
     flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center',
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 3, shadowOffset: { width: 0, height: 2 }, elevation: 2,
   },
   disabled: { opacity: 0.45 },
-});
+}));

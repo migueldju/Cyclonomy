@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { t } from '../i18n';
-import { fonts } from '../theme';
+import { fonts, themed } from '../theme';
 
 // Maillot con el puesto en el pecho: amarillo el líder, plata el 2.º, bronce el 3.º y blanco el resto.
 // fill: el cuerpo · trim: cuello, puños y bajo · edge: el contorno · ink: el número
@@ -52,6 +52,6 @@ export function PositionJersey({ position, size = 36 }: { position: number | nul
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   center: { alignItems: 'center', justifyContent: 'center' },
-});
+}));

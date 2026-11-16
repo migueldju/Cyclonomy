@@ -6,7 +6,7 @@ import { api } from '../lib/api';
 import { money, moneyShort } from '../lib/format';
 import { CLAUSE_MAX_PCT, CLAUSE_MIN_PCT, clauseChange, clauseCurrentPct } from '../lib/rosterActions';
 import type { RosterRow } from '../lib/types';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { StatTile, StatTiles } from './Hero';
 import { InfoButton } from './Info';
@@ -107,7 +107,7 @@ export function ClauseSheet({ row, available, visible, onClose, onDone }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   headline: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.s, flexWrap: 'wrap',
     backgroundColor: colors.road, borderRadius: 18, paddingVertical: space.m, paddingHorizontal: space.l, marginBottom: space.m,
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.road,
   },
   ends: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 44 },
-});
+}));

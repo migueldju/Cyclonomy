@@ -10,7 +10,7 @@ import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { authErrorText, redirectTo, signInWithGoogle } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { colors, fonts, space } from '@/theme';
+import { colors, fonts, space, themed } from '@/theme';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -54,8 +54,8 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   tagline: { fontFamily: fonts.bodyMedium, textAlign: 'center', color: colors.inkSoft, marginBottom: space.xl },
   link: { fontFamily: fonts.bodyBold, color: colors.ink, textDecorationLine: 'underline' },
   forgot: { alignSelf: 'flex-end', marginTop: -space.s, marginBottom: space.m },
-});
+}));

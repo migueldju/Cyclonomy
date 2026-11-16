@@ -3,7 +3,7 @@ import Svg, { Ellipse, G, Path } from 'react-native-svg';
 import { t } from '../i18n';
 import { RIDER_LOOKS } from '../lib/riderLooks';
 import { teamKit } from '../lib/teamKits';
-import { colors } from '../theme';
+import { colors, themed } from '../theme';
 
 /** Ciclista ilustrado con el maillot de su equipo y sus rasgos (de su foto si la tenemos; si no, al azar). */
 export function RiderAvatar({ name, team, size = 40 }: {
@@ -257,7 +257,7 @@ function Cyclist({ team, name, size }: { team?: string | null; name: string; siz
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   base: { overflow: 'hidden', backgroundColor: colors.line },
   figureBg: { backgroundColor: '#DCE3DF' },
-});
+}));

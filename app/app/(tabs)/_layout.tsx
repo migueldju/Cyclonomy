@@ -4,7 +4,7 @@ import { type ColorValue, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TopBar } from '@/components/TopBar';
 import { t } from '@/i18n';
-import { colors, fonts } from '@/theme';
+import { colors, fonts, themed } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 // la pestaña activa lleva el icono relleno; las demás, solo el contorno
@@ -44,8 +44,8 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   bar: { flex: 1, backgroundColor: colors.asphalt, borderTopLeftRadius: 22, borderTopRightRadius: 22 },
   icon: { width: 52, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   iconOn: { backgroundColor: colors.jersey },
-});
+}));

@@ -17,7 +17,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { dateRange, dateTime, moneyShort, points } from '@/lib/format';
 import { CategoryBadge, MetaItem, MetaLine } from '@/components/Meta';
-import { colors, space } from '@/theme';
+import { colors, space, themed } from '@/theme';
 
 /** Inscripción de una carrera: hasta el máximo de su categoría, hasta la salida de la 1.ª etapa */
 export default function Inscripcion() {
@@ -100,7 +100,7 @@ export default function Inscripcion() {
           return (
             <Pressable key={r.rider_id} onPress={() => toggle(r.rider_id)} disabled={disabled}
                        accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled }}
-                       style={[styles.row, i < riders.length - 1 && styles.line, on && { backgroundColor: '#FFF7D1' },
+                       style={[styles.row, i < riders.length - 1 && styles.line, on && { backgroundColor: colors.highlight },
                                disabled && !on && { opacity: 0.5 }]}>
               <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={26} color={on ? colors.ink : colors.line} />
               <View style={{ flex: 1 }}>
@@ -132,7 +132,7 @@ export default function Inscripcion() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
-});
+}));

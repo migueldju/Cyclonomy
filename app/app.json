@@ -5,7 +5,7 @@
     "scheme": "cyclonomy",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "bundleIdentifier": "com.tuempresa.cyclonomy",
       "supportsTablet": false

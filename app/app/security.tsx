@@ -16,7 +16,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { authErrorText, redirectTo } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { colors, space } from '@/theme';
+import { colors, space, themed } from '@/theme';
 
 type Panel = 'email' | 'password' | 'delete' | null;
 
@@ -184,6 +184,6 @@ export default function Seguridad() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   block: { padding: space.l, gap: space.m },
-});
+}));

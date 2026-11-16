@@ -12,7 +12,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { resetTo } from '@/lib/nav';
-import { cardShadow, colors, space } from '@/theme';
+import { cardShadow, colors, space, themed } from '@/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function CrearLiga() {
@@ -54,8 +54,8 @@ export default function CrearLiga() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { width: '100%', maxWidth: 560, alignSelf: 'center' },
   card: { backgroundColor: colors.paper, borderRadius: 20, padding: space.l, ...cardShadow },
   head: { marginBottom: space.l },
-});
+}));

@@ -14,7 +14,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { course, dateRange, dateTime, dayMonth, ordinal, points } from '@/lib/format';
 import type { RaceDetail, StageScores } from '@/lib/types';
-import { colors, fonts, space } from '@/theme';
+import { colors, fonts, space, themed } from '@/theme';
 
 type View_ = 'scores' | 'entries';
 
@@ -215,7 +215,7 @@ function StageItem({ leagueId, item, isOpen, onToggle, last, open }: {
                  style={({ pressed }) => [styles.teamRow, expanded && styles.stageOpen,
                                           pressed && { backgroundColor: expanded ? colors.asphaltSoft : colors.road }]}>
         <View style={{ flex: 1 }}>
-          <Txt variant="lead" style={expanded && { color: colors.paper }}>
+          <Txt variant="lead" style={expanded && { color: colors.onDark }}>
             {part === 'final' ? t('kind.gc') : stage.number === 0 ? t('race.prologue') : t('race.stageN', { n: stage.number })}
           </Txt>
           {part === 'final' ? null : (
@@ -230,7 +230,7 @@ function StageItem({ leagueId, item, isOpen, onToggle, last, open }: {
             <View style={styles.winnerName}>
               <Ionicons name="trophy" size={13} color={colors.jersey} />
               <Flag code={winner.nationality} />
-              <Txt numberOfLines={1} style={[styles.winnerText, expanded && { color: colors.paper }]}>{winner.name}</Txt>
+              <Txt numberOfLines={1} style={[styles.winnerText, expanded && { color: colors.onDark }]}>{winner.name}</Txt>
             </View>
             {winner.team ? (
               <Txt variant="small" numberOfLines={1} style={[{ textAlign: 'right' }, expanded && { color: colors.line }]}>
@@ -306,9 +306,9 @@ function StageScoresBody({ data, open, compact, ridersOnly }: {
 }
 
 // color de la cabecera de los puntos de una etapa abierta
-const TINT = {
-  scores: { bg: '#DDF0E4', bar: colors.green, ink: '#0E4F2C' },
-};
+const TINT = themed(() => ({
+  scores: { bg: colors.greenSoft, bar: colors.green, ink: colors.greenInk },
+}));
 
 /** Tarjeta de un bloque dentro de una etapa abierta, con la cabecera de su color */
 function Panel({ title, tint, children }: { title: string; tint: (typeof TINT)['scores']; children: ReactNode }) {
@@ -336,7 +336,7 @@ function StageRiders({ data, open }: { data: StageScores; open: (riderId: number
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   winner: { alignItems: 'flex-end', maxWidth: '42%', gap: 2 },
   myPoints: { minWidth: 48, textAlign: 'right' },
   winnerName: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
@@ -354,4 +354,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.l, paddingVertical: space.s,
     backgroundColor: colors.road, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line,
   },
-});
+}));

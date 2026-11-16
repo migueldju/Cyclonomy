@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { cardShadow, colors, fonts, space, type } from '../theme';
+import { cardShadow, colors, fonts, space, themed, type } from '../theme';
 import { Screen } from './Screen';
 import { Txt } from './Txt';
 
@@ -16,7 +16,7 @@ export function AuthScreen({ title, subtitle, children, footer }: {
   return (
     <Screen padded>
       <View style={[styles.wrap, { paddingTop: insets.top + space.xxl }]}>
-        <Image source={require('../../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
+        <Image source={require('../../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain" tintColor={colors.ink}
                accessibilityLabel="Cyclonomy" />
         <View style={styles.card}>
           {title ? <Txt style={[styles.title, { marginBottom: subtitle ? space.xs : space.l }]}>{title}</Txt> : null}
@@ -34,7 +34,7 @@ export function Divider() {
   return <View style={styles.or} />;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   // centrado y sin estirarse en pantallas anchas (web, tableta)
   wrap: { width: '100%', maxWidth: 460, alignSelf: 'center' },
   logo: { width: 214, height: 36, alignSelf: 'center', marginBottom: space.xl },          // 1200 × 202
@@ -43,4 +43,4 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.bodyBold, fontSize: type.title, color: colors.ink, letterSpacing: -0.2 },
   footer: { alignItems: 'center', marginTop: space.l, gap: space.xs },
   or: { height: 1, backgroundColor: colors.line, marginVertical: space.l },
-});
+}));

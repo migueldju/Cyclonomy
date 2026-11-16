@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLeague } from '../context/LeagueContext';
 import { t } from '../i18n';
 import { moneyShort } from '../lib/format';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { PositionJersey } from './PositionJersey';
 import { Txt } from './Txt';
 
@@ -21,7 +21,7 @@ export function TopBar({ back }: { back?: boolean }) {
       <View style={styles.left}>
         {back ? (
           <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={10}>
-            <Ionicons name="chevron-back" size={22} color={colors.paper} />
+            <Ionicons name="chevron-back" size={22} color={colors.onDark} />
           </Pressable>
         ) : null}
         <Pressable onPress={() => router.push('/profile')} accessibilityRole="button" accessibilityLabel={t('topbar.profile')}>
@@ -57,7 +57,7 @@ function goBack() {
   else router.replace('/');
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   wrap: { backgroundColor: colors.road },      // lo que asoma tras las esquinas redondeadas
   bar: {
     backgroundColor: colors.asphalt, flexDirection: 'row', alignItems: 'center',
@@ -67,9 +67,9 @@ const styles = StyleSheet.create({
   left: { flexDirection: 'row', alignItems: 'center', gap: space.s, minWidth: 92 },
   avatar: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, borderColor: colors.jersey },
   avatarEmpty: { backgroundColor: colors.asphaltSoft, alignItems: 'center', justifyContent: 'center' },
-  initials: { fontFamily: fonts.bodyBold, color: colors.paper, fontSize: type.small },
-  team: { flex: 1, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.8, color: colors.paper },
+  initials: { fontFamily: fonts.bodyBold, color: colors.onDark, fontSize: type.small },
+  team: { flex: 1, textAlign: 'center', fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.8, color: colors.onDark },
   pill: { backgroundColor: colors.asphaltSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
   right: { flexDirection: 'row', alignItems: 'center', gap: space.s, minWidth: 92, justifyContent: 'flex-end' },
   value: { fontFamily: fonts.number, fontSize: type.body, color: colors.jersey },
-});
+}));

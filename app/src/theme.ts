@@ -3,13 +3,13 @@ import type { Key } from './i18n/types';
 
 // Identidad visual: la carretera y el dorsal.
 // Asfalto para la barra superior, gris de marca vial de fondo, amarillo maillot para la acción principal.
-export const colors = {
-  asphalt: '#1E272C',      // barra superior, texto principal
+const LIGHT = {
+  asphalt: '#1E272C',      // barra superior y de pestañas: oscura en los dos temas
   asphaltSoft: '#3A464D',
   road: '#EEF1EF',         // fondo, claro: las tarjetas blancas se separan con sombra
   paper: '#FFFFFF',        // dorsal, superficies
   line: '#E3E8E5',         // separadores
-  ink: '#1E272C',
+  ink: '#1E272C',          // texto principal
   inkSoft: '#5E6B71',
   jersey: '#F4C63F',       // acción principal: el amarillo del logo
   jerseyInk: '#2A2300',
@@ -17,7 +17,81 @@ export const colors = {
   orange: '#E9852B',       // llega el lunes
   red: '#D23A3A',          // se va el lunes / errores
   focus: '#2F6FDB',
+  blue: '#2F6FB7',         // blindado
+  onDark: '#FFFFFF',       // texto sobre asfalto o sobre un color: blanco en los dos temas
+  onLight: '#1E272C',      // texto sobre un color claro (amarillo, gris): oscuro en los dos temas
+  highlight: '#FFF7D1',    // fila o tarjeta destacada (la tuya, la elegida)
+  zebra: '#F7F9F8',        // filas alternas de las tablas
+  greenSoft: '#DDF0E4',    // cabecera verde suave
+  greenInk: '#0E4F2C',
 };
+
+// Tema oscuro: mismo papel de cada color, sobre fondo casi negro y tarjetas gris asfalto
+const DARK: typeof LIGHT = {
+  asphalt: '#1E272C',
+  asphaltSoft: '#3A464D',
+  road: '#0E1315',
+  paper: '#1A2125',
+  line: '#2C373D',
+  ink: '#EEF1EF',
+  inkSoft: '#9BA8AE',
+  jersey: '#F4C63F',
+  jerseyInk: '#2A2300',
+  green: '#3DBE78',
+  orange: '#F09A4A',
+  red: '#F06A6A',
+  focus: '#6EA0F0',
+  blue: '#6FA6E0',
+  onDark: '#FFFFFF',
+  onLight: '#1E272C',
+  highlight: '#3A3214',
+  zebra: '#20292E',
+  greenSoft: '#173A27',
+  greenInk: '#9FE0BB',
+};
+
+/** Colores del tema actual. El objeto es siempre el mismo: al cambiar de tema se le cambian los valores. */
+export const colors = { ...LIGHT };
+
+let version = 0;
+let dark = false;
+export const isDark = () => dark;
+
+/** Pone el tema claro u oscuro. Quien lo llama vuelve a pintar la app (ver ThemeProvider). */
+export function applyScheme(toDark: boolean) {
+  if (toDark === dark) return;
+  dark = toDark;
+  Object.assign(colors, dark ? DARK : LIGHT);
+  // las WorldTour van en asfalto: sobre las tarjetas oscuras no se verían
+  categoryColor.MWT = categoryColor.WT = dark ? '#D5DCDF' : '#1E272C';
+  version += 1;
+}
+
+/**
+ * Estilos (o cualquier tabla de colores) que dependen del tema: se calculan la primera vez que se usan y otra vez
+ * cuando cambia el tema. Se usa igual que el objeto que devuelve `make`.
+ */
+export function themed<T extends object>(make: () => T): T {
+  let cache: T | null = null;
+  let at = -1;
+  const now = (): T => {
+    if (!cache || at !== version) { cache = make(); at = version; }
+    return cache;
+  };
+  return new Proxy({} as T, {
+    get: (_, key) => {
+      const target = now() as Record<PropertyKey, unknown>;
+      const v = target[key];
+      return typeof v === 'function' ? (v as (...a: unknown[]) => unknown).bind(target) : v;
+    },
+    has: (_, key) => key in now(),
+    ownKeys: () => Reflect.ownKeys(now()),
+    getOwnPropertyDescriptor: (_, key) => {
+      const d = Reflect.getOwnPropertyDescriptor(now(), key);
+      return d ? { ...d, configurable: true } : undefined;
+    },
+  });
+}
 
 export const fonts = {
   body: 'FiraSans_400Regular',

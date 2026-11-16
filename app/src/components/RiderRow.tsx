@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
 import { moneyShort } from '../lib/format';
 import type { RiderStatus } from '../lib/types';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Flag } from './Flag';
 import { RiderAvatar } from './RiderAvatar';
 import { Txt } from './Txt';
@@ -63,7 +63,7 @@ export function RiderRow({ name, team, value, detail, note, onPress, last, right
   ) : <View>{content}</View>;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.l, paddingVertical: space.m, gap: space.m },
   main: { flex: 1, gap: 2 },
   // las dos líneas de cada lado miden lo mismo, para que equipo y cláusula queden a la misma altura
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   ptsText: { fontFamily: fonts.bodyBold, fontSize: type.small - 1, color: colors.ink },
   tag: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   line: { height: StyleSheet.hairlineWidth, backgroundColor: colors.line },
-});
+}));
 
 /** Avisos de un ciclista de una plantilla: llega o se va el lunes, en venta, blindado, oferta del juego */
 export function riderTags(r: { status: RiderStatus; for_sale?: boolean; locked?: boolean; locked_next?: boolean; gameOffer?: string | null }): RiderTag[] {
@@ -84,8 +84,8 @@ export function riderTags(r: { status: RiderStatus; for_sale?: boolean; locked?:
   if (r.status === 'incoming') out.push({ icon: 'enter-outline', text: t('status.incoming'), color: colors.orange });
   if (r.status === 'leaving') out.push({ icon: 'exit-outline', text: t('status.leaving'), color: colors.red });
   if (r.for_sale) out.push({ icon: 'pricetag', text: t('squad.forSale'), color: colors.green });
-  if (r.locked) out.push({ icon: 'lock-closed', text: t('squad.locked'), color: '#2F6FB7' });
-  else if (r.locked_next) out.push({ icon: 'lock-closed-outline', text: t('squad.lockedNext'), color: '#2F6FB7' });
+  if (r.locked) out.push({ icon: 'lock-closed', text: t('squad.locked'), color: colors.blue });
+  else if (r.locked_next) out.push({ icon: 'lock-closed-outline', text: t('squad.lockedNext'), color: colors.blue });
   if (r.gameOffer) out.push({ icon: 'cash-outline', text: t('squad.gameOffers', { amount: r.gameOffer }), color: colors.inkSoft });
   return out;
 }

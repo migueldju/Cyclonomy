@@ -3,7 +3,7 @@ import { type ComponentProps, ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
 import { ErrorText } from './Section';
@@ -196,7 +196,7 @@ export function AmountSheet({ visible, onClose, title, subtitle, chips, min, ini
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   action: {
     flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: space.m, paddingHorizontal: space.m,
     borderRadius: 14, backgroundColor: colors.road, marginBottom: space.s,
@@ -232,4 +232,4 @@ const styles = StyleSheet.create({
   quick: { flexDirection: 'row', gap: space.s, marginBottom: space.l },
   bump: { flex: 1, alignItems: 'center', backgroundColor: colors.road, borderRadius: 999, paddingVertical: 9 },
   bumpText: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.ink },
-});
+}));

@@ -490,6 +490,11 @@ const es = {
   "chart.range.3m": "3 meses",
   "chart.range.all": "Total",
   "profile.photoError": "No se ha podido leer la foto. Prueba con otra.",
+  "profile.theme": "Apariencia",
+  "profile.themeHint": "Tema de la app",
+  "theme.system": "Sistema",
+  "theme.light": "Claro",
+  "theme.dark": "Oscuro",
   "topbar.profile": "Mi perfil",
 } as const;
 

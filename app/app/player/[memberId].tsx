@@ -16,7 +16,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { money, moneyShort, ordinal, points } from '@/lib/format';
 import type { RosterRow } from '@/lib/types';
-import { cardShadow, colors, fonts, space, type } from '@/theme';
+import { cardShadow, colors, fonts, space, themed, type } from '@/theme';
 
 /** Plantilla de otro jugador: desde aquí se hacen ofertas y se pagan cláusulas */
 export default function Jugador() {
@@ -123,9 +123,9 @@ function ValueHistory({ leagueId, riderId }: { leagueId: string; riderId: number
   return <ValueChart points={detail.data.values} />;
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   chart: { minHeight: 150, backgroundColor: colors.paper, borderRadius: 20, overflow: 'hidden', ...cardShadow },
   crest: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.line },
   crestEmpty: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.asphaltSoft },
-  crestInitial: { fontFamily: fonts.display, fontSize: type.display, color: colors.paper },
-});
+  crestInitial: { fontFamily: fonts.display, fontSize: type.display, color: colors.onDark },
+}));

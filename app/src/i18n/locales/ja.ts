@@ -491,6 +491,11 @@ const ja: Partial<Dict> = {
   "chart.range.3m": "3か月",
   "chart.range.all": "全期間",
   "profile.photoError": "写真を読み込めませんでした。別の写真をお試しください。",
+  "profile.theme": "外観",
+  "profile.themeHint": "アプリのテーマ",
+  "theme.system": "システム",
+  "theme.light": "ライト",
+  "theme.dark": "ダーク",
   "topbar.profile": "プロフィール",
 };
 

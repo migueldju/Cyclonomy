@@ -491,6 +491,11 @@ const ar: Partial<Dict> = {
   "chart.range.3m": "3 أشهر",
   "chart.range.all": "الكل",
   "profile.photoError": "تعذّرت قراءة الصورة. جرّب صورة أخرى.",
+  "profile.theme": "المظهر",
+  "profile.themeHint": "سمة التطبيق",
+  "theme.system": "النظام",
+  "theme.light": "فاتح",
+  "theme.dark": "داكن",
   "topbar.profile": "ملفي الشخصي",
 };
 

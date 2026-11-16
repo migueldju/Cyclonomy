@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
-import { cardShadow, colors, fonts, space, type } from '../theme';
+import { cardShadow, colors, fonts, space, themed, type } from '../theme';
 import { Txt } from './Txt';
 
 /** Tarjeta de cabecera de una pantalla: el resumen (título, cifras, filtros) sobre blanco, como las secciones */
@@ -61,7 +61,7 @@ export function Pills<T extends string>({ options, value, onChange, style, compa
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   card: {
     backgroundColor: colors.paper, marginHorizontal: space.l, marginTop: space.l, padding: space.l, borderRadius: 20,
     ...cardShadow,
@@ -71,10 +71,10 @@ const styles = StyleSheet.create({
     flexGrow: 1, flexBasis: '45%', backgroundColor: colors.road, borderRadius: 14, paddingHorizontal: space.m,
     paddingVertical: 10, gap: 2, justifyContent: 'space-between',
   },
-  tileOpen: { backgroundColor: '#FFF7D1' },
+  tileOpen: { backgroundColor: colors.highlight },
   tileValue: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   pills: { flexDirection: 'row', alignSelf: 'flex-start', backgroundColor: colors.line, borderRadius: 999, padding: 3 },
   pill: { paddingHorizontal: space.l, paddingVertical: 6, borderRadius: 999 },
   pillOn: { backgroundColor: colors.ink },
   pillText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink, letterSpacing: 0.2 },
-});
+}));

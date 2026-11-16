@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { COUNTRIES, countryName } from '../lib/countries';
-import { colors, fonts, space, type } from '../theme';
+import { colors, fonts, space, themed, type } from '../theme';
 import { Flag } from './Flag';
 import { Sheet } from './Modal';
 import { Txt } from './Txt';
@@ -55,7 +55,7 @@ export function CountryPicker({ value, onChange, label, hint = true }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   field: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.paper, borderWidth: 1,
     borderColor: colors.line, borderRadius: 14, paddingHorizontal: space.l, paddingVertical: 13,
@@ -66,4 +66,4 @@ const styles = StyleSheet.create({
   },
   option: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: 10, paddingHorizontal: space.s,
             borderRadius: 12 },
-});
+}));

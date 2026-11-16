@@ -15,7 +15,7 @@ import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, points } from '@/lib/format';
 import type { RankingRow } from '@/lib/types';
-import { cardShadow, colors, fonts, space, type } from '@/theme';
+import { cardShadow, colors, fonts, space, themed, type } from '@/theme';
 
 // Propietario: todos, libres, míos o los de un jugador concreto (member_id)
 type Owner = 'all' | 'free' | 'mine' | string;
@@ -134,7 +134,7 @@ function normalize(s: string) {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   filters: {
     margin: space.l, padding: space.l, gap: space.m, backgroundColor: colors.paper, borderRadius: 20, ...cardShadow,
   },
@@ -155,4 +155,4 @@ const styles = StyleSheet.create({
   nameLine: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   valueHead: { flexDirection: 'row', justifyContent: 'space-between' },
   mine: { color: colors.green, fontFamily: fonts.bodyBold },
-});
+}));

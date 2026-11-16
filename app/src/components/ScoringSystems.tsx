@@ -5,7 +5,7 @@ import { useLoader } from '../hooks/useLoader';
 import { t } from '../i18n';
 import { api } from '../lib/api';
 import type { Category, ScoringScheme, ScoringSystem } from '../lib/types';
-import { categoryLabel, categoryName, colors, fonts, space } from '../theme';
+import { categoryLabel, categoryName, colors, fonts, space, themed } from '../theme';
 import { Button } from './Button';
 import { Sheet } from './Modal';
 import { Row } from './Section';
@@ -205,7 +205,7 @@ export function ScoringSystemPicker({ system, wtSplit, onChange }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   card: {
     flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.s, borderWidth: 1.5, borderColor: colors.line,
     borderRadius: 16, backgroundColor: colors.paper, paddingLeft: space.m, paddingRight: space.s, paddingVertical: space.s,
@@ -213,15 +213,15 @@ const styles = StyleSheet.create({
   // la elegida se distingue por el fondo amarillo y el borde: sin círculo, el nombre cabe entero
   cardTitle: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 16, color: colors.ink },
   how: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.road, alignItems: 'center', justifyContent: 'center' },
-  cardOn: { borderColor: colors.asphalt, backgroundColor: '#FFF7D1' },
+  cardOn: { borderColor: colors.ink, backgroundColor: colors.highlight },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: space.s },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.line },
-  radioOn: { borderColor: colors.asphalt, borderWidth: 6 },
+  radioOn: { borderColor: colors.ink, borderWidth: 6 },
   table: { flexDirection: 'row', borderRadius: 12, borderWidth: 1, borderColor: colors.line, overflow: 'hidden' },
   row: { flexDirection: 'row', height: 30 },
   cell: { height: 30, justifyContent: 'center', paddingHorizontal: space.s, borderRightWidth: 1, borderRightColor: colors.line },
   head: { backgroundColor: colors.road },
-  zebra: { backgroundColor: '#F7F9F8' },
+  zebra: { backgroundColor: colors.zebra },
   headText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.inkSoft, textAlign: 'center' },
   rowLabel: { fontFamily: fonts.bodyMedium, color: colors.ink },
   num: { width: CELL_W, height: 30, alignItems: 'center', justifyContent: 'center' },
@@ -236,4 +236,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, overflow: 'hidden',
   },
   link: { fontFamily: fonts.bodyMedium, color: colors.ink, textDecorationLine: 'underline' },
-});
+}));

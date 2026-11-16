@@ -491,6 +491,11 @@ const fr: Partial<Dict> = {
   "chart.range.3m": "3 mois",
   "chart.range.all": "Tout",
   "profile.photoError": "La photo n'a pas pu être lue. Essaies-en une autre.",
+  "profile.theme": "Apparence",
+  "profile.themeHint": "Thème de l'appli",
+  "theme.system": "Système",
+  "theme.light": "Clair",
+  "theme.dark": "Sombre",
   "topbar.profile": "Mon profil",
 };
 

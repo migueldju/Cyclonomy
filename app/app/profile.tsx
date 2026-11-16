@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { Button } from '@/components/Button';
-import { Input } from '@/components/Inputs';
+import { Input, Segmented } from '@/components/Inputs';
 import { LanguagePicker } from '@/components/LanguagePicker';
 import { Screen } from '@/components/Screen';
 import { Section } from '@/components/Section';
@@ -13,10 +13,11 @@ import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
 import { useAuth } from '@/context/AuthContext';
 import { useLeague } from '@/context/LeagueContext';
+import { useTheme } from '@/context/ThemeContext';
 import { LANGUAGES, t, useI18n } from '@/i18n';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
-import { cardShadow, colors, space } from '@/theme';
+import { cardShadow, colors, space, themed } from '@/theme';
 
 // redes de Cyclonomy
 const SOCIAL = [
@@ -46,6 +47,7 @@ export default function Perfil() {
   const { session } = useAuth();
   const { leagueId, me, refresh, selectLeague } = useLeague();
   const { lang, setLang } = useI18n();
+  const { pref, setPref } = useTheme();
   const userId = session?.user.id;
   const [name, setName] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -128,6 +130,14 @@ export default function Perfil() {
         </View>
       </Section>
 
+      <Section title={t('profile.theme')} style={{ marginHorizontal: -space.l }}>
+        <View style={{ padding: space.l, paddingBottom: 0 }}>
+          <Segmented label={t('profile.themeHint')} value={pref} onChange={setPref}
+                     options={[{ value: 'system', label: t('theme.system') }, { value: 'light', label: t('theme.light') },
+                               { value: 'dark', label: t('theme.dark') }]} />
+        </View>
+      </Section>
+
       <View style={{ gap: space.m, marginTop: space.xl }}>
         <Button kind="secondary" label={t('account.title')} onPress={() => router.push('/security')} />
         <Button kind="secondary" label={t('profile.switchLeague')} onPress={() => router.push('/leagues')} />
@@ -156,7 +166,7 @@ export default function Perfil() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => StyleSheet.create({
   head: {
     flexDirection: 'row', alignItems: 'center', gap: space.l, marginBottom: space.xl, backgroundColor: colors.paper,
     borderRadius: 20, padding: space.l, ...cardShadow,
@@ -174,4 +184,4 @@ const styles = StyleSheet.create({
   socialIcon: {
     width: 40, height: 40, borderRadius: 20, backgroundColor: '#000000', overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
   },
-});
+}));
