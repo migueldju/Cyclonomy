@@ -120,7 +120,16 @@ const capitalize = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 const iso = (y: number, m: number, d: number) =>
   `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
-/** Cuadrícula de un mes (semanas de lunes a domingo); cada día, una rayita del color de la categoría por carrera */
+const LANES = 3;          // vueltas por etapas que caben a la vez, una línea cada una
+const MAX_DOTS = 5;       // carreras de un día que caben como puntos
+const ROW_H = 66;         // alto de una semana
+const LANE_TOP = 45;      // donde empiezan las líneas de las vueltas
+
+/**
+ * Cuadrícula de un mes (semanas de lunes a domingo). Las vueltas por etapas son una línea continua de su color que
+ * cruza los días que duran; las carreras de un día, un punto bajo el número. Todo va a alturas fijas: el número, los
+ * puntos y las tres líneas quedan alineados en todos los días.
+ */
 function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: {
   month: string; width: number; races: CalendarRow[]; selected: string; onSelect: (d: string) => void;
   onPrev?: () => void; onNext?: () => void;
@@ -134,6 +143,26 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
   const weekdays = [...wd.slice(1), wd[0]];
   const today = todayISO();
   const cell = (width - space.l * 2 - space.s * 2) / 7;
+
+  // cada vuelta, en su línea: las más importantes primero, y cada una en la primera línea que tenga libre esos días
+  const { tours, lane, singles } = useMemo(() => {
+    const first = iso(y, m, 1), last = iso(y, m, days);
+    const here = races.filter((r) => r.start_date <= last && r.end_date >= first);
+    const multi = here.filter((r) => r.start_date !== r.end_date)
+      .sort((p, q) => categoryRank(p.category) - categoryRank(q.category) || p.start_date.localeCompare(q.start_date));
+    const taken: CalendarRow[][] = [];
+    const where = new Map<number, number>();
+    for (const r of multi) {
+      let l = taken.findIndex((rs) => rs.every((o) => o.end_date < r.start_date || o.start_date > r.end_date));
+      if (l < 0) { l = taken.length; taken.push([]); }
+      taken[l].push(r);
+      where.set(r.race_id, l);
+    }
+    return { tours: multi, lane: where, singles: here.filter((r) => r.start_date === r.end_date) };
+  }, [races, y, m, days]);
+
+  const weeks = Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
+
   return (
     <View style={{ width, paddingHorizontal: space.l, paddingTop: space.l, paddingBottom: space.m }}>
       <View style={styles.month}>
@@ -148,28 +177,62 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
           <Ionicons name="chevron-forward" size={18} color={colors.ink} />
         </Pressable>
       </View>
-      <View style={styles.grid}>
+      <View style={styles.week}>
         {weekdays.map((w) => <Txt key={w} variant="label" style={[styles.weekday, { width: cell }]}>{w}</Txt>)}
-        {cells.map((d, i) => {
-          if (d == null) return <View key={`x${i}`} style={{ width: cell, height: 50 }} />;
-          const date = iso(y, m, d);
-          const here = races.filter((r) => r.start_date <= date && date <= r.end_date)
-            .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
-          const on = date === selected;
-          return (
-            <Pressable key={date} onPress={() => onSelect(date)} accessibilityRole="button" accessibilityState={{ selected: on }}
-                       style={[styles.day, { width: cell }, on && styles.dayOn, date === today && !on && styles.dayToday]}>
-              <Txt style={[styles.dayNum, on && styles.dayNumOn]}>{d}</Txt>
-              <View style={styles.bars}>
-                {here.slice(0, 3).map((r) => (
-                  <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.bar} />
-                ))}
-                {here.length > 3 ? <Txt style={styles.more}>+{here.length - 3}</Txt> : null}
-              </View>
-            </Pressable>
-          );
-        })}
       </View>
+      {weeks.map((week, w) => {
+        const from = week.find((d) => d != null)!, to = [...week].reverse().find((d) => d != null)!;
+        const weekFrom = iso(y, m, from), weekTo = iso(y, m, to);
+        return (
+          <View key={w} style={{ height: ROW_H }}>
+            <View style={styles.week}>
+              {week.map((d, i) => {
+                if (d == null) return <View key={`x${i}`} style={{ width: cell }} />;
+                const date = iso(y, m, d);
+                // puntos: las carreras de un día y las vueltas que no han cabido en las líneas
+                const dots = [
+                  ...singles.filter((r) => r.start_date === date),
+                  ...tours.filter((r) => (lane.get(r.race_id) ?? 0) >= LANES && r.start_date <= date && date <= r.end_date),
+                ].sort((p, q) => categoryRank(p.category) - categoryRank(q.category));
+                const on = date === selected;
+                return (
+                  <Pressable key={date} onPress={() => onSelect(date)} accessibilityRole="button"
+                             accessibilityState={{ selected: on }} style={[styles.day, { width: cell }, on && styles.dayOn]}>
+                    <View style={[styles.num, date === today && styles.numToday, on && styles.numOn]}>
+                      <Txt style={[styles.dayNum, (on || date === today) && styles.dayNumOn, on && { color: colors.jerseyInk }]}>{d}</Txt>
+                    </View>
+                    <View style={styles.dots}>
+                      {dots.slice(0, dots.length > MAX_DOTS ? MAX_DOTS - 1 : MAX_DOTS).map((r) => (
+                        <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.dot} />
+                      ))}
+                      {dots.length > MAX_DOTS ? <View style={[styles.dot, styles.dotMore]} /> : null}
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {/* las vueltas: un tramo por semana, redondeado solo donde la carrera empieza o acaba de verdad */}
+            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+              {tours.map((r) => {
+                const l = lane.get(r.race_id) ?? 0;
+                if (l >= LANES || r.start_date > weekTo || r.end_date < weekFrom) return null;
+                const starts = r.start_date >= weekFrom, ends = r.end_date <= weekTo;
+                const a = week.indexOf(starts ? Number(r.start_date.slice(8)) : from);
+                const z = week.indexOf(ends ? Number(r.end_date.slice(8)) : to);
+                return (
+                  <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal
+                            style={{
+                              position: 'absolute', top: LANE_TOP + l * 6, height: 4,
+                              left: a * cell + (starts ? 5 : 0), width: (z - a + 1) * cell - (starts ? 5 : 0) - (ends ? 5 : 0),
+                              borderTopLeftRadius: starts ? 2 : 0, borderBottomLeftRadius: starts ? 2 : 0,
+                              borderTopRightRadius: ends ? 2 : 0, borderBottomRightRadius: ends ? 2 : 0,
+                            }} />
+                );
+              })}
+            </View>
+          </View>
+        );
+      })}
       </View>
     </View>
   );
@@ -330,20 +393,19 @@ const styles = themed(() => StyleSheet.create({
   month: { backgroundColor: colors.paper, borderRadius: 20, padding: space.s, paddingBottom: space.m, ...cardShadow },
   monthHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: space.s, paddingBottom: space.m },
   monthBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.road, alignItems: 'center', justifyContent: 'center' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap' },
+  week: { flexDirection: 'row' },
   weekday: { textAlign: 'center', paddingBottom: space.xs, textTransform: 'capitalize' },
-  day: { height: 50, alignItems: 'center', paddingTop: 5, borderRadius: 12 },
-  // el día elegido, con borde y sin relleno: las rayas de las carreras (también las negras del WorldTour) se ven igual
-  dayOn: { borderWidth: 2, borderColor: colors.ink, backgroundColor: colors.paper, paddingTop: 3 },
-  dayToday: { backgroundColor: colors.road },
+  day: { height: ROW_H, alignItems: 'center', paddingTop: 3, borderRadius: 12 },
+  dayOn: { backgroundColor: colors.road },
+  // el número, en un círculo: gris el de hoy, amarillo el elegido
+  num: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  numToday: { borderWidth: 1.5, borderColor: colors.ink },
+  numOn: { backgroundColor: colors.jersey, borderWidth: 0 },
   dayNumOn: { fontFamily: fonts.bodyBold },
-  dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
-  bars: {
-    flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 2, marginTop: 4,
-    paddingHorizontal: 3,
-  },
-  bar: { width: 9, height: 4, borderRadius: 2 },
-  more: { fontFamily: fonts.bodyMedium, fontSize: 9, color: colors.inkSoft },
+  dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, lineHeight: 20, color: colors.ink },
+  dots: { flexDirection: 'row', justifyContent: 'center', gap: 2, height: 5, marginTop: 3 },
+  dot: { width: 5, height: 5, borderRadius: 3 },
+  dotMore: { backgroundColor: colors.line },
   dayTitle: { paddingHorizontal: space.l + 4, paddingTop: space.xs, paddingBottom: space.s },
   item: {
     backgroundColor: colors.paper, marginHorizontal: space.l, marginBottom: space.s, borderRadius: 16, overflow: 'hidden',
