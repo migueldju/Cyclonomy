@@ -12,7 +12,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
 import { useContentWidth, useWide } from '@/lib/layout';
-import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
+import { course, dateRange, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
 import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
 import type { CalendarRow, RaceDetail } from '@/lib/types';
@@ -123,6 +123,7 @@ const iso = (y: number, m: number, d: number) =>
 const LANES = 3;          // vueltas por etapas que caben a la vez, una línea cada una
 const MAX_DOTS = 5;       // carreras de un día que caben como puntos
 const ROW_H = 66;         // alto de una semana
+const TIP_W = 230;         // ancho máximo de la cajita con el nombre
 const LANE_TOP = 45;      // donde empiezan las líneas de las vueltas
 
 /**
@@ -163,6 +164,17 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
 
   const weeks = Array.from({ length: cells.length / 7 }, (_, w) => cells.slice(w * 7, w * 7 + 7));
 
+  // cajita con el nombre de la carrera: al pasar el ratón por su línea o su punto, o al tocarlos con el dedo
+  const [tip, setTip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const hide = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (hide.current) clearTimeout(hide.current); }, []);
+  const show = (r: CalendarRow, x: number, y: number, touch: boolean) => {
+    if (hide.current) clearTimeout(hide.current);
+    setTip({ text: `${r.name} · ${dateRange(r.start_date, r.end_date)}`, x, y });
+    if (touch) hide.current = setTimeout(() => setTip(null), 2500);       // con el dedo no hay «salir»: se quita sola
+  };
+  const gridWidth = cell * 7;
+
   return (
     <View style={{ width, paddingHorizontal: space.l, paddingTop: space.l, paddingBottom: space.m }}>
       <View style={styles.month}>
@@ -180,6 +192,7 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
       <View style={styles.week}>
         {weekdays.map((w) => <Txt key={w} variant="label" style={[styles.weekday, { width: cell }]}>{w}</Txt>)}
       </View>
+      <View>
       {weeks.map((week, w) => {
         const from = week.find((d) => d != null)!, to = [...week].reverse().find((d) => d != null)!;
         const weekFrom = iso(y, m, from), weekTo = iso(y, m, to);
@@ -203,7 +216,11 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
                     </View>
                     <View style={styles.dots}>
                       {dots.slice(0, dots.length > MAX_DOTS ? MAX_DOTS - 1 : MAX_DOTS).map((r) => (
-                        <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.dot} />
+                        <Pressable key={r.race_id} onPress={() => onSelect(date)} accessibilityLabel={r.name}
+                                   onHoverIn={() => show(r, i * cell + cell / 2, w * ROW_H + 36, false)}
+                                   onHoverOut={() => setTip(null)}>
+                          <ColorBar category={r.category} name={r.name} horizontal style={styles.dot} />
+                        </Pressable>
                       ))}
                       {dots.length > MAX_DOTS ? <View style={[styles.dot, styles.dotMore]} /> : null}
                     </View>
@@ -212,27 +229,48 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
               })}
             </View>
             {/* las vueltas: un tramo por semana, redondeado solo donde la carrera empieza o acaba de verdad */}
-            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+            <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
               {tours.map((r) => {
                 const l = lane.get(r.race_id) ?? 0;
                 if (l >= LANES || r.start_date > weekTo || r.end_date < weekFrom) return null;
                 const starts = r.start_date >= weekFrom, ends = r.end_date <= weekTo;
                 const a = week.indexOf(starts ? Number(r.start_date.slice(8)) : from);
                 const z = week.indexOf(ends ? Number(r.end_date.slice(8)) : to);
+                const left = a * cell + (starts ? 5 : 0), span = (z - a + 1) * cell - (starts ? 5 : 0) - (ends ? 5 : 0);
+                const top = w * ROW_H + LANE_TOP + l * 6;
                 return (
-                  <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal
-                            style={{
-                              position: 'absolute', top: LANE_TOP + l * 6, height: 4,
-                              left: a * cell + (starts ? 5 : 0), width: (z - a + 1) * cell - (starts ? 5 : 0) - (ends ? 5 : 0),
-                              borderTopLeftRadius: starts ? 2 : 0, borderBottomLeftRadius: starts ? 2 : 0,
-                              borderTopRightRadius: ends ? 2 : 0, borderBottomRightRadius: ends ? 2 : 0,
-                            }} />
+                  <Pressable key={r.race_id} accessibilityLabel={r.name}
+                             style={{ position: 'absolute', top: LANE_TOP + l * 6 - 1, height: 6, left, width: span, justifyContent: 'center' }}
+                             onHoverIn={() => show(r, left + span / 2, top, false)} onHoverOut={() => setTip(null)}
+                             onPress={(e) => {
+                               // el día que queda bajo el dedo (en la web el clic no trae locationX, sino offsetX)
+                               const ne = e.nativeEvent as { locationX?: number; offsetX?: number };
+                               const at = ne.locationX ?? ne.offsetX;
+                               const x = left + (typeof at === 'number' && isFinite(at) ? at : span / 2);
+                               const d = week[Math.min(z, Math.max(a, Math.floor(x / cell)))];
+                               if (d != null) onSelect(iso(y, m, d));
+                               show(r, x, top, true);
+                             }}>
+                    <ColorBar category={r.category} name={r.name} horizontal
+                              style={{
+                                height: 4,
+                                borderTopLeftRadius: starts ? 2 : 0, borderBottomLeftRadius: starts ? 2 : 0,
+                                borderTopRightRadius: ends ? 2 : 0, borderBottomRightRadius: ends ? 2 : 0,
+                              }} />
+                  </Pressable>
                 );
               })}
             </View>
           </View>
         );
       })}
+      {tip ? (
+        <View pointerEvents="none" style={[styles.tipWrap, { top: tip.y - 30,
+                                                           left: Math.max(0, Math.min(gridWidth - TIP_W, tip.x - TIP_W / 2)) }]}>
+          <View style={styles.tip}><Txt numberOfLines={1} style={styles.tipText}>{tip.text}</Txt></View>
+        </View>
+      ) : null}
+      </View>
       </View>
     </View>
   );
@@ -406,6 +444,9 @@ const styles = themed(() => StyleSheet.create({
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 2, height: 5, marginTop: 3 },
   dot: { width: 5, height: 5, borderRadius: 3 },
   dotMore: { backgroundColor: colors.line },
+  tipWrap: { position: 'absolute', width: TIP_W, alignItems: 'center', zIndex: 10 },
+  tip: { maxWidth: TIP_W, backgroundColor: colors.asphalt, borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4, ...cardShadow },
+  tipText: { fontFamily: fonts.bodyMedium, fontSize: type.small, lineHeight: 18, color: colors.onDark },
   dayTitle: { paddingHorizontal: space.l + 4, paddingTop: space.xs, paddingBottom: space.s },
   item: {
     backgroundColor: colors.paper, marginHorizontal: space.l, marginBottom: space.s, borderRadius: 16, overflow: 'hidden',
