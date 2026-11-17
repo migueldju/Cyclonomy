@@ -120,6 +120,8 @@ const capitalize = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 const iso = (y: number, m: number, d: number) =>
   `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
+const MAX_BARS = 6;
+
 /** Cuadrícula de un mes (semanas de lunes a domingo); cada día, una rayita del color de la categoría por carrera */
 function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: {
   month: string; width: number; races: CalendarRow[]; selected: string; onSelect: (d: string) => void;
@@ -161,10 +163,11 @@ function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: 
                        style={[styles.day, { width: cell }, on && styles.dayOn, date === today && !on && styles.dayToday]}>
               <Txt style={[styles.dayNum, on && styles.dayNumOn]}>{d}</Txt>
               <View style={styles.bars}>
-                {here.slice(0, 3).map((r) => (
+                {/* hasta seis rayas en dos filas de tres; con más carreras, la última es un punto («hay más») */}
+                {here.slice(0, here.length > MAX_BARS ? MAX_BARS - 1 : MAX_BARS).map((r) => (
                   <ColorBar key={r.race_id} category={r.category} name={r.name} horizontal style={styles.bar} />
                 ))}
-                {here.length > 3 ? <Txt style={styles.more}>+{here.length - 3}</Txt> : null}
+                {here.length > MAX_BARS ? <View style={styles.more}><View style={styles.moreDot} /></View> : null}
               </View>
             </Pressable>
           );
@@ -338,12 +341,14 @@ const styles = themed(() => StyleSheet.create({
   dayToday: { backgroundColor: colors.road },
   dayNumOn: { fontFamily: fonts.bodyBold },
   dayNum: { fontFamily: fonts.bodyMedium, fontSize: type.body, color: colors.ink },
+  // caja de tamaño fijo (3 rayas de ancho, 2 filas de alto): la primera fila queda a la misma altura en todos los días
   bars: {
-    flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 2, marginTop: 4,
-    paddingHorizontal: 3,
+    flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignContent: 'flex-start', gap: 2, marginTop: 4,
+    width: 31, height: 10,
   },
   bar: { width: 9, height: 4, borderRadius: 2 },
-  more: { fontFamily: fonts.bodyMedium, fontSize: 9, color: colors.inkSoft },
+  more: { width: 9, height: 4, alignItems: 'center', justifyContent: 'center' },
+  moreDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.inkSoft },
   dayTitle: { paddingHorizontal: space.l + 4, paddingTop: space.xs, paddingBottom: space.s },
   item: {
     backgroundColor: colors.paper, marginHorizontal: space.l, marginBottom: space.s, borderRadius: 16, overflow: 'hidden',
