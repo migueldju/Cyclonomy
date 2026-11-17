@@ -11,7 +11,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { getLang, t } from '@/i18n';
 import { api } from '@/lib/api';
-import { useContentWidth } from '@/lib/layout';
+import { useContentWidth, useWide } from '@/lib/layout';
 import { course, dateTime, dayMonth, ordinal, parseDay, points, todayISO } from '@/lib/format';
 import { CategoryBadge, ColorBar, MetaItem, MetaLine } from '@/components/Meta';
 import { stageLabel } from '@/lib/stages';
@@ -24,7 +24,9 @@ export default function Calendario() {
   const { data, error, loading, reload } = useLoader(() => api.calendar(id), [id], !!leagueId);
   const [open, setOpen] = useState<number | null>(null);
   const [day, setDay] = useState(todayISO());
-  const width = useContentWidth();
+  const wide = useWide();
+  const contentWidth = useContentWidth();
+  const width = wide ? 460 : contentWidth;
   const pager = useRef<FlatList<string>>(null);
 
   const rows = data ?? [];
@@ -47,9 +49,8 @@ export default function Calendario() {
   const dayRaces = rows.filter((r) => r.start_date <= day && day <= r.end_date)
     .sort((a, b) => categoryRank(a.category) - categoryRank(b.category));
 
-  const header = (
-    <>
-      {/* un mes por página: se desliza a izquierda y derecha */}
+  // un mes por página: se desliza a izquierda y derecha
+  const monthPager = (
       <FlatList
         ref={pager}
         key={months.length}
@@ -64,12 +65,16 @@ export default function Calendario() {
                      onNext={index < months.length - 1 ? () => pager.current?.scrollToIndex({ index: index + 1 }) : undefined} />
         )}
       />
+  );
+  const header = (
+    <>
+      {wide ? null : monthPager}
       <Txt variant="title" style={styles.dayTitle}>{dayTitle(day)}</Txt>
       <ErrorText error={error} />
     </>
   );
 
-  return (
+  const list = (
     <FlatList
       style={{ flex: 1, backgroundColor: colors.road }}
       data={dayRaces}
@@ -87,6 +92,12 @@ export default function Calendario() {
       )}
     />
   );
+  return wide ? (
+    <View style={styles.wide}>
+      <View style={{ width }}>{monthPager}</View>
+      {list}
+    </View>
+  ) : list;
 }
 
 /** Título de un mes en el idioma de la app ("octubre de 2026"); sin Intl, el mes abreviado */
@@ -313,6 +324,7 @@ function RaceDetailView({ r, leagueId }: { r: CalendarRow; leagueId: string }) {
 }
 
 const styles = themed(() => StyleSheet.create({
+  wide: { flex: 1, flexDirection: 'row', backgroundColor: colors.road, width: '100%', maxWidth: 1400, alignSelf: 'center', paddingHorizontal: space.s },
   stageCol: { width: 116 },
   winner: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
   month: { backgroundColor: colors.paper, borderRadius: 20, padding: space.s, paddingBottom: space.m, ...cardShadow },

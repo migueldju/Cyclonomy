@@ -4,6 +4,7 @@ import { type ColorValue, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TopBar } from '@/components/TopBar';
 import { t } from '@/i18n';
+import { useWide } from '@/lib/layout';
 import { colors, fonts, themed } from '@/theme';
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -17,6 +18,7 @@ const icon = (name: IconName) => ({ color, focused }: { color: ColorValue; size:
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const wide = useWide();
   return (
     <Tabs
       backBehavior="history"
@@ -25,7 +27,8 @@ export default function TabsLayout() {
         // a juego con la barra superior: asfalto, y la pestaña activa en amarillo maillot
         tabBarActiveTintColor: colors.jersey,
         tabBarInactiveTintColor: '#A9B4B9',
-        tabBarStyle: { backgroundColor: colors.road, borderTopWidth: 0, elevation: 0, paddingTop: 8,
+        // en la web de escritorio las pestañas están en el menú lateral
+        tabBarStyle: wide ? { display: 'none' } : { backgroundColor: colors.road, borderTopWidth: 0, elevation: 0, paddingTop: 8,
                        height: 66 + insets.bottom },   // caben la pastilla del icono y el nombre
         tabBarBackground: () => <View style={styles.bar} />,
         tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 11, letterSpacing: 0.2, marginTop: 4 },

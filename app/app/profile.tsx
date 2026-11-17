@@ -96,7 +96,7 @@ export default function Perfil() {
   }
 
   return (
-    <Screen padded>
+    <Screen padded size="narrow">
       <View style={styles.head}>
         <Pressable onPress={pickPhoto} accessibilityRole="button" accessibilityLabel={t('profile.changePhoto')}>
           {avatar ? <Image source={{ uri: avatar }} style={styles.avatar} /> : <View style={[styles.avatar, styles.noAvatar]} />}

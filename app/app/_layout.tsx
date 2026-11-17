@@ -13,13 +13,14 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SideBar } from '@/components/SideBar';
 import { ToastHost } from '@/components/Toast';
 import { TopBar } from '@/components/TopBar';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LeagueProvider, useLeague } from '@/context/LeagueContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { I18nProvider } from '@/i18n';
-import { MAX_WIDTH } from '@/lib/layout';
+import { MAX_WIDTH, useWide } from '@/lib/layout';
 import { resetTo } from '@/lib/nav';
 import { colors, themed } from '@/theme';
 
@@ -55,18 +56,35 @@ function Root({ scheme }: { scheme: string }) {
           <AuthProvider>
             <LeagueProvider>
               <StatusBar style="light" />
-              {/* en la web, con la ventana grande, la app va en una columna centrada sobre el asfalto */}
-              <View style={styles.page}>
-                <View style={styles.column}>
-                  <Gate key={lang + scheme} splash={!shown} />
-                  <ToastHost key={scheme} />
-                </View>
-              </View>
+              <Shell key={lang + scheme} splash={!shown} />
             </LeagueProvider>
           </AuthProvider>
         )}
       </I18nProvider>
     </SafeAreaProvider>
+  );
+}
+
+/**
+ * Marco de la app. En el móvil (y en la web con la ventana estrecha), una columna centrada; en la web de escritorio,
+ * el menú lateral y el contenido a todo el ancho.
+ */
+function Shell({ splash }: { splash: boolean }) {
+  const wide = useWide();
+  const { session } = useAuth();
+  const { leagueId } = useLeague();
+  const first = useSegments()[0] ?? '';
+  // sin sesión o sin liga elegida no hay menú: son pantallas de acceso o de elegir liga
+  const menu = wide && !!session && !!leagueId && !AUTH_SCREENS.includes(first)
+    && !['leagues', 'league', 'join', 'unirse'].includes(first);
+  return (
+    <View style={[styles.page, wide && styles.pageWide]}>
+      {menu ? <SideBar /> : null}
+      <View style={wide ? styles.main : styles.column}>
+        <Gate splash={splash} />
+        <ToastHost />
+      </View>
+    </View>
   );
 }
 
@@ -126,7 +144,9 @@ function LoadingScreen() {
 
 const styles = themed(() => StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.asphalt, alignItems: 'center' },
+  pageWide: { flexDirection: 'row', alignItems: 'stretch' },
   column: { flex: 1, width: '100%', maxWidth: MAX_WIDTH, backgroundColor: colors.road, overflow: 'hidden' },
+  main: { flex: 1, minWidth: 0, backgroundColor: colors.road, overflow: 'hidden' },
   loading: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
   logo: { width: 260, height: 44 },
 }));

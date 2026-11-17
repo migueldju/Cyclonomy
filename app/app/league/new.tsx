@@ -22,7 +22,7 @@ export default function CrearLiga() {
   const [country, setCountry] = useState<string | null>(null);
 
   return (
-    <Screen padded>
+    <Screen padded size="narrow">
       <View style={[styles.wrap, { paddingTop: insets.top + space.s }]}>
       <View style={[styles.card, styles.head]}>
         <Txt variant="display">{t('create.title')}</Txt>

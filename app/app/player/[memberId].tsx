@@ -7,7 +7,7 @@ import { Flag } from '@/components/Flag';
 import { ActionSheet, AmountSheet } from '@/components/Modal';
 import { RiderRow, riderTags } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Section } from '@/components/Section';
+import { Empty, ErrorText, ListSection } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { ValueChart } from '@/components/ValueChart';
 import { useLeague } from '@/context/LeagueContext';
@@ -54,15 +54,15 @@ export default function Jugador() {
           </View>
         )) : null}
       </HeroCard>
-      <Section style={{ marginTop: space.l }}>
-        {rows.length ? rows.map((r, i) => (
+      <ListSection style={{ marginTop: space.l }} items={rows}
+                   empty={<Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
+                   render={(r, last) => (
           <RiderRow key={r.ownership_id} name={r.rider_name} team={r.pro_team}
                     photo={r.photo_url} nationality={r.nationality}
                     tags={riderTags({ status: r.status, locked_next: r.locked_next })}
                     value={r.market_value}
-                    detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={i === rows.length - 1} />
-        )) : <Empty text={roster.loading ? t('common.loading') : t('player.noRiders')} />}
-      </Section>
+                    detail={t('squad.clause', { amount: moneyShort(r.clause) })} onPress={() => setPicked(r)} last={last} />
+        )} />
       <ErrorText error={roster.error} />
 
       <ActionSheet

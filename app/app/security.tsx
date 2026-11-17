@@ -90,7 +90,7 @@ export default function Seguridad() {
   });
 
   return (
-    <Screen>
+    <Screen size="narrow">
       <HeroCard>
         <Txt variant="display">{t('account.title')}</Txt>
         <Txt variant="small">{user?.email ?? ''}</Txt>

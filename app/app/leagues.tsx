@@ -48,7 +48,7 @@ export default function Ligas() {
   }
 
   return (
-    <Screen onRefresh={reload} refreshing={loading}>
+    <Screen onRefresh={reload} refreshing={loading} size="narrow">
       <Txt variant="hero" style={{ marginTop: insets.top + space.xl, paddingHorizontal: space.l + 4 }}>{t('leagues.title')}</Txt>
       <Section>
         {data?.length ? data.map((l, i) => (
