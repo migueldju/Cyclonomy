@@ -13,18 +13,26 @@ import { space } from '@/theme';
  * Canjea el código por la sesión; la redirección la hace el Gate de _layout al detectar la sesión.
  */
 export default function AuthCallback() {
-  const { code } = useLocalSearchParams<{ code?: string }>();
+  const { code, error: failed, error_description: why } =
+    useLocalSearchParams<{ code?: string; error?: string; error_description?: string }>();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session && code) {
+      const hasSession = async () => !!(await supabase.auth.getSession()).data.session;
+      if (await hasSession()) return;
+      // Google o Supabase han devuelto un error: se enseña, en vez de quedarse en «Entrando…»
+      if (failed || why) { setError(String(why ?? failed).replace(/\+/g, ' ')); return; }
+      if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(String(code));
-        if (error) setError(error.message);
+        if (error && !(await hasSession())) setError(error.message);
+        return;
       }
+      // sin código: se da un momento por si la sesión llega por otro lado (en el móvil la canjea quien abrió el navegador)
+      await new Promise((r) => setTimeout(r, 2000));
+      if (!(await hasSession())) setError(t('auth.googleNoCode'));
     })();
-  }, [code]);
+  }, [code, failed, why]);
 
   return (
     <Screen padded>
