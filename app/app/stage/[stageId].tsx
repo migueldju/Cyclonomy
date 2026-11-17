@@ -219,7 +219,7 @@ function StageItem({ leagueId, item, isOpen, onToggle, last, open }: {
             {part === 'final' ? t('kind.gc') : stage.number === 0 ? t('race.prologue') : t('race.stageN', { n: stage.number })}
           </Txt>
           {part === 'final' ? null : (
-            <Txt variant="small" numberOfLines={2} style={expanded && { color: colors.line }}>
+            <Txt variant="small" numberOfLines={2} style={expanded && { color: colors.jersey }}>
               {[dayMonth(stage.date), course(stage.distance_km, stage.vertical_m)].filter(Boolean).join(' · ')}
             </Txt>
           )}
@@ -233,7 +233,7 @@ function StageItem({ leagueId, item, isOpen, onToggle, last, open }: {
               <Txt numberOfLines={1} style={[styles.winnerText, expanded && { color: colors.onDark }]}>{winner.name}</Txt>
             </View>
             {winner.team ? (
-              <Txt variant="small" numberOfLines={1} style={[{ textAlign: 'right' }, expanded && { color: colors.line }]}>
+              <Txt variant="small" numberOfLines={1} style={[{ textAlign: 'right' }, expanded && { color: '#C9D2D6' }]}>
                 {winner.team}
               </Txt>
             ) : null}
