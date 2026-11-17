@@ -13,6 +13,18 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Fuentes e imágenes: también llevan huella en el nombre
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# La app habla con Supabase nada más arrancar: se abre la conexión mientras se descarga el código
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Link = "<https://yjevkuhcrrumtwaonrqv.supabase.co>; rel=preconnect"
+
 # Cualquier ruta (/join/CÓDIGO, /auth/callback…) la resuelve la app
 [[redirects]]
   from = "/*"

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, StyleSheet, Switch, TextInput, TextInputProps, View } from 'react-native';
 import { colors, fonts, space, themed, type } from '../theme';

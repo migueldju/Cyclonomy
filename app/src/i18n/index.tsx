@@ -1,23 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-import ar from './locales/ar';
-import ca from './locales/ca';
-import cs from './locales/cs';
-import da from './locales/da';
-import de from './locales/de';
-import en from './locales/en';
 import es from './locales/es';
-import eu from './locales/eu';
-import fr from './locales/fr';
-import gl from './locales/gl';
-import it from './locales/it';
-import ja from './locales/ja';
-import nl from './locales/nl';
-import pl from './locales/pl';
-import pt from './locales/pt';
-import ru from './locales/ru';
-import sl from './locales/sl';
 import type { Dict, Key } from './types';
 
 /**
@@ -35,14 +19,41 @@ export const LANGUAGES: { code: Lang; name: string }[] = [
 ];
 export type Lang = 'es' | 'en' | 'fr' | 'pt' | 'it' | 'nl' | 'de' | 'ca' | 'eu' | 'gl' | 'pl' | 'ru' | 'ar' | 'ja' | 'da' | 'sl' | 'cs';
 
-const DICTS: Record<Lang, Partial<Dict>> = { es, en, fr, pt, it, nl, de, ca, eu, gl, pl, ru, ar, ja, da, sl, cs };
+// Solo el español va en el paquete inicial (es el de referencia). Los demás se cargan al elegirlos: en la web cada
+// uno es un fichero aparte, así que la primera carga no arrastra los 17 idiomas.
+const LOADERS: Record<Exclude<Lang, 'es'>, () => Promise<{ default: Partial<Dict> }>> = {
+  ar: () => import('./locales/ar'),
+  ca: () => import('./locales/ca'),
+  cs: () => import('./locales/cs'),
+  da: () => import('./locales/da'),
+  de: () => import('./locales/de'),
+  en: () => import('./locales/en'),
+  eu: () => import('./locales/eu'),
+  fr: () => import('./locales/fr'),
+  gl: () => import('./locales/gl'),
+  it: () => import('./locales/it'),
+  ja: () => import('./locales/ja'),
+  nl: () => import('./locales/nl'),
+  pl: () => import('./locales/pl'),
+  pt: () => import('./locales/pt'),
+  ru: () => import('./locales/ru'),
+  sl: () => import('./locales/sl'),
+};
+const DICTS: Partial<Record<Lang, Partial<Dict>>> = { es };
+const isLang = (code: string): code is Lang => code === 'es' || code in LOADERS;
+
+/** Deja cargado el diccionario de un idioma; si falla (sin red), la app sigue en español */
+async function loadDict(l: Lang) {
+  if (DICTS[l] || l === 'es') return;
+  try { DICTS[l] = (await LOADERS[l]()).default; } catch { /* se queda el español */ }
+}
 const STORAGE_KEY = 'cyclonomy:lang';
 
 function deviceLang(): Lang {
   try {
     for (const l of getLocales()) {
       const code = (l.languageCode ?? '').toLowerCase();
-      if (code in DICTS) return code as Lang;
+      if (isLang(code)) return code;
     }
   } catch { /* sin información del dispositivo */ }
   return 'es';
@@ -52,7 +63,7 @@ let current: Lang = deviceLang();
 
 /** Texto traducido al idioma actual (con {parámetros}) */
 export function t(key: Key, params?: Record<string, string | number>): string {
-  let s = DICTS[current][key] ?? es[key] ?? key;
+  let s = DICTS[current]?.[key] ?? es[key] ?? key;
   if (params) for (const [k, v] of Object.entries(params)) s = s.split(`{${k}}`).join(String(v));
   return s;
 }
@@ -68,14 +79,16 @@ export function I18nProvider({ children }: { children: (lang: Lang) => ReactNode
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
-      .then((saved) => { if (saved && saved in DICTS) { current = saved as Lang; setState(current); } })
-      .finally(() => setReady(true));
+      .then((saved) => { if (saved && isLang(saved)) current = saved; })
+      .catch(() => undefined)
+      .then(() => loadDict(current))
+      .finally(() => { setState(current); setReady(true); });
   }, []);
 
   const setLang = useCallback((l: Lang) => {
-    current = l;
-    setState(l);
     AsyncStorage.setItem(STORAGE_KEY, l).catch(() => undefined);
+    // la app se vuelve a pintar cuando el diccionario ya está cargado
+    loadDict(l).then(() => { current = l; setState(l); });
   }, []);
 
   if (!ready) return null;
