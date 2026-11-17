@@ -7,7 +7,7 @@ import { InfoButton } from '@/components/Info';
 import { Button } from '@/components/Button';
 import { Flag } from '@/components/Flag';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Section } from '@/components/Section';
+import { Empty, ErrorText, ListSection } from '@/components/Section';
 import { StatusDot } from '@/components/StatusDot';
 import { Txt } from '@/components/Txt';
 import { showToast } from '@/components/Toast';
@@ -93,14 +93,15 @@ export default function Inscripcion() {
                     items={[t('rules.r9'), t('entry.autoHint'), t('rules.r4')]} />
       </HeroCard>
 
-      <Section title={t('entry.yourRiders', { n: chosen.size, max })}>
-        {riders.length ? riders.map((r, i) => {
+      <ListSection title={t('entry.yourRiders', { n: chosen.size, max })} items={riders}
+                   empty={<Empty text={t('entry.noRiders')} />}
+                   render={(r, last) => {
           const on = chosen.has(r.rider_id);
           const disabled = !data.open || (!on && (!r.available || chosen.size >= max));
           return (
             <Pressable key={r.rider_id} onPress={() => toggle(r.rider_id)} disabled={disabled}
                        accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled }}
-                       style={[styles.row, i < riders.length - 1 && styles.line, on && { backgroundColor: colors.highlight },
+                       style={[styles.row, !last && styles.line, on && { backgroundColor: colors.highlight },
                                disabled && !on && { opacity: 0.5 }]}>
               <Ionicons name={on ? 'checkmark-circle' : 'ellipse-outline'} size={26} color={on ? colors.ink : colors.line} />
               <View style={{ flex: 1 }}>
@@ -118,8 +119,7 @@ export default function Inscripcion() {
               <Txt variant="number">{moneyShort(r.market_value)}</Txt>
             </Pressable>
           );
-        }) : <Empty text={t('entry.noRiders')} />}
-      </Section>
+        }} />
 
       {data.open ? (
         <View style={{ padding: space.l }}>

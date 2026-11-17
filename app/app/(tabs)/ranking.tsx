@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { Chips } from '@/components/Chips';
 import { Flag } from '@/components/Flag';
 import { RangeSlider } from '@/components/RangeSlider';
@@ -13,6 +13,7 @@ import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
+import { useWide } from '@/lib/layout';
 import { moneyShort, points } from '@/lib/format';
 import type { RankingRow } from '@/lib/types';
 import { cardShadow, colors, fonts, space, themed, type } from '@/theme';
@@ -61,17 +62,8 @@ export default function Ranking() {
 
   const ownerChips: [Owner, string][] = [['all', t('ranking.all')], ['free', t('ranking.free')], ['mine', t('ranking.mine')], ...owners];
 
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.road }}>
-      <FlatList
-        data={rows}
-        keyExtractor={(r) => String(r.rider_id)}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
-        initialNumToRender={20}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ flexGrow: 1 }}
-        // los filtros se desplazan con la lista: en pantallas bajas no tapan los ciclistas
-        ListHeaderComponent={
+  const wide = useWide();
+  const filters = (
           <View style={styles.filters}>
             <Txt variant="display">{t('ranking.title')}</Txt>
             <View style={styles.search}>
@@ -94,7 +86,21 @@ export default function Ranking() {
                            onChange={(l, h) => { setLow(l); setHigh(h); }} />
             </View>
           </View>
-        }
+  );
+
+  return (
+    <View style={[{ flex: 1, backgroundColor: colors.road }, wide && styles.wide]}>
+      {wide ? <ScrollView style={{ width: 400, flexGrow: 0 }} keyboardShouldPersistTaps="handled">{filters}</ScrollView> : null}
+      <FlatList
+        style={{ flex: 1 }}
+        data={rows}
+        keyExtractor={(r) => String(r.rider_id)}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}
+        initialNumToRender={20}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flexGrow: 1 }}
+        // los filtros se desplazan con la lista: en pantallas bajas no tapan los ciclistas
+        ListHeaderComponent={wide ? <View style={{ height: space.l }} /> : filters}
         ListFooterComponent={<><ErrorText error={error} /><BottomFill /></>}
         ListEmptyComponent={<Txt variant="small" style={{ padding: space.l, paddingHorizontal: space.l + 4 }}>
           {loading ? t('common.loading') : t('ranking.noMatch')}
@@ -135,6 +141,7 @@ function normalize(s: string) {
 }
 
 const styles = themed(() => StyleSheet.create({
+  wide: { flexDirection: 'row', width: '100%', maxWidth: 1400, alignSelf: 'center', paddingHorizontal: space.s },
   filters: {
     margin: space.l, padding: space.l, gap: space.m, backgroundColor: colors.paper, borderRadius: 20, ...cardShadow,
   },

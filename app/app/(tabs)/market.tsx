@@ -9,7 +9,7 @@ import { ActionSheet, AmountSheet, SheetAction } from '@/components/Modal';
 import { OffersSection } from '@/components/OffersSection';
 import { RiderRow } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Section } from '@/components/Section';
+import { Empty, ErrorText, ListSection } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
@@ -71,17 +71,14 @@ export default function Mercado() {
 
       <OffersSection />
 
-      <Section title={t('market.daily')}
-               action={<Button small kind="dark" label={t('moves.history')} onPress={() => router.push('/moves')} />}>
-        {free.length ? free.map((r, i) => (
-          <ListingRow key={r.listing_id} r={r} last={i === free.length - 1} onPress={() => open(r)} />
-        )) : <Empty text={loading ? t('common.loading') : t('market.empty')} />}
-      </Section>
+      <ListSection title={t('market.daily')} items={free}
+                   action={<Button small kind="dark" label={t('moves.history')} onPress={() => router.push('/moves')} />}
+                   empty={<Empty text={loading ? t('common.loading') : t('market.empty')} />}
+                   render={(r, last) => <ListingRow key={r.listing_id} r={r} last={last} onPress={() => open(r)} />} />
 
       {sales.length ? (
-        <Section title={t('market.sales')}>
-          {sales.map((r, i) => <ListingRow key={r.listing_id} r={r} last={i === sales.length - 1} onPress={() => open(r)} />)}
-        </Section>
+        <ListSection title={t('market.sales')} items={sales}
+                     render={(r, last) => <ListingRow key={r.listing_id} r={r} last={last} onPress={() => open(r)} />} />
       ) : null}
       <ErrorText error={error} />
 

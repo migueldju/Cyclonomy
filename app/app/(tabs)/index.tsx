@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { HeroCard } from '@/components/Hero';
 import { Button } from '@/components/Button';
+import { Col, Columns } from '@/components/Columns';
 import { PositionJersey } from '@/components/PositionJersey';
 import { MoveRow } from '@/components/MoveRow';
 import { Flag } from '@/components/Flag';
@@ -44,6 +45,8 @@ export default function Inicio() {
 
   return (
     <Screen onRefresh={reload} refreshing={today.loading}>
+      <Columns>
+      <Col flex={3}>
       {/* Mi puesto */}
       <HeroCard style={styles.hero}>
         <PositionJersey position={me?.position} size={56} />
@@ -71,6 +74,23 @@ export default function Inicio() {
         </Section>
       ) : null}
 
+      <Section title={`${t('home.today')} · ${dayMonth(todayISO())}`}>
+        {todayRows.length ? todayRows.map((s, i) => (
+          <StageRow key={s.stage_id} s={s} last={i === todayRows.length - 1}
+                    entriesOpen={!!calendar.data?.find((r) => r.race_id === s.race_id)?.entries_open} />
+        )) : <Empty text={today.loading ? t('common.loading') : t('home.noToday')} />}
+      </Section>
+      <ErrorText error={today.error} />
+
+      <Section title={t('home.upcoming')}
+               action={<Button small kind="dark" icon="calendar-outline" label={t('tabs.calendar')} onPress={() => router.navigate('/calendar')} />}>
+        {upcoming.length ? upcoming.map((r, i) => (
+          <RaceRow key={r.race_id} r={r} last={i === upcoming.length - 1} />
+        )) : <Empty text={calendar.loading ? t('common.loading') : t('home.noUpcoming')} />}
+      </Section>
+      <ErrorText error={calendar.error} />
+      </Col>
+      <Col flex={2}>
       {/* noticias: los últimos movimientos de la liga */}
       <Section title={t('news.title')}>
         {news.data?.length ? news.data.map((m, i) => (
@@ -101,23 +121,8 @@ export default function Inicio() {
         )) : <Empty text={top.loading ? t('common.loading') : t('home.noRiders')} />}
       </Section>
       <ErrorText error={top.error} />
-
-
-      <Section title={`${t('home.today')} · ${dayMonth(todayISO())}`}>
-        {todayRows.length ? todayRows.map((s, i) => (
-          <StageRow key={s.stage_id} s={s} last={i === todayRows.length - 1}
-                    entriesOpen={!!calendar.data?.find((r) => r.race_id === s.race_id)?.entries_open} />
-        )) : <Empty text={today.loading ? t('common.loading') : t('home.noToday')} />}
-      </Section>
-      <ErrorText error={today.error} />
-
-      <Section title={t('home.upcoming')}
-               action={<Button small kind="dark" icon="calendar-outline" label={t('tabs.calendar')} onPress={() => router.navigate('/calendar')} />}>
-        {upcoming.length ? upcoming.map((r, i) => (
-          <RaceRow key={r.race_id} r={r} last={i === upcoming.length - 1} />
-        )) : <Empty text={calendar.loading ? t('common.loading') : t('home.noUpcoming')} />}
-      </Section>
-      <ErrorText error={calendar.error} />
+      </Col>
+      </Columns>
 
     </Screen>
   );

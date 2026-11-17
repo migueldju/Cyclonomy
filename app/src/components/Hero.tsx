@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps, ReactNode } from 'react';
 import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
+import { useWide } from '../lib/layout';
 import { cardShadow, colors, fonts, space, themed, type } from '../theme';
 import { Txt } from './Txt';
 
@@ -32,7 +33,8 @@ export function StatTile({ label, value, color, icon, wide, onPress, open }: {
       </View>
     </>
   );
-  const style = [styles.tile, wide && { flexBasis: '100%' as const }, open && styles.tileOpen];
+  const desktop = useWide();
+  const style = [styles.tile, desktop && { flexBasis: '20%' as const }, wide && { flexBasis: '100%' as const }, open && styles.tileOpen];
   return onPress ? (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${label}: ${value}`}
                accessibilityState={{ expanded: !!open }} style={({ pressed }) => [...style, pressed && { opacity: 0.7 }]}>

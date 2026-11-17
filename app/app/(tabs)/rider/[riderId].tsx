@@ -8,6 +8,7 @@ import { ClauseSheet } from '@/components/ClauseSheet';
 import { LockSheet } from '@/components/LockSheet';
 import { ActionSheet } from '@/components/Modal';
 import { Screen } from '@/components/Screen';
+import { Col, Columns } from '@/components/Columns';
 import { Empty, ErrorText, Section } from '@/components/Section';
 import { Flag } from '@/components/Flag';
 import { RiderAvatar } from '@/components/RiderAvatar';
@@ -76,6 +77,8 @@ export default function Ciclista() {
 
   return (
     <Screen onRefresh={detail.reload} refreshing={detail.loading}>
+      <Columns>
+      <Col>
       <HeroCard>
       <View style={styles.head}>
         <RiderAvatar url={r.photo?.url} name={r.name} team={r.pro_team} size={72} />
@@ -114,6 +117,8 @@ export default function Ciclista() {
       <Section title={t('rider.marketValue')}>
         <ValueChart points={d.values} />
       </Section>
+      </Col>
+      <Col>
 
       <Section title={t('admin.results')}
                action={
@@ -138,6 +143,8 @@ export default function Ciclista() {
             : t('rider.noResults')} />
         )}
       </Section>
+      </Col>
+      </Columns>
       <ErrorText error={detail.error} />
 
       {rosterRow ? (

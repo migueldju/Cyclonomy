@@ -29,7 +29,7 @@ export default function Normativa() {
   const lg = league.data;
 
   return (
-    <Screen onRefresh={league.reload} refreshing={league.loading}>
+    <Screen onRefresh={league.reload} refreshing={league.loading} size="medium">
       <HeroCard>
         <Txt variant="display">{t('home.rules')}</Txt>
         <Txt variant="small">{lg?.name ?? ''}</Txt>

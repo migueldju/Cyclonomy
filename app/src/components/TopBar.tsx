@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLeague } from '../context/LeagueContext';
 import { t } from '../i18n';
 import { moneyShort } from '../lib/format';
+import { useWide } from '../lib/layout';
 import { colors, fonts, space, themed, type } from '../theme';
 import { PositionJersey } from './PositionJersey';
 import { Txt } from './Txt';
@@ -14,6 +15,20 @@ export function TopBar({ back }: { back?: boolean }) {
   const insets = useSafeAreaInsets();
   const { me } = useLeague();
   const initials = (me?.display_name ?? me?.team_name ?? '?').trim().slice(0, 1).toUpperCase();
+  const wide = useWide();
+
+  // en la web de escritorio el equipo, el puesto y el dinero van en el menú lateral: aquí queda solo «volver»
+  if (wide) {
+    return back ? (
+      <View style={styles.wideBar}>
+        <Pressable onPress={goBack} accessibilityRole="button" accessibilityLabel={t('common.back')}
+                   style={({ pressed }) => [styles.wideBack, pressed && { opacity: 0.7 }]}>
+          <Ionicons name="chevron-back" size={18} color={colors.ink} />
+          <Txt style={styles.wideBackText}>{t('common.back')}</Txt>
+        </Pressable>
+      </View>
+    ) : null;
+  }
 
   return (
     <View style={styles.wrap}>
@@ -72,4 +87,10 @@ const styles = themed(() => StyleSheet.create({
   pill: { backgroundColor: colors.asphaltSoft, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
   right: { flexDirection: 'row', alignItems: 'center', gap: space.s, minWidth: 92, justifyContent: 'flex-end' },
   value: { fontFamily: fonts.number, fontSize: type.body, color: colors.jersey },
+  wideBar: { backgroundColor: colors.road, paddingHorizontal: space.xl, paddingTop: space.l },
+  wideBack: {
+    flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: colors.paper,
+    borderRadius: 999, paddingLeft: 10, paddingRight: 16, paddingVertical: 8,
+  },
+  wideBackText: { fontFamily: fonts.bodyMedium, fontSize: type.small, color: colors.ink },
 }));

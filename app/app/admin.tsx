@@ -34,7 +34,7 @@ export default function Admin() {
   }
 
   return (
-    <Screen padded>
+    <Screen padded size="narrow">
       <Txt variant="hero" style={{ marginTop: space.l }}>{t('admin.title')}</Txt>
       <Txt variant="small" style={{ marginBottom: space.l }}>
         {t('admin.intro')}

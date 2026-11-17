@@ -3,7 +3,7 @@ import { HeroCard, StatTile, StatTiles } from '@/components/Hero';
 import { AdSlot, InfoButton } from '@/components/Info';
 import { RiderRow, riderTags } from '@/components/RiderRow';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Section } from '@/components/Section';
+import { Empty, ErrorText, ListSection } from '@/components/Section';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
@@ -35,8 +35,9 @@ export default function Plantilla() {
       </HeroCard>
       <AdSlot />
 
-      <Section style={{ marginTop: space.l }}>
-        {rows.length ? rows.map((r, i) => (
+      <ListSection style={{ marginTop: space.l }} items={rows}
+                   empty={<Empty text={roster.loading ? t('common.loading') : t('squad.empty')} />}
+                   render={(r, last) => (
           <RiderRow
             key={r.ownership_id}
             name={r.rider_name}
@@ -49,10 +50,9 @@ export default function Plantilla() {
             trend={r.trend ?? 0}
             detail={t('squad.clause', { amount: moneyShort(r.clause) })}
             onPress={() => router.push(`/rider/${r.rider_id}`)}
-            last={i === rows.length - 1}
+            last={last}
           />
-        )) : <Empty text={roster.loading ? t('common.loading') : t('squad.empty')} />}
-      </Section>
+        )} />
       <ErrorText error={roster.error} />
     </Screen>
   );

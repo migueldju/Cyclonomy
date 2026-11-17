@@ -45,7 +45,7 @@ export default function Unirse() {
   }
 
   return (
-    <Screen padded>
+    <Screen padded size="narrow">
       <Txt variant="hero" style={{ marginTop: space.xxl * 2 }}>{t('join.title')}</Txt>
       <Txt style={{ marginVertical: space.l }}>{t('join.code', { code: clean })}</Txt>
       {session ? (

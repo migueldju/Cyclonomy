@@ -3,7 +3,7 @@ import { HeroCard } from '@/components/Hero';
 import { Chips } from '@/components/Chips';
 import { MoveRow } from '@/components/MoveRow';
 import { Screen } from '@/components/Screen';
-import { Empty, ErrorText, Section } from '@/components/Section';
+import { Empty, ErrorText, ListSection } from '@/components/Section';
 import { Txt } from '@/components/Txt';
 import { useLeague } from '@/context/LeagueContext';
 import { useLoader } from '@/hooks/useLoader';
@@ -27,11 +27,9 @@ export default function Movimientos() {
         <Txt variant="display">{t('moves.title')}</Txt>
         <Chips label={t('moves.player')} items={chips} value={player} onChange={setPlayer} />
       </HeroCard>
-      <Section style={{ marginTop: space.l }}>
-        {moves.data?.length ? moves.data.map((m, i) => (
-          <MoveRow key={m.id} m={m} last={i === moves.data!.length - 1} myId={me?.member_id} />
-        )) : <Empty text={moves.loading ? t('common.loading') : t('moves.empty')} />}
-      </Section>
+      <ListSection style={{ marginTop: space.l }} items={moves.data ?? []}
+                   empty={<Empty text={moves.loading ? t('common.loading') : t('moves.empty')} />}
+                   render={(m, last) => <MoveRow key={m.id} m={m} last={last} myId={me?.member_id} />} />
       <ErrorText error={moves.error ?? members.error} />
     </Screen>
   );

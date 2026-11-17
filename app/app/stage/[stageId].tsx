@@ -41,7 +41,7 @@ export default function Etapa() {
   const open = (riderId: number) => router.push(`/rider/${riderId}`);
 
   return (
-    <Screen onRefresh={reload} refreshing={scores.loading || entries.loading}>
+    <Screen onRefresh={reload} refreshing={scores.loading || entries.loading} size="medium">
       <HeroCard style={{ gap: space.m }}>
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.s }}>

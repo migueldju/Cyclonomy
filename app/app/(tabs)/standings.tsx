@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import { Col, Columns } from '@/components/Columns';
 import { Pills } from '@/components/Hero';
 import { AdSlot, InfoButton } from '@/components/Info';
 import { PositionJersey } from '@/components/PositionJersey';
@@ -13,6 +14,7 @@ import { useLoader } from '@/hooks/useLoader';
 import { t } from '@/i18n';
 import { api } from '@/lib/api';
 import { moneyShort, points } from '@/lib/format';
+import { useWide } from '@/lib/layout';
 import { colors, space, themed } from '@/theme';
 
 export default function Clasificacion() {
@@ -21,19 +23,19 @@ export default function Clasificacion() {
   const { data, error, loading, reload } = useLoader(() => api.standings(id), [id], !!leagueId);
   const [mode, setMode] = useState<'total' | 'week'>('total');
 
-  const rows = useMemo(() => {
+  const wide = useWide();
+
+  const rowsFor = (m: 'total' | 'week') => {
     const list = [...(data ?? [])];
-    if (mode === 'total') return list.map((r) => ({ ...r, shown: r.points_total, rank: r.pos }));
+    if (m === 'total') return list.map((r) => ({ ...r, shown: r.points_total, rank: r.pos }));
     list.sort((a, b) => b.points_week - a.points_week);
     return list.map((r) => ({ ...r, shown: r.points_week, rank: 1 + list.filter((x) => x.points_week > r.points_week).length }));
-  }, [data, mode]);
+  };
 
-  return (
-    <Screen onRefresh={reload} refreshing={loading}>
-      <AdSlot />
-      <Section title={t('admin.classification')}
-               action={<Pills value={mode} onChange={setMode}
-                              options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />}>
+  const table = (m: 'total' | 'week', title: string, action?: ReactNode) => {
+    const rows = rowsFor(m);
+    return (
+      <Section title={title} action={action}>
         {rows.length ? rows.map((r, i) => {
           const mine = r.member_id === me?.member_id;
           return (
@@ -56,6 +58,21 @@ export default function Clasificacion() {
           );
         }) : <Empty text={loading ? t('common.loading') : t('standings.empty')} />}
       </Section>
+    );
+  };
+
+  return (
+    <Screen onRefresh={reload} refreshing={loading}>
+      <AdSlot />
+      {wide ? (
+        // en la web de escritorio caben las dos clasificaciones: no hace falta el selector
+        <Columns>
+          <Col>{table('total', t('kind.gc'))}</Col>
+          <Col>{table('week', t('standings.week'))}</Col>
+        </Columns>
+      ) : table(mode, t('admin.classification'),
+                <Pills value={mode} onChange={setMode}
+                       options={[{ value: 'total', label: t('kind.gc') }, { value: 'week', label: t('standings.week') }]} />)}
       <ErrorText error={error} />
       <InfoButton title={t('tabs.standings')} style={{ margin: space.l }}
                   items={[t('standings.hint'), t('rules.r6'), t('rules.r2')]} />

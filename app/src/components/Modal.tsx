@@ -3,7 +3,7 @@ import { type ComponentProps, ReactNode, useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { t } from '../i18n';
 import { money, parseAmount } from '../lib/format';
-import { MAX_WIDTH } from '../lib/layout';
+import { useWide } from '../lib/layout';
 import { colors, fonts, space, themed, type } from '../theme';
 import { Button } from './Button';
 import { showToast } from './Toast';
@@ -16,6 +16,31 @@ export function Sheet({ visible, onClose, title, children, above, onTitlePress }
   onTitlePress?: () => void;  // título pulsable (p. ej. ir a la ficha del ciclista): cierra la hoja y lo ejecuta
   above?: ReactNode;          // tarjeta flotante en el hueco libre, pegada encima de la hoja
 }) {
+  const wide = useWide();
+  const title_ = onTitlePress ? (
+    <Pressable onPress={() => { onClose(); onTitlePress(); }} accessibilityRole="link" accessibilityLabel={title}
+               style={({ pressed }) => [styles.titleLink, pressed && { opacity: 0.6 }]}>
+      <Txt variant="title" style={{ flexShrink: 1 }}>{title}</Txt>
+      <Ionicons name="eye-outline" size={20} color={colors.ink} />
+    </Pressable>
+  ) : <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>;
+
+  // web de escritorio: diálogo centrado, con la tarjeta flotante (`above`) encima
+  if (wide) {
+    return (
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+        <View style={styles.center}>
+          <Pressable style={[styles.backdrop, StyleSheet.absoluteFill]} onPress={onClose} accessibilityLabel={t('common.close')} />
+          {above ? <View style={styles.dialogAbove} pointerEvents="box-none">{above}</View> : null}
+          <View style={styles.dialog}>
+            {title_}
+            {children}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1 }}>
@@ -25,13 +50,7 @@ export function Sheet({ visible, onClose, title, children, above, onTitlePress }
       <KeyboardAvoidingView behavior="padding">
         <View style={styles.sheet}>
           <View style={styles.handle} />
-          {onTitlePress ? (
-            <Pressable onPress={() => { onClose(); onTitlePress(); }} accessibilityRole="link" accessibilityLabel={title}
-                       style={({ pressed }) => [styles.titleLink, pressed && { opacity: 0.6 }]}>
-              <Txt variant="title" style={{ flexShrink: 1 }}>{title}</Txt>
-              <Ionicons name="eye-outline" size={20} color={colors.ink} />
-            </Pressable>
-          ) : <Txt variant="title" style={{ marginBottom: space.m }}>{title}</Txt>}
+          {title_}
           {children}
         </View>
       </KeyboardAvoidingView>
@@ -209,9 +228,13 @@ const styles = themed(() => StyleSheet.create({
   actionLabel: { fontFamily: fonts.bodyBold, fontSize: type.body, color: colors.ink },
   backdrop: { flex: 1, backgroundColor: 'rgba(30,39,44,0.45)' },
   titleLink: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: space.m },
-  above: { flex: 1, justifyContent: 'flex-end', padding: space.l, width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
+  above: { flex: 1, justifyContent: 'flex-end', padding: space.l, width: '100%', maxWidth: 720, alignSelf: 'center' },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.m },
+  dialog: { width: '100%', maxWidth: 520, maxHeight: '90%', backgroundColor: colors.paper, borderRadius: 24, padding: space.xl,
+            overflow: 'auto' as 'scroll' },      // en la web, barra de desplazamiento solo si no cabe
+  dialogAbove: { width: '100%', maxWidth: 520 },
   sheet: {
-    width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center',
+    width: '100%', maxWidth: 720, alignSelf: 'center',
     backgroundColor: colors.paper, padding: space.xl, paddingTop: space.m, paddingBottom: space.xxl,
     borderTopLeftRadius: 28, borderTopRightRadius: 28,
   },
