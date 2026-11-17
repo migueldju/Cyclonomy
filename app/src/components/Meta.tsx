@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps, ReactNode } from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { categoryLabel, colors, fonts, raceColors, themed } from '../theme';
+import { categoryLabel, colors, fonts, isContinental, raceColors, STAR, themed } from '../theme';
 import { Txt } from './Txt';
 
 /** Segunda línea de una fila: datos cortos con icono y pastillas, en vez de una frase separada por puntos */
@@ -23,6 +23,12 @@ export function ColorBar({ category, name, horizontal, style }: {
   return (
     <View style={[{ flexDirection: horizontal ? 'row' : 'column', overflow: 'hidden' }, style]}>
       {list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}
+      {/* continentales: la «estrella», un punto amarillo en el centro de la franja azul */}
+      {isContinental(category) ? (
+        <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <View style={styles.starDot} />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -42,7 +48,10 @@ export function CategoryBadge({ code, stageRace, name }: { code: string; stageRa
           {list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}
         </View>
       )}
-      <Txt style={[styles.badgeText, { color: rainbow ? colors.ink : dark ? colors.onLight : colors.onDark }]}>{categoryLabel(code, stageRace)}</Txt>
+      <View style={styles.badgeRow}>
+        {isContinental(code) ? <Ionicons name="star" size={10} color={STAR} /> : null}
+        <Txt style={[styles.badgeText, { color: rainbow ? colors.ink : dark ? colors.onLight : colors.onDark }]}>{categoryLabel(code, stageRace)}</Txt>
+      </View>
       {rainbow ? (
         <View style={styles.rainbow}>{list.map((c, i) => <View key={i} style={{ flex: 1, backgroundColor: c }} />)}</View>
       ) : null}
@@ -78,6 +87,8 @@ const styles = themed(() => StyleSheet.create({
   line: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: 8, rowGap: 2, marginTop: 3 },
   badge: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, overflow: 'hidden' },
   badgeRainbow: { backgroundColor: colors.paper, borderWidth: 1, borderColor: colors.line, paddingBottom: 4 },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  starDot: { width: 3, height: 3, borderRadius: 1.5, backgroundColor: STAR },
   rainbow: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 3, flexDirection: 'row' },
   badgeText: { fontFamily: fonts.bodyBold, fontSize: 11, lineHeight: 16, letterSpacing: 0.2 },
   item: { flexDirection: 'row', alignItems: 'center', gap: 3, flexShrink: 1 },

@@ -62,7 +62,6 @@ export function applyScheme(toDark: boolean) {
   if (toDark === dark) return;
   dark = toDark;
   Object.assign(colors, dark ? DARK : LIGHT);
-  Object.assign(categoryColor, dark ? CATEGORY_DARK : CATEGORY_LIGHT);
   version += 1;
 }
 
@@ -120,18 +119,18 @@ export const cardShadow = {
 export const space = { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 };
 
 // Categorías: un color por tipo de carrera, para reconocerlas de un vistazo en el calendario
-// WorldTour en turquesa (A, el tono fuerte; B, el suave) y .1 en marrón: sin grises, que en oscuro no se distinguían
-const CATEGORY_LIGHT: Record<string, string> = {
+// WorldTour A en azul y B en cian, y .1 en marrón: sin grises. Los continentales comparten el azul de las WT A y se
+// distinguen por la estrella amarilla (ver isContinental). Son tonos medios: los mismos en el tema claro y en el
+// oscuro, y se ven sobre las tarjetas blancas y sobre las gris asfalto.
+export const categoryColor: Record<string, string> = {
   TDF: '#F4C63F', GT: '#E8578A', MON: '#7A4BC2', WC: '#0073CF', WC_ITT: '#0073CF',
-  MWT: '#0B5C6B', SWT: '#1098AD', WT: '#0B5C6B', CC: '#003399', CC_ITT: '#003399', NC: '#C0613A', NC_ITT: '#C0613A',
-  PRO: '#17834A', C1: '#6B4A22',
+  MWT: '#2B66D9', SWT: '#16A3B8', WT: '#2B66D9', CC: '#2B66D9', CC_ITT: '#2B66D9', NC: '#C0613A', NC_ITT: '#C0613A',
+  PRO: '#1F9A57', C1: '#7D5527',
 };
-// En oscuro, los tonos que sobre las tarjetas gris asfalto se perderían van más luminosos
-const CATEGORY_DARK: Record<string, string> = {
-  ...CATEGORY_LIGHT,
-  MWT: '#3BC9DB', WT: '#3BC9DB', SWT: '#1789A0', CC: '#4C7BE0', CC_ITT: '#4C7BE0', PRO: '#3DBE78', C1: '#9A733F',
-};
-export const categoryColor: Record<string, string> = { ...CATEGORY_LIGHT };
+
+/** Campeonatos continentales: azul con estrella amarilla, como la bandera europea */
+export const isContinental = (category: string) => category === 'CC' || category === 'CC_ITT';
+export const STAR = '#FFCC00';
 
 const GIRO = '#E8578A';      // maglia rosa
 const VUELTA = '#D8232A';    // maillot rojo
