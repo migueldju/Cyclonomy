@@ -6,6 +6,7 @@ import type { Me } from '../lib/types';
 import { useAuth } from './AuthContext';
 
 const KEY = 'fantasy:league_id';
+const INVITE_KEY = 'cyclonomy:invite';
 
 interface LeagueState {
   leagueId: string | null;
@@ -26,10 +27,19 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [me, setMe] = useState<Me | null>(null);
   const [version, setVersion] = useState(0);
-  const [pendingInvite, setPendingInvite] = useState<string | null>(null);
+  const [pendingInvite, setInvite] = useState<string | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then((id) => { setLeagueId(id); setReady(true); });
+    AsyncStorage.multiGet([KEY, INVITE_KEY])
+      .then(([[, id], [, invite]]) => { setLeagueId(id); setInvite(invite); })
+      .catch(() => undefined)
+      .finally(() => setReady(true));
+  }, []);
+
+  // se guarda: en la web, entrar con Google recarga la página y se perdería el código
+  const setPendingInvite = useCallback((code: string | null) => {
+    setInvite(code);
+    (code ? AsyncStorage.setItem(INVITE_KEY, code) : AsyncStorage.removeItem(INVITE_KEY)).catch(() => undefined);
   }, []);
 
   // la hora del juego (puede estar simulada): «hoy» y las cuentas atrás se calculan con ella
