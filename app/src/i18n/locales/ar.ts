@@ -144,6 +144,8 @@ const ar: Partial<Dict> = {
   "input.more": "أكثر: {label}",
   "invite.message": "انضم إلى دوري «{league}» في Cyclonomy.\nالرمز: {code}\nالرابط: {link}",
   "invite.copied": "تم نسخ الدعوة إلى الحافظة",
+  "join.already": "أنت بالفعل في دوري «{league}» بفريقك {team}.",
+  "join.goToLeague": "اذهب إلى الدوري",
   "join.code": "رمز الدعوة: {code}",
   "join.signIn": "تسجيل الدخول",
   "join.signInFirst": "سجّل الدخول أو أنشئ حسابًا للانضمام.",

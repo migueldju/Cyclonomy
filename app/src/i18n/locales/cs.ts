@@ -144,6 +144,8 @@ const cs: Partial<Dict> = {
   "input.more": "Více: {label}",
   "invite.message": "Přidej se do mé ligy „{league}“ v Cyclonomy.\nKód: {code}\nOdkaz: {link}",
   "invite.copied": "Pozvánka zkopírována do schránky",
+  "join.already": "Už jsi v lize „{league}“ s týmem {team}.",
+  "join.goToLeague": "Přejít do ligy",
   "join.code": "Kód pozvánky: {code}",
   "join.signIn": "Přihlásit se",
   "join.signInFirst": "Přihlas se nebo si vytvoř účet, abys se mohl přidat.",
