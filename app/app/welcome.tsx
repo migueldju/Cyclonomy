@@ -1,25 +1,41 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { Image, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Image, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { LoginForm, SignupForm } from '@/components/AuthForms';
 import { Button } from '@/components/Button';
 import { Features, HowItWorks } from '@/components/GameIntro';
+import { Pills } from '@/components/Hero';
 import { PositionJersey } from '@/components/PositionJersey';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
-import { categoryColor, colors, fonts, space, themed } from '@/theme';
+import { cardShadow, colors, fonts, space, themed, UCI_RAINBOW } from '@/theme';
 
 const MAX = 1120;
-// franjas de colores de carrera bajo la portada: el pelotón del calendario
-const STRIPES = ['TDF', 'GT', 'MON', 'MWT', 'SWT', 'CC', 'NC', 'PRO', 'C1'];
+type Panel = 'login' | 'signup';
 
 /** Portada de la web para quien aún no tiene sesión: qué es el juego y cómo entrar */
 export default function Welcome() {
   const { width } = useWindowDimensions();
   const wide = width >= 900;
   const columns = width >= 900 ? 3 : width >= 620 ? 2 : 1;
-  const signUp = () => router.push('/signup');
-  const signIn = () => router.push('/login');
+  // en el ordenador, entrar y crear cuenta se abren en un desplegable bajo el menú, sin cambiar de página
+  const [panel, setPanel] = useState<Panel | null>(null);
+  const signUp = () => (wide ? setPanel('signup') : router.push('/signup'));
+  const signIn = () => (wide ? setPanel('login') : router.push('/login'));
+  const toggle = (p: Panel) => setPanel((cur) => (cur === p ? null : p));
+
+  // Esc lo cierra; si la ventana se estrecha, se pasa a las pantallas de siempre
+  useEffect(() => {
+    if (!panel || Platform.OS !== 'web') return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPanel(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [panel]);
+  useEffect(() => { if (!wide) setPanel(null); }, [wide]);
 
   return (
+    <View style={{ flex: 1 }}>
     <ScrollView style={styles.page} contentContainerStyle={{ flexGrow: 1 }}>
       {/* portada, sobre asfalto */}
       <View style={styles.top}>
@@ -27,8 +43,13 @@ export default function Welcome() {
           <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
                  tintColor={colors.onDark} accessibilityLabel="Cyclonomy" />
           <View style={styles.navButtons}>
-            {wide ? <Button small kind="ghost" label={t('login.signIn')} onPress={signIn} /> : null}
-            <Button small label={wide ? t('auth.createAccount') : t('login.signIn')} onPress={wide ? signUp : signIn} />
+            {wide ? (
+              <>
+                <Button small kind="ghost" label={t('login.signIn')} onPress={() => toggle('login')}
+                        style={panel === 'login' ? styles.navOn : undefined} />
+                <Button small label={t('auth.createAccount')} onPress={() => toggle('signup')} />
+              </>
+            ) : <Button small label={t('login.signIn')} onPress={signIn} />}
           </View>
         </View>
 
@@ -49,8 +70,9 @@ export default function Welcome() {
           </View>
         </View>
       </View>
+      {/* franja con el arcoíris de la UCI */}
       <View style={styles.stripes}>
-        {STRIPES.map((c) => <View key={c} style={{ flex: 1, backgroundColor: categoryColor[c] }} />)}
+        {UCI_RAINBOW.map((c) => <View key={c} style={{ flex: 1, backgroundColor: c }} />)}
       </View>
 
       <View style={[styles.inner, styles.block]}>
@@ -74,6 +96,26 @@ export default function Welcome() {
       <View style={{ flexGrow: 1 }} />
       <Txt variant="small" style={styles.footer}>© {new Date().getFullYear()} Cyclonomy</Txt>
     </ScrollView>
+
+    {panel ? (
+      <>
+        {/* fuera del desplegable: lo cierra */}
+        <Pressable style={styles.backdrop} onPress={() => setPanel(null)} accessibilityLabel={t('common.close')} />
+        <View style={styles.dropWrap} pointerEvents="box-none">
+          <View style={styles.drop} accessibilityViewIsModal>
+            <View style={styles.dropHead}>
+              <Pills value={panel} onChange={setPanel}
+                     options={[{ value: 'login', label: t('login.signIn') }, { value: 'signup', label: t('auth.createAccount') }]} />
+              <Pressable onPress={() => setPanel(null)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('common.close')}>
+                <Ionicons name="close" size={22} color={colors.inkSoft} />
+              </Pressable>
+            </View>
+            {panel === 'login' ? <LoginForm key="login" /> : <SignupForm key="signup" />}
+          </View>
+        </View>
+      </>
+    ) : null}
+    </View>
   );
 }
 
@@ -84,6 +126,15 @@ const styles = themed(() => StyleSheet.create({
   nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: space.l },
   logo: { width: 168, height: 28 },
   navButtons: { flexDirection: 'row', alignItems: 'center', gap: space.s },
+  navOn: { backgroundColor: 'rgba(255,255,255,0.12)' },
+  backdrop: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(14,19,21,0.35)' },
+  // anclado arriba a la derecha, bajo los botones del menú, alineado con el contenido
+  dropWrap: { position: 'absolute', top: 62, left: 0, right: 0, alignItems: 'flex-end', width: '100%', maxWidth: MAX,
+              alignSelf: 'center', paddingHorizontal: space.xl },
+  drop: { width: 400, maxHeight: 640, backgroundColor: colors.paper, borderRadius: 20, padding: space.xl,
+          overflow: 'auto' as 'scroll', ...cardShadow,          // barra de desplazamiento solo si no cabe
+          shadowOpacity: 0.25, shadowRadius: 24 },
+  dropHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.l },
   hero: { paddingTop: space.xxl },
   heroWide: { flexDirection: 'row', alignItems: 'center', gap: space.xxl, paddingTop: space.xxl * 1.5 },
   title: { fontFamily: fonts.display, fontSize: 64, lineHeight: 66, letterSpacing: 1, color: colors.onDark },

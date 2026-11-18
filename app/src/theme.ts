@@ -135,7 +135,7 @@ export const STAR = '#FFCC00';
 const GIRO = '#E8578A';      // maglia rosa
 const VUELTA = '#D8232A';    // maillot rojo
 // arcoíris de la UCI: azul, rojo, negro, amarillo y verde
-const UCI_RAINBOW = ['#0073CF', '#E4002B', '#111111', '#FFD100', '#00A651'];
+export const UCI_RAINBOW = ['#0073CF', '#E4002B', '#111111', '#FFD100', '#00A651'];
 
 /**
  * Colores de una carrera, en franjas: casi todas uno solo, el de su categoría. Las grandes vueltas, mitad rosa y
