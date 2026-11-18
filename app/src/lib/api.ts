@@ -22,6 +22,9 @@ export const api = {
     rpc<string>('create_league', { p_name: name, p_team_name: teamName, p_settings: settings, p_country: country }),
   joinLeague: (code: string, teamName: string, country: string) =>
     rpc<string>('join_league', { p_code: code, p_team_name: teamName, p_country: country }),
+  // la liga de un código de invitación, solo si ya soy miembro (las demás no se pueden leer): null si no lo soy
+  myLeagueByCode: (code: string) =>
+    select<{ id: string; name: string } | null>(supabase.from('league').select('id, name').eq('invite_code', code).maybeSingle()),
   league: (leagueId: string) => select<League>(supabase.from('league').select('*').eq('id', leagueId).single()),
   updateLeague: (leagueId: string, settings: LeagueSettings) =>
     rpc<void>('update_league_settings', { p_league: leagueId, p_settings: settings }),

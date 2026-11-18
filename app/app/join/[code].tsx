@@ -31,6 +31,30 @@ export default function Unirse() {
   const [error, setError] = useState<string | null>(null);
   const clean = String(code ?? '').toUpperCase();
   const columns = width >= 900 ? 3 : width >= 620 ? 2 : 1;
+  // con sesión: si ya estoy en la liga de este código, no se ofrece unirse otra vez
+  const [member, setMember] = useState<{ id: string; name: string; team: string } | null | undefined>(undefined);
+
+  useEffect(() => {
+    if (!session || !clean) { setMember(undefined); return; }
+    let alive = true;
+    (async () => {
+      try {
+        const lg = await api.myLeagueByCode(clean);
+        const mine = lg ? (await api.myLeagues()).find((l) => l.league_id === lg.id) : null;
+        if (alive) setMember(lg ? { id: lg.id, name: lg.name, team: mine?.team_name ?? '' } : null);
+      } catch {
+        if (alive) setMember(null);          // sin poder comprobarlo, se deja unirse (el servidor no duplica)
+      }
+    })();
+    return () => { alive = false; };
+  }, [session, clean]);
+
+  async function goToLeague() {
+    if (!member) return;
+    setPendingInvite(null);
+    await selectLeague(member.id);
+    resetTo('/');
+  }
 
   // sin sesión, el código se guarda: al entrar o crear la cuenta se vuelve aquí
   useEffect(() => { if (!session && clean) setPendingInvite(clean); }, [session, clean, setPendingInvite]);
@@ -61,7 +85,18 @@ export default function Unirse() {
             <Txt variant="label">{t('landing.invited')}</Txt>
             <Txt style={styles.code}>{clean}</Txt>
           </View>
-          {session ? (
+          {session && member === undefined ? (
+            <Txt style={{ textAlign: 'center', color: colors.inkSoft }}>{t('common.loading')}</Txt>
+          ) : session && member ? (
+            <View style={styles.form}>
+              <View style={styles.already}>
+                <Ionicons name="checkmark-circle" size={22} color={colors.green} />
+                <Txt style={{ flex: 1 }}>{t('join.already', { league: member.name, team: member.team })}</Txt>
+              </View>
+              <Button label={t('join.goToLeague')} leftIcon="arrow-forward" onPress={goToLeague} />
+              <Button kind="quiet" label={t('common.back')} onPress={() => { setPendingInvite(null); router.replace('/leagues'); }} />
+            </View>
+          ) : session ? (
             <View style={styles.form}>
               <Input label={t('team.yourTeamName')} value={team} onChangeText={setTeam} maxLength={40} />
               <CountryPicker value={country} onChange={setCountry} />
@@ -105,6 +140,10 @@ const styles = themed(() => StyleSheet.create({
   },
   code: { fontFamily: fonts.number, fontSize: 34, letterSpacing: 4, color: colors.ink },
   form: { gap: space.m },
+  already: {
+    flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.greenSoft, borderRadius: 14,
+    padding: space.m,
+  },
   intro: {
     fontFamily: fonts.bodyMedium, fontSize: 17, lineHeight: 26, textAlign: 'center', color: colors.inkSoft,
     maxWidth: 620, alignSelf: 'center', marginTop: space.xxl,

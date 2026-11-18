@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { Chips } from '@/components/Chips';
 import { Flag } from '@/components/Flag';
 import { RangeSlider } from '@/components/RangeSlider';
 import { RiderAvatar } from '@/components/RiderAvatar';
+import { SearchField } from '@/components/SearchField';
 import { BottomFill } from '@/components/Screen';
 import { ErrorText } from '@/components/Section';
 import { Txt } from '@/components/Txt';
@@ -66,11 +67,7 @@ export default function Ranking() {
   const filters = (
           <View style={styles.filters}>
             <Txt variant="display">{t('ranking.title')}</Txt>
-            <View style={styles.search}>
-              <Ionicons name="search" size={18} color={colors.inkSoft} />
-              <TextInput value={query} onChangeText={setQuery} placeholder={t('ranking.search')}
-                         placeholderTextColor={colors.inkSoft} style={styles.searchInput} accessibilityLabel={t('ranking.search')} />
-            </View>
+            <SearchField value={query} onChangeText={setQuery} placeholder={t('ranking.search')} />
             <Chips label={t('ranking.owner')} items={ownerChips} value={owner} onChange={setOwner} />
             <View style={{ gap: space.xs }}>
               <View style={styles.valueHead}>
@@ -145,11 +142,6 @@ const styles = themed(() => StyleSheet.create({
   filters: {
     margin: space.l, padding: space.l, gap: space.m, backgroundColor: colors.paper, borderRadius: 20, ...cardShadow,
   },
-  search: {
-    flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.road, borderRadius: 999,
-    paddingHorizontal: space.l,
-  },
-  searchInput: { flex: 1, paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink },
   // las filas forman una sola tarjeta: redondeada la primera por arriba y la última por abajo
   row: {
     flexDirection: 'row', alignItems: 'center', gap: space.m, paddingHorizontal: space.l, paddingVertical: space.m,
