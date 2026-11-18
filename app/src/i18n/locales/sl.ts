@@ -87,6 +87,7 @@ const sl: Partial<Dict> = {
   "common.back": "Nazaj",
   "common.cancel": "Prekliči",
   "common.change": "Spremeni",
+  "common.clear": "Počisti",
   "common.close": "Zapri",
   "common.loading": "Nalaganje…",
   "common.save": "Shrani",

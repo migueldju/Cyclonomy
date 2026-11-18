@@ -87,6 +87,7 @@ const ar: Partial<Dict> = {
   "common.back": "رجوع",
   "common.cancel": "إلغاء",
   "common.change": "تغيير",
+  "common.clear": "مسح",
   "common.close": "إغلاق",
   "common.loading": "جارٍ التحميل…",
   "common.save": "حفظ",

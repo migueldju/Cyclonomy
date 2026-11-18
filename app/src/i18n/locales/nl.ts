@@ -87,6 +87,7 @@ const nl: Partial<Dict> = {
   "common.back": "Terug",
   "common.cancel": "Annuleren",
   "common.change": "Wijzigen",
+  "common.clear": "Wissen",
   "common.close": "Sluiten",
   "common.loading": "Laden…",
   "common.save": "Opslaan",

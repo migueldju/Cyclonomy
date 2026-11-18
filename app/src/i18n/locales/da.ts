@@ -87,6 +87,7 @@ const da: Partial<Dict> = {
   "common.back": "Tilbage",
   "common.cancel": "Annuller",
   "common.change": "Ændr",
+  "common.clear": "Ryd",
   "common.close": "Luk",
   "common.loading": "Indlæser…",
   "common.save": "Gem",

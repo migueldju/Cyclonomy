@@ -86,6 +86,7 @@ const es = {
   "common.back": "Volver",
   "common.cancel": "Cancelar",
   "common.change": "Cambiar",
+  "common.clear": "Borrar",
   "common.close": "Cerrar",
   "common.loading": "Cargando…",
   "common.save": "Guardar",

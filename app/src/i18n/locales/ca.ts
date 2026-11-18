@@ -87,6 +87,7 @@ const ca: Partial<Dict> = {
   "common.back": "Tornar",
   "common.cancel": "Cancel·lar",
   "common.change": "Canviar",
+  "common.clear": "Esborrar",
   "common.close": "Tancar",
   "common.loading": "Carregant…",
   "common.save": "Desa",

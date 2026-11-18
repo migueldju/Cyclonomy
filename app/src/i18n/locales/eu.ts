@@ -87,6 +87,7 @@ const eu: Partial<Dict> = {
   "common.back": "Itzuli",
   "common.cancel": "Utzi",
   "common.change": "Aldatu",
+  "common.clear": "Garbitu",
   "common.close": "Itxi",
   "common.loading": "Kargatzen…",
   "common.save": "Gorde",

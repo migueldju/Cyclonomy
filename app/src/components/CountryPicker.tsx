@@ -1,11 +1,12 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { t } from '../i18n';
 import { COUNTRIES, countryName } from '../lib/countries';
 import { colors, fonts, space, themed, type } from '../theme';
 import { Flag } from './Flag';
 import { Sheet } from './Modal';
+import { SearchField } from './SearchField';
 import { Txt } from './Txt';
 
 const plain = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -34,8 +35,7 @@ export function CountryPicker({ value, onChange, label, hint = true }: {
       {hint ? <Txt variant="small" style={{ marginTop: space.xs }}>{t('country.permanent')}</Txt> : null}
 
       <Sheet visible={open} onClose={() => setOpen(false)} title={t('country.label')}>
-        <TextInput value={query} onChangeText={setQuery} placeholder={t('country.search')} placeholderTextColor={colors.inkSoft}
-                   style={styles.search} accessibilityLabel={t('country.search')} autoCorrect={false} />
+        <SearchField value={query} onChangeText={setQuery} placeholder={t('country.search')} style={{ marginBottom: space.s }} />
         <FlatList
           data={list}
           keyExtractor={([code]) => code}
@@ -59,10 +59,6 @@ const styles = themed(() => StyleSheet.create({
   field: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.paper, borderWidth: 1,
     borderColor: colors.line, borderRadius: 14, paddingHorizontal: space.l, paddingVertical: 13,
-  },
-  search: {
-    backgroundColor: colors.road, borderRadius: 999, paddingHorizontal: space.l,
-    paddingVertical: 10, fontFamily: fonts.body, fontSize: type.body, color: colors.ink, marginBottom: space.s,
   },
   option: { flexDirection: 'row', alignItems: 'center', gap: space.m, paddingVertical: 10, paddingHorizontal: space.s,
             borderRadius: 12 },

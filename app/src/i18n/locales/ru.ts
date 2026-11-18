@@ -87,6 +87,7 @@ const ru: Partial<Dict> = {
   "common.back": "Назад",
   "common.cancel": "Отмена",
   "common.change": "Изменить",
+  "common.clear": "Очистить",
   "common.close": "Закрыть",
   "common.loading": "Загрузка…",
   "common.save": "Сохранить",

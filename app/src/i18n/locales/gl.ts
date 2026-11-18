@@ -87,6 +87,7 @@ const gl: Partial<Dict> = {
   "common.back": "Volver",
   "common.cancel": "Cancelar",
   "common.change": "Cambiar",
+  "common.clear": "Borrar",
   "common.close": "Pechar",
   "common.loading": "Cargando…",
   "common.save": "Gardar",

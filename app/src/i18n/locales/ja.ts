@@ -87,6 +87,7 @@ const ja: Partial<Dict> = {
   "common.back": "戻る",
   "common.cancel": "キャンセル",
   "common.change": "変更",
+  "common.clear": "クリア",
   "common.close": "閉じる",
   "common.loading": "読み込み中…",
   "common.save": "保存",

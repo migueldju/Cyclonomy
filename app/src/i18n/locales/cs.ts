@@ -87,6 +87,7 @@ const cs: Partial<Dict> = {
   "common.back": "Zpět",
   "common.cancel": "Zrušit",
   "common.change": "Změnit",
+  "common.clear": "Vymazat",
   "common.close": "Zavřít",
   "common.loading": "Načítání…",
   "common.save": "Uložit",

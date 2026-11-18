@@ -87,6 +87,7 @@ const pt: Partial<Dict> = {
   "common.back": "Voltar",
   "common.cancel": "Cancelar",
   "common.change": "Alterar",
+  "common.clear": "Limpar",
   "common.close": "Fechar",
   "common.loading": "A carregar…",
   "common.save": "Guardar",

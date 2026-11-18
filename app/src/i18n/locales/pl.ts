@@ -87,6 +87,7 @@ const pl: Partial<Dict> = {
   "common.back": "Wstecz",
   "common.cancel": "Anuluj",
   "common.change": "Zmień",
+  "common.clear": "Wyczyść",
   "common.close": "Zamknij",
   "common.loading": "Ładowanie…",
   "common.save": "Zapisz",
