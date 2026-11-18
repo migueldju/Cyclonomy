@@ -1,10 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import { colors, fonts, themed, type } from '../theme';
 import { Txt } from './Txt';
 
-type Kind = 'primary' | 'secondary' | 'dark' | 'danger' | 'quiet';
+type Kind = 'primary' | 'secondary' | 'dark' | 'danger' | 'quiet' | 'ghost';
 
 export function Button({
   label, onPress, kind = 'primary', disabled, busy, style, small, icon, leftIcon,
@@ -47,6 +47,7 @@ const kinds = themed((): Record<Kind, { bg: string; fg: string; border: string }
   dark: { bg: colors.ink, fg: colors.paper, border: colors.ink },              // llamativo: negro, letra blanca
   danger: { bg: colors.paper, fg: colors.red, border: colors.red },
   quiet: { bg: 'transparent', fg: colors.ink, border: 'transparent' },
+  ghost: { bg: 'transparent', fg: colors.onDark, border: '#5A6870' },      // sobre asfalto (portada de la web)
 }));
 
 const styles = themed(() => StyleSheet.create({

@@ -11,7 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SideBar } from '@/components/SideBar';
 import { ToastHost } from '@/components/Toast';
@@ -28,7 +28,7 @@ SplashScreen.preventAutoHideAsync();
 // fondo de la vista raíz: es lo que se ve en la franja del sistema bajo la barra de pestañas (asfalto, como la barra)
 SystemUI.setBackgroundColorAsync(colors.asphalt).catch(() => {});
 
-const AUTH_SCREENS = ['login', 'signup', 'reset-password', 'auth'];
+const AUTH_SCREENS = ['welcome', 'login', 'signup', 'reset-password', 'auth'];
 const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin'];
 
 export default function RootLayout() {
@@ -100,7 +100,8 @@ function Gate({ splash }: { splash: boolean }) {
   useEffect(() => {
     if (loading || !ready) return;
     if (!session) {
-      if (!AUTH_SCREENS.includes(first) && first !== 'join' && first !== 'unirse') resetTo('/login');
+      // en la web, quien llega sin sesión ve la portada; en la app, directamente el acceso
+      if (!AUTH_SCREENS.includes(first) && first !== 'join' && first !== 'unirse') resetTo(Platform.OS === 'web' ? '/welcome' : '/login');
     } else if (AUTH_SCREENS.includes(first) && !settingPassword) {
       if (pendingInvite) {
         resetTo(`/join/${pendingInvite}`);

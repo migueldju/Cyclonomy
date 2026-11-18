@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cardShadow, colors, fonts, space, themed, type } from '../theme';
 import { Screen } from './Screen';
@@ -16,8 +17,10 @@ export function AuthScreen({ title, subtitle, children, footer }: {
   return (
     <Screen padded>
       <View style={[styles.wrap, { paddingTop: insets.top + space.xxl }]}>
-        <Image source={require('../../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain" tintColor={colors.ink}
-               accessibilityLabel="Cyclonomy" />
+        <Pressable onPress={() => router.replace('/welcome')} disabled={Platform.OS !== 'web'} accessibilityRole="link"
+                   accessibilityLabel="Cyclonomy" style={{ alignSelf: 'center' }}>
+          <Image source={require('../../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain" tintColor={colors.ink} />
+        </Pressable>
         <View style={styles.card}>
           {title ? <Txt style={[styles.title, { marginBottom: subtitle ? space.xs : space.l }]}>{title}</Txt> : null}
           {subtitle ? <Txt variant="small" style={{ marginBottom: space.l }}>{subtitle}</Txt> : null}
