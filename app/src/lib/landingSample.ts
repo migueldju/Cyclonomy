@@ -119,6 +119,7 @@ export const SAMPLE = {
   "worlds": [
     {
       "position": 1,
+      "score": 1000,
       "id": 329,
       "name": "Brandon Mcnulty",
       "nationality": "us",
@@ -130,6 +131,7 @@ export const SAMPLE = {
     },
     {
       "position": 2,
+      "score": 750,
       "id": 260,
       "name": "Michael Matthews",
       "nationality": "au",
@@ -141,6 +143,7 @@ export const SAMPLE = {
     },
     {
       "position": 3,
+      "score": 600,
       "id": 1,
       "name": "Mathieu Van Der Poel",
       "nationality": "nl",
@@ -152,6 +155,7 @@ export const SAMPLE = {
     },
     {
       "position": 4,
+      "score": 500,
       "id": 133,
       "name": "Quinn Simmons",
       "nationality": "us",
@@ -163,6 +167,7 @@ export const SAMPLE = {
     },
     {
       "position": 5,
+      "score": 425,
       "id": 331,
       "name": "Isaac Del Toro",
       "nationality": "mx",
@@ -173,6 +178,138 @@ export const SAMPLE = {
       "trend": 0
     }
   ],
+  "rider": {
+    "id": 300,
+    "name": "Sepp Kuss",
+    "nationality": "us",
+    "team": "Team Visma | Lease a Bike",
+    "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Sepp_Kuss_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Sepp_Kuss_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
+    "value": 1539000,
+    "points": 70,
+    "trend": 0,
+    "values": [
+      {
+        "day": "2026-03-01",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-02",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-03",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-04",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-05",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-06",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-07",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-08",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-09",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-10",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-11",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-12",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-13",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-14",
+        "value": 1440000
+      },
+      {
+        "day": "2026-03-15",
+        "value": 1484000
+      },
+      {
+        "day": "2026-03-16",
+        "value": 1525000
+      },
+      {
+        "day": "2026-03-17",
+        "value": 1563000
+      },
+      {
+        "day": "2026-03-18",
+        "value": 1598000
+      },
+      {
+        "day": "2026-03-19",
+        "value": 1631000
+      },
+      {
+        "day": "2026-03-20",
+        "value": 1661000
+      },
+      {
+        "day": "2026-03-21",
+        "value": 1689000
+      },
+      {
+        "day": "2026-03-22",
+        "value": 1665000
+      },
+      {
+        "day": "2026-03-23",
+        "value": 1643000
+      },
+      {
+        "day": "2026-03-24",
+        "value": 1623000
+      },
+      {
+        "day": "2026-03-25",
+        "value": 1605000
+      },
+      {
+        "day": "2026-03-26",
+        "value": 1589000
+      },
+      {
+        "day": "2026-03-27",
+        "value": 1575000
+      },
+      {
+        "day": "2026-03-28",
+        "value": 1562000
+      },
+      {
+        "day": "2026-03-29",
+        "value": 1550000
+      },
+      {
+        "day": "2026-03-30",
+        "value": 1539000
+      }
+    ]
+  },
   "calendar": [
     {
       "race_id": 651,

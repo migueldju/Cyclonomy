@@ -11,18 +11,22 @@ import { Flag } from './Flag';
 import { CategoryBadge } from './Meta';
 import { PositionJersey } from './PositionJersey';
 import { RiderAvatar } from './RiderAvatar';
+import { ValueChart } from './ValueChart';
 import { Txt } from './Txt';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
-type Page = 'market' | 'ranking' | 'worlds' | 'standings' | 'calendar';
+type Page = 'market' | 'ranking' | 'rider' | 'worlds' | 'standings' | 'calendar';
+type Key = Parameters<typeof t>[0];
 
 // páginas del juego que gira la portada, con datos de muestra reales (ver landingSample)
-const PAGES: { page: Page; icon: IconName; title: () => string }[] = [
-  { page: 'market', icon: 'pricetags', title: () => t('tabs.market') },
+// `caption`: el rótulo que sale bajo el carrusel mientras la página está al frente
+const PAGES: { page: Page; icon: IconName; title: () => string; caption?: Key }[] = [
+  { page: 'market', icon: 'pricetags', title: () => t('tabs.market'), caption: 'landing.capMarket' },
   { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title') },
-  { page: 'worlds', icon: 'earth', title: () => categoryName('WC') },
-  { page: 'standings', icon: 'podium', title: () => t('tabs.standings') },
-  { page: 'calendar', icon: 'calendar', title: () => t('tabs.calendar') },
+  { page: 'rider', icon: 'person', title: () => SAMPLE.rider.name, caption: 'landing.capRider' },
+  { page: 'worlds', icon: 'earth', title: () => categoryName('WC'), caption: 'landing.capWorlds' },
+  { page: 'standings', icon: 'podium', title: () => t('tabs.standings'), caption: 'landing.capStandings' },
+  { page: 'calendar', icon: 'calendar', title: () => t('tabs.calendar'), caption: 'landing.capCalendar' },
 ];
 const N = PAGES.length;
 const HALF = Math.floor(N / 2);
@@ -65,10 +69,10 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
     });
   }, [front, vals]);
 
-  const range = Array.from({ length: N }, (_, k) => k - HALF);
+  const range = Array.from({ length: 2 * HALF + 1 }, (_, k) => k - HALF);
   const hover = Platform.OS === 'web' ? { onMouseEnter: () => setPaused(true), onMouseLeave: () => setPaused(false) } : {};
   return (
-    <View style={[styles.wrap, { height: (CARD_H + 60) * size }]} {...hover}>
+    <View style={[styles.wrap, { height: (CARD_H + 110) * size }]} {...hover}>
       <View style={[styles.stage, { height: (CARD_H + 20) * size }]}>
         {PAGES.map((p, i) => {
           const d = offsetOf(i, front);
@@ -77,7 +81,7 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
             <Animated.View key={p.page}
               style={[styles.slot, {
                 zIndex: 10 - Math.abs(d),
-                opacity: v.interpolate({ inputRange: range, outputRange: range.map((k) => (Math.abs(k) >= HALF ? 0 : 1 - Math.abs(k) * 0.35)) }),
+                opacity: v.interpolate({ inputRange: range, outputRange: range.map((k) => (Math.abs(k) >= 2 ? 0 : 1 - Math.abs(k) * 0.35)) }),
                 transform: [
                   { translateX: v.interpolate({ inputRange: range, outputRange: range.map((k) => k * step) }) },
                   { scale: v.interpolate({ inputRange: range, outputRange: range.map((k) => (1 - Math.min(Math.abs(k), 1) * 0.2) * size) }) },
@@ -101,6 +105,10 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
                      style={[styles.dot, i === front && styles.dotOn]} />
         ))}
       </View>
+      {/* el rótulo de la página del frente */}
+      <Txt style={[styles.caption, { fontSize: 30 * Math.max(size, 0.85), lineHeight: 33 * Math.max(size, 0.85) }]} numberOfLines={2} accessibilityLiveRegion="polite">
+        {PAGES[front].caption ? t(PAGES[front].caption!) : ' '}
+      </Txt>
     </View>
   );
 }
@@ -170,6 +178,26 @@ function renderPage(page: Page) {
           ))}
         </Box>
       );
+    case 'rider': {
+      const r = SAMPLE.rider;
+      return (
+        <>
+          <View style={[styles.box, styles.riderHead]}>
+            <RiderAvatar name={r.name} team={r.team} size={46} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <View style={styles.nameLine}>
+                <Txt style={[styles.name, { fontSize: type.body }]} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
+              </View>
+              <Txt variant="small" numberOfLines={1}>{r.team}</Txt>
+            </View>
+            <View style={styles.pts}><Txt style={styles.ptsText}>{points(r.points)}</Txt></View>
+          </View>
+          <View style={[styles.box, { padding: space.s }]}>
+            <ValueChart points={r.values as unknown as { day: string; value: number }[]} />
+          </View>
+        </>
+      );
+    }
     case 'worlds':
       return (
         <>
@@ -188,6 +216,7 @@ function renderPage(page: Page) {
                   </View>
                   <Txt variant="small" numberOfLines={1}>{r.team}</Txt>
                 </View>
+                <View style={styles.score}><Txt style={styles.scoreText}>+{points(r.score)}</Txt></View>
               </View>
             ))}
           </Box>
@@ -264,6 +293,15 @@ const styles = themed(() => StyleSheet.create({
   crest: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   crestText: { fontFamily: fonts.bodyBold, color: '#FFFFFF', fontSize: type.small },
   dots: { flexDirection: 'row', gap: 8, marginTop: space.m },
+  caption: {
+    fontFamily: fonts.display, color: colors.jersey, letterSpacing: 0.8, textAlign: 'center', marginTop: space.m,
+    minHeight: 40, paddingHorizontal: space.l,
+  },
+  riderHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.m },
+  tiles: { flexDirection: 'row', gap: space.s },
+  tile: { flex: 1, backgroundColor: colors.paper, borderRadius: 12, paddingHorizontal: space.m, paddingVertical: space.s, gap: 2 },
+  score: { backgroundColor: colors.greenSoft, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
+  scoreText: { fontFamily: fonts.number, fontSize: type.small, color: colors.green },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)' },
   dotOn: { width: 22, backgroundColor: colors.jersey },
 }));
