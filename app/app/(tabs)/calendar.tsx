@@ -130,7 +130,7 @@ const LANE_TOP = 45;      // donde empiezan las líneas de las vueltas
  * cruza los días que duran; las carreras de un día, un punto bajo el número. Todo va a alturas fijas: el número, los
  * puntos y las tres líneas quedan alineados en todos los días.
  */
-function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: {
+export function MonthGrid({ month, width, races, selected, onSelect, onPrev, onNext }: {
   month: string; width: number; races: CalendarRow[]; selected: string; onSelect: (d: string) => void;
   onPrev?: () => void; onNext?: () => void;
 }) {

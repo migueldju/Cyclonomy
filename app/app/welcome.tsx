@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Image, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { LoginForm, SignupForm } from '@/components/AuthForms';
 import { Button } from '@/components/Button';
-import { GameCarousel } from '@/components/GameCarousel';
+import { Features, HowItWorks } from '@/components/GameIntro';
 import { Pills } from '@/components/Hero';
+import { GameCarousel } from '@/components/GameCarousel';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { cardShadow, colors, fonts, space, themed, UCI_RAINBOW } from '@/theme';
@@ -19,6 +20,7 @@ const DROP_W = 400;
 export default function Welcome() {
   const { width, height } = useWindowDimensions();
   const wide = width >= 900;
+  const columns = width >= 900 ? 3 : width >= 620 ? 2 : 1;
   // en el ordenador, entrar y crear cuenta se abren en un desplegable bajo el menú, sin cambiar de página
   // el desplegable cuelga del botón que lo abre: se mide dónde está en la ventana
   const [panel, setPanel] = useState<Panel | null>(null);
@@ -90,9 +92,9 @@ export default function Welcome() {
               <Button kind="ghost" label={t('landing.haveAccount')} onPress={() => open('login', true)} style={styles.cta} />
             </View>
           </View>
-          {/* los menús del juego, girando */}
+          {/* páginas del juego, girando */}
           <View style={[styles.carousel, !wide && { marginTop: space.xl }]}>
-            <GameCarousel size={wide ? 1 : 0.86} />
+            <GameCarousel size={wide ? 1 : 0.8} />
           </View>
         </View>
       </View>
@@ -101,6 +103,25 @@ export default function Welcome() {
         {UCI_RAINBOW.map((c) => <View key={c} style={{ flex: 1, backgroundColor: c }} />)}
       </View>
 
+      <View style={[styles.inner, styles.block]}>
+        <Txt variant="hero" style={styles.blockTitle}>{t('landing.howTitle')}</Txt>
+        <HowItWorks columns={columns} />
+      </View>
+
+      <View style={[styles.inner, styles.block]}>
+        <Txt variant="hero" style={styles.blockTitle}>{t('landing.featTitle')}</Txt>
+        <Features columns={wide ? 2 : 1} />
+      </View>
+
+      {/* llamada final, en amarillo maillot */}
+      <View style={[styles.inner, styles.block]}>
+        <View style={[styles.band, wide && styles.bandWide]}>
+          <Txt style={styles.bandTitle}>{t('landing.title')}</Txt>
+          <Button kind="dark" label={t('landing.cta')} onPress={() => open('signup', true)} />
+        </View>
+      </View>
+
+      <View style={{ flexGrow: 1 }} />
       <Txt variant="small" style={styles.footer}>© {new Date().getFullYear()} Cyclonomy</Txt>
     </ScrollView>
 
@@ -139,7 +160,7 @@ export default function Welcome() {
 const styles = themed(() => StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.road },
   inner: { width: '100%', maxWidth: MAX, alignSelf: 'center', paddingHorizontal: space.xl },
-  top: { flexGrow: 1, backgroundColor: colors.asphalt, paddingBottom: space.xxl * 1.5 },
+  top: { backgroundColor: colors.asphalt, paddingBottom: space.xxl * 1.5 },
   nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: space.l },
   logo: { width: 168, height: 28 },
   navButtons: { flexDirection: 'row', alignItems: 'center', gap: space.s },
@@ -153,7 +174,7 @@ const styles = themed(() => StyleSheet.create({
   },
   caret: { position: 'absolute', width: 14, height: 14, backgroundColor: colors.paper, transform: [{ rotate: '45deg' }], zIndex: 1 },
   dropHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.l },
-  hero: { paddingTop: space.xxl, flexGrow: 1, justifyContent: 'center' },          // centrada en el alto que queda
+  hero: { paddingTop: space.xxl },
   heroWide: { flexDirection: 'row', alignItems: 'center', gap: space.xxl, paddingTop: space.xxl * 1.5 },
   title: { fontFamily: fonts.display, fontSize: 64, lineHeight: 66, letterSpacing: 1, color: colors.onDark },
   titleNarrow: { fontSize: 44, lineHeight: 46 },
@@ -162,5 +183,12 @@ const styles = themed(() => StyleSheet.create({
   cta: { paddingHorizontal: space.xl },
   carousel: { flex: 1, minWidth: 0, overflow: 'hidden' },
   stripes: { flexDirection: 'row', height: 8 },
+  block: { paddingTop: space.xxl * 1.5 },
+  blockTitle: { marginBottom: space.l },
+  band: {
+    backgroundColor: colors.jersey, borderRadius: 24, padding: space.xxl, gap: space.l, alignItems: 'flex-start',
+  },
+  bandWide: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  bandTitle: { fontFamily: fonts.display, fontSize: 34, lineHeight: 38, color: colors.jerseyInk, flexShrink: 1 },
   footer: { textAlign: 'center', paddingVertical: space.xxl },
 }));

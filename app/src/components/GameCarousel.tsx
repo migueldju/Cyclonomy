@@ -1,29 +1,36 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { type ComponentProps, useEffect, useRef, useState } from 'react';
+import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { MonthGrid } from '../../app/(tabs)/calendar';
 import { t } from '../i18n';
-import { categoryColor, colors, fonts, space, themed, UCI_RAINBOW } from '../theme';
+import { moneyShort, points } from '../lib/format';
+import { SAMPLE } from '../lib/landingSample';
+import type { CalendarRow } from '../lib/types';
+import { categoryName, colors, fonts, space, themed, type } from '../theme';
+import { Flag } from './Flag';
+import { CategoryBadge } from './Meta';
 import { PositionJersey } from './PositionJersey';
+import { RiderAvatar } from './RiderAvatar';
 import { Txt } from './Txt';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
-type Kind = 'home' | 'market' | 'squad' | 'standings' | 'calendar' | 'clauses' | 'leagues';
+type Page = 'market' | 'ranking' | 'worlds' | 'standings' | 'calendar';
 
-// los menús y funciones del juego, cada uno con un color de carrera
-const CARDS: { kind: Kind; icon: IconName; title: Parameters<typeof t>[0]; tint: string }[] = [
-  { kind: 'home', icon: 'home', title: 'tabs.home', tint: 'TDF' },
-  { kind: 'market', icon: 'pricetags', title: 'tabs.market', tint: 'PRO' },
-  { kind: 'squad', icon: 'people', title: 'tabs.squad', tint: 'MWT' },
-  { kind: 'standings', icon: 'podium', title: 'tabs.standings', tint: 'GT' },
-  { kind: 'calendar', icon: 'calendar', title: 'tabs.calendar', tint: 'SWT' },
-  { kind: 'clauses', icon: 'flash', title: 'landing.f3T', tint: 'MON' },
-  { kind: 'leagues', icon: 'trophy', title: 'landing.f4T', tint: 'NC' },
+// páginas del juego que gira la portada, con datos de muestra reales (ver landingSample)
+const PAGES: { page: Page; icon: IconName; title: () => string }[] = [
+  { page: 'market', icon: 'pricetags', title: () => t('tabs.market') },
+  { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title') },
+  { page: 'worlds', icon: 'earth', title: () => categoryName('WC') },
+  { page: 'standings', icon: 'podium', title: () => t('tabs.standings') },
+  { page: 'calendar', icon: 'calendar', title: () => t('tabs.calendar') },
 ];
-const N = CARDS.length;
+const N = PAGES.length;
 const HALF = Math.floor(N / 2);
-const EVERY = 2800;          // ms entre giro y giro
+const EVERY = 3200;          // ms entre giro y giro
+const CARD_W = 320;
+const CARD_H = 500;
 
-// posición relativa de la tarjeta i con la i-ésima al frente: de -HALF a HALF
+// posición relativa de la página i con la `front` delante: de -HALF a HALF
 const offsetOf = (i: number, front: number) => {
   let d = (i - front) % N;
   if (d > HALF) d -= N;
@@ -32,15 +39,15 @@ const offsetOf = (i: number, front: number) => {
 };
 
 /**
- * Carrusel giratorio con los menús del juego: la tarjeta del frente, grande, y las de los lados más pequeñas y
- * apagadas. Gira solo; al pasar el ratón se para, y se puede tocar una tarjeta o un punto para traerla al frente.
+ * Carrusel giratorio con páginas del juego tal como se ven dentro: la del frente, grande, y las de los lados más
+ * pequeñas, giradas y apagadas. Gira solo; se para con el ratón encima, y se trae una al frente tocándola o con los puntos.
  */
 export function GameCarousel({ size = 1 }: { size?: number }) {
   const [front, setFront] = useState(0);
   const [paused, setPaused] = useState(false);
-  const vals = useRef(CARDS.map((_, i) => new Animated.Value(offsetOf(i, 0)))).current;
-  const last = useRef(CARDS.map((_, i) => offsetOf(i, 0)));
-  const step = 150 * size;
+  const vals = useRef(PAGES.map((_, i) => new Animated.Value(offsetOf(i, 0)))).current;
+  const last = useRef(PAGES.map((_, i) => offsetOf(i, 0)));
+  const step = 175 * size;
 
   useEffect(() => {
     if (paused) return;
@@ -49,47 +56,48 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
   }, [paused]);
 
   useEffect(() => {
-    CARDS.forEach((_, i) => {
+    PAGES.forEach((_, i) => {
       const d = offsetOf(i, front);
       // la que da la vuelta por detrás salta sin animación (va invisible)
       if (Math.abs(d - last.current[i]) > 1) vals[i].setValue(d);
-      else Animated.timing(vals[i], { toValue: d, duration: 650, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start();
+      else Animated.timing(vals[i], { toValue: d, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start();
       last.current[i] = d;
     });
   }, [front, vals]);
 
   const range = Array.from({ length: N }, (_, k) => k - HALF);
+  const hover = Platform.OS === 'web' ? { onMouseEnter: () => setPaused(true), onMouseLeave: () => setPaused(false) } : {};
   return (
-    <View style={[styles.wrap, { height: 380 * size }]}
-          // @ts-expect-error: solo en la web (el ratón encima para el giro)
-          onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-      <View style={[styles.stage, { height: 330 * size }]}>
-        {CARDS.map((c, i) => {
+    <View style={[styles.wrap, { height: (CARD_H + 60) * size }]} {...hover}>
+      <View style={[styles.stage, { height: (CARD_H + 20) * size }]}>
+        {PAGES.map((p, i) => {
           const d = offsetOf(i, front);
           const v = vals[i];
           return (
-            <Animated.View key={c.kind}
+            <Animated.View key={p.page}
               style={[styles.slot, {
                 zIndex: 10 - Math.abs(d),
-                opacity: v.interpolate({ inputRange: range, outputRange: range.map((k) => (Math.abs(k) >= HALF ? 0 : 1 - Math.abs(k) * 0.3)) }),
+                opacity: v.interpolate({ inputRange: range, outputRange: range.map((k) => (Math.abs(k) >= HALF ? 0 : 1 - Math.abs(k) * 0.35)) }),
                 transform: [
-                  { translateX: v.interpolate({ inputRange: range, outputRange: range.map((k) => k * step - Math.sign(k) * Math.max(0, Math.abs(k) - 1) * step * 0.35) }) },
-                  { scale: v.interpolate({ inputRange: range, outputRange: range.map((k) => 1 - Math.min(Math.abs(k), 2) * 0.16) }) },
-                  { perspective: 900 },
-                  { rotateY: v.interpolate({ inputRange: range, outputRange: range.map((k) => `${-k * 18}deg`) }) },
+                  { translateX: v.interpolate({ inputRange: range, outputRange: range.map((k) => k * step) }) },
+                  { scale: v.interpolate({ inputRange: range, outputRange: range.map((k) => (1 - Math.min(Math.abs(k), 1) * 0.2) * size) }) },
+                  { perspective: 1000 },
+                  { rotateY: v.interpolate({ inputRange: range, outputRange: range.map((k) => `${-k * 22}deg`) }) },
                 ],
               }]}>
-              <Pressable onPress={() => setFront(i)} disabled={d === 0} accessibilityRole="button"
-                         accessibilityLabel={t(c.title)} style={{ transform: [{ scale: size }] }}>
-                <Card c={c} />
-              </Pressable>
+              <Card icon={p.icon} title={p.title()}>{renderPage(p.page)}</Card>
+              {/* las de los lados se traen al frente tocándolas (encima, para no meter botones dentro de botones) */}
+              {d !== 0 ? (
+                <Pressable onPress={() => setFront(i)} accessibilityRole="button" accessibilityLabel={p.title()}
+                           style={StyleSheet.absoluteFill} />
+              ) : null}
             </Animated.View>
           );
         })}
       </View>
       <View style={styles.dots}>
-        {CARDS.map((c, i) => (
-          <Pressable key={c.kind} onPress={() => setFront(i)} accessibilityRole="button" accessibilityLabel={t(c.title)} hitSlop={6}
+        {PAGES.map((p, i) => (
+          <Pressable key={p.page} onPress={() => setFront(i)} accessibilityRole="button" accessibilityLabel={p.title()} hitSlop={6}
                      style={[styles.dot, i === front && styles.dotOn]} />
         ))}
       </View>
@@ -97,138 +105,164 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
   );
 }
 
-/** Una tarjeta: cabecera del color del menú con su icono y su nombre, y debajo un dibujo de la pantalla */
-function Card({ c }: { c: (typeof CARDS)[number] }) {
-  const tint = categoryColor[c.tint];
+/** El marco de una página: la barra de asfalto de la app con el título, y el contenido sobre el fondo gris */
+function Card({ icon, title, children }: { icon: IconName; title: string; children: ReactNode }) {
   return (
     <View style={styles.card}>
-      <View style={[styles.head, { backgroundColor: tint }]}>
-        <View style={styles.headIcon}><Ionicons name={c.icon} size={20} color={tint} /></View>
-        <Txt style={[styles.headTitle, { color: c.tint === 'TDF' ? colors.onLight : colors.onDark }]} numberOfLines={1}>{t(c.title)}</Txt>
+      <View style={styles.bar}>
+        <Ionicons name={icon} size={18} color={colors.jersey} />
+        <Txt style={styles.barTitle} numberOfLines={1}>{title}</Txt>
       </View>
-      <View style={styles.body}><Sketch kind={c.kind} tint={tint} /></View>
+      {/* solo para ver: dentro no se pulsa nada */}
+      <View style={styles.body} pointerEvents="none">{children}</View>
     </View>
   );
 }
 
-// barra gris de «texto»
-const Bar = ({ w, h = 8, c }: { w: number | `${number}%`; h?: number; c?: string }) =>
-  <View style={{ width: w, height: h, borderRadius: h / 2, backgroundColor: c ?? colors.line }} />;
-const Dot = ({ s = 26, c }: { s?: number; c?: string }) =>
-  <View style={{ width: s, height: s, borderRadius: s / 2, backgroundColor: c ?? colors.line }} />;
+const Box = ({ children }: { children: ReactNode }) => <View style={styles.box}>{children}</View>;
 
-/** Dibujo esquemático de cada pantalla (sin datos de verdad) */
-function Sketch({ kind, tint }: { kind: Kind; tint: string }) {
-  const row = (k: number, right: React.ReactNode) => (
-    <View key={k} style={styles.row}>
-      <Dot />
-      <View style={{ flex: 1, gap: 5 }}><Bar w="80%" /><Bar w="50%" h={6} /></View>
-      {right}
-    </View>
-  );
-  switch (kind) {
+function renderPage(page: Page) {
+  switch (page) {
     case 'market':
-      return <>{[0, 1, 2, 3].map((k) => row(k, (
-        <View style={styles.price}>
-          <Ionicons name={k % 3 === 2 ? 'arrow-down' : 'arrow-up'} size={11} color={k % 3 === 2 ? colors.red : colors.green} />
-          <Bar w={34} h={7} c={colors.ink} />
-        </View>
-      )))}</>;
-    case 'squad':
       return (
-        <View style={styles.grid}>
-          {Array.from({ length: 9 }, (_, k) => (
-            <View key={k} style={styles.gridCell}><Dot s={30} c={k % 4 === 0 ? tint + '55' : undefined} /><Bar w={36} h={6} /></View>
-          ))}
-        </View>
+        <Box>
+          {SAMPLE.market.map((r, i) => {
+            const trend = TREND[String(r.trend) as '1' | '0' | '-1'];
+            return (
+              <View key={r.id} style={[styles.row, i < SAMPLE.market.length - 1 && styles.line]}>
+                <RiderAvatar name={r.name} team={r.team} size={34} />
+                <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
+                  <View style={styles.nameLine}>
+                    <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
+                  </View>
+                  <View style={styles.nameLine}>
+                    <View style={styles.pts}><Txt style={styles.ptsText}>{points(r.points)}</Txt></View>
+                    <Txt variant="small" numberOfLines={1} style={[styles.small, { flexShrink: 1 }]}>{r.team}</Txt>
+                  </View>
+                </View>
+                <View style={styles.nameLine}>
+                  <Ionicons name={trend.icon} size={13} color={trend.color} />
+                  <Txt variant="number" style={styles.num}>{moneyShort(r.value)}</Txt>
+                </View>
+              </View>
+            );
+          })}
+        </Box>
       );
-    case 'standings':
-      return <>{[1, 2, 3, 4].map((p) => (
-        <View key={p} style={styles.row}>
-          <PositionJersey position={p} size={28} />
-          <View style={{ flex: 1, gap: 5 }}><Bar w="70%" /><Bar w="40%" h={6} /></View>
-          <Bar w={30} h={9} c={colors.ink} />
-        </View>
-      ))}</>;
-    case 'calendar':
+    case 'ranking':
       return (
-        <View style={styles.grid}>
-          {Array.from({ length: 28 }, (_, k) => (
-            <View key={k} style={styles.calCell}>
-              <View style={[styles.calNum, k === 17 && { backgroundColor: colors.jersey }]} />
-              {k % 3 === 0 ? <View style={[styles.calDot, { backgroundColor: Object.values(categoryColor)[k % 9] }]} /> : null}
+        <Box>
+          {SAMPLE.ranking.map((r, i) => (
+            <View key={r.id} style={[styles.row, i < SAMPLE.ranking.length - 1 && styles.line]}>
+              <Txt variant="number" style={styles.rank}>{i + 1}</Txt>
+              <RiderAvatar name={r.name} team={r.team} size={34} />
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <View style={styles.nameLine}>
+                  <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
+                </View>
+                <Txt variant="small" numberOfLines={1}>{r.team}</Txt>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Txt variant="number" style={styles.num}>{points(r.points)}</Txt>
+                <Txt variant="small" style={styles.small}>{moneyShort(r.value)}</Txt>
+              </View>
             </View>
           ))}
-          <View style={[styles.calLine, { top: 34, left: '28%', width: '58%', backgroundColor: categoryColor.MWT }]} />
-          <View style={[styles.calLine, { top: 104, left: '0%', width: '44%', backgroundColor: categoryColor.SWT }]} />
-        </View>
+        </Box>
       );
-    case 'clauses':
-      return (
-        <View style={styles.center}>
-          <View style={[styles.bigIcon, { backgroundColor: tint + '22' }]}><Ionicons name="flash" size={42} color={tint} /></View>
-          <Bar w="70%" h={10} c={colors.ink} />
-          <View style={styles.clauseRow}><Ionicons name="lock-closed" size={14} color={colors.blue} /><Bar w={90} /></View>
-        </View>
-      );
-    case 'leagues':
-      return (
-        <View style={styles.center}>
-          <View style={styles.podium}>
-            <View style={[styles.step, { height: 46 }]}><PositionJersey position={2} size={34} /></View>
-            <View style={[styles.step, { height: 66 }]}><PositionJersey position={1} size={40} /></View>
-            <View style={[styles.step, { height: 34 }]}><PositionJersey position={3} size={30} /></View>
-          </View>
-          <View style={styles.rainbow}>{UCI_RAINBOW.map((c) => <View key={c} style={{ flex: 1, backgroundColor: c }} />)}</View>
-        </View>
-      );
-    default:   // inicio
+    case 'worlds':
       return (
         <>
-          <View style={[styles.hero, { backgroundColor: colors.road }]}>
-            <PositionJersey position={1} size={34} />
-            <View style={{ flex: 1, gap: 5 }}><Bar w="40%" h={6} /><Bar w="60%" h={12} c={colors.ink} /></View>
+          <View style={styles.raceHead}>
+            <CategoryBadge code="WC" stageRace={false} name="World Championships" />
+            <Txt variant="small">27/09/2026 · Montréal</Txt>
           </View>
-          {[0, 1, 2].map((k) => (
-            <View key={k} style={styles.row}>
-              <View style={[styles.swatch, { backgroundColor: [categoryColor.MWT, categoryColor.PRO, categoryColor.C1][k] }]} />
-              <View style={{ flex: 1, gap: 5 }}><Bar w="75%" /><Bar w="45%" h={6} /></View>
+          <Box>
+            {SAMPLE.worlds.map((r, i) => (
+              <View key={r.id} style={[styles.row, i < SAMPLE.worlds.length - 1 && styles.line]}>
+                <PositionJersey position={r.position} size={30} />
+                <RiderAvatar name={r.name} team={r.team} size={34} />
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <View style={styles.nameLine}>
+                    <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
+                  </View>
+                  <Txt variant="small" numberOfLines={1}>{r.team}</Txt>
+                </View>
+              </View>
+            ))}
+          </Box>
+        </>
+      );
+    case 'standings':
+      return (
+        <Box>
+          {STANDINGS.map((s, i) => (
+            <View key={s.team} style={[styles.row, i < STANDINGS.length - 1 && styles.line, i === 1 && { backgroundColor: colors.highlight }]}>
+              <PositionJersey position={i + 1} size={30} />
+              <View style={[styles.crest, { backgroundColor: s.color }]}><Txt style={styles.crestText}>{s.team[0]}</Txt></View>
+              <View style={{ flex: 1, minWidth: 0 }}>
+                <View style={styles.nameLine}><Txt style={styles.name} numberOfLines={1}>{s.team}</Txt><Flag code={s.country} /></View>
+                <Txt variant="small" numberOfLines={1}>{moneyShort(s.value)}</Txt>
+              </View>
+              <Txt variant="number" style={styles.num}>{points(s.points)}</Txt>
             </View>
           ))}
-        </>
+        </Box>
+      );
+    default:
+      return (
+        <View style={{ marginHorizontal: -space.l, marginTop: -space.l }}>
+          <MonthGrid month="2026-09" width={CARD_W} races={SAMPLE.calendar as unknown as CalendarRow[]}
+                     selected="2026-09-27" onSelect={() => undefined} />
+        </View>
       );
   }
 }
 
-const CARD_W = 230;
+const TREND = themed(() => ({
+  '1': { icon: 'arrow-up' as IconName, color: colors.green },
+  '0': { icon: 'remove' as IconName, color: colors.inkSoft },
+  '-1': { icon: 'arrow-down' as IconName, color: colors.red },
+}));
+
+// equipos inventados (las ligas de los jugadores son privadas)
+const STANDINGS = [
+  { team: 'Los Escaladores', country: 'es', points: 4210, value: 58_400_000, color: '#2B66D9' },
+  { team: 'Pavé & Barro', country: 'be', points: 3985, value: 61_200_000, color: '#C0613A' },
+  { team: 'Abanico CC', country: 'nl', points: 3640, value: 49_800_000, color: '#1F9A57' },
+  { team: 'La Grupeta', country: 'it', points: 3310, value: 52_100_000, color: '#7A4BC2' },
+  { team: 'Contrarreloj FC', country: 'fr', points: 2975, value: 44_900_000, color: '#16A3B8' },
+  { team: 'Fuga Bidea', country: 'es', points: 2730, value: 40_300_000, color: '#E8578A' },
+];
+
 const styles = themed(() => StyleSheet.create({
   wrap: { width: '100%', alignItems: 'center', justifyContent: 'center' },
   stage: { width: '100%', alignItems: 'center', justifyContent: 'center' },
   slot: { position: 'absolute' },
   card: {
-    width: CARD_W, height: 300, backgroundColor: colors.paper, borderRadius: 22, overflow: 'hidden',
-    shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 22, shadowOffset: { width: 0, height: 10 }, elevation: 8,
+    width: CARD_W, height: CARD_H, backgroundColor: colors.road, borderRadius: 26, overflow: 'hidden',
+    borderWidth: 4, borderColor: '#0E1315',
+    shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 26, shadowOffset: { width: 0, height: 12 }, elevation: 10,
   },
-  head: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.l, paddingVertical: space.m },
-  headIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center' },
-  headTitle: { fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.6, flexShrink: 1 },
-  body: { flex: 1, padding: space.m, gap: space.s },
-  row: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingVertical: 4 },
-  price: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: space.s },
-  gridCell: { width: '33.3%', alignItems: 'center', gap: 5, paddingVertical: 2 },
-  calCell: { width: `${100 / 7}%`, height: 34, alignItems: 'center', gap: 4, paddingTop: 2 },
-  calNum: { width: 16, height: 16, borderRadius: 8, backgroundColor: colors.line },
-  calDot: { width: 5, height: 5, borderRadius: 3 },
-  calLine: { position: 'absolute', height: 4, borderRadius: 2 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.m },
-  bigIcon: { width: 84, height: 84, borderRadius: 42, alignItems: 'center', justifyContent: 'center' },
-  clauseRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  podium: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
-  step: { width: 56, backgroundColor: colors.road, borderTopLeftRadius: 8, borderTopRightRadius: 8, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 0, marginTop: 40 },
-  rainbow: { flexDirection: 'row', width: 180, height: 5, borderRadius: 3, overflow: 'hidden' },
-  hero: { flexDirection: 'row', alignItems: 'center', gap: space.s, borderRadius: 14, padding: space.s, marginBottom: 2 },
-  swatch: { width: 4, alignSelf: 'stretch', borderRadius: 2 },
+  bar: {
+    flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.asphalt,
+    paddingHorizontal: space.l, paddingVertical: space.m, borderBottomLeftRadius: 18, borderBottomRightRadius: 18,
+  },
+  barTitle: { fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.8, color: colors.onDark, flexShrink: 1 },
+  body: { flex: 1, padding: space.l, gap: space.m, overflow: 'hidden' },
+  box: { backgroundColor: colors.paper, borderRadius: 16, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.m, paddingVertical: 9 },
+  line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
+  rank: { width: 16, color: colors.inkSoft, fontSize: type.small },
+  nameLine: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  name: { fontFamily: fonts.bodyBold, fontSize: type.small, color: colors.ink, flexShrink: 1 },
+  num: { fontSize: type.small },
+  small: { fontSize: 11 },
+  pts: { backgroundColor: colors.road, borderRadius: 5, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 4 },
+  ptsText: { fontFamily: fonts.bodyBold, fontSize: 10, color: colors.ink },
+  raceHead: { flexDirection: 'row', alignItems: 'center', gap: space.s },
+  crest: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  crestText: { fontFamily: fonts.bodyBold, color: '#FFFFFF', fontSize: type.small },
   dots: { flexDirection: 'row', gap: 8, marginTop: space.m },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.25)' },
   dotOn: { width: 22, backgroundColor: colors.jersey },
