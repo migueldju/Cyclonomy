@@ -25,7 +25,7 @@ const RANGES = [
 type Range = (typeof RANGES)[number]['value'];
 
 /** Evolución del valor de mercado, con selector de periodo: 3 días, 1 semana, 1 mes, 3 meses o todo (por defecto). */
-export function ValueChart({ points }: { points: Point[] }) {
+export function ValueChart({ points, dense }: { points: Point[]; dense?: boolean }) {    // dense: para huecos estrechos
   const [range, setRange] = useState<Range>('all');
   if (points.length < 2) return <Chart points={points} />;
   // desde N días antes del último dato (incluido, para que el cambio abarque los N días)
@@ -36,7 +36,7 @@ export function ValueChart({ points }: { points: Point[] }) {
   return (
     <View>
       <Pills options={RANGES.map((r) => ({ value: r.value, label: t(r.label) }))} value={range} onChange={setRange} compact
-             style={{ marginHorizontal: space.l, marginTop: space.l, alignSelf: 'center' }} />
+             dense={dense} style={{ marginHorizontal: dense ? 0 : space.l, marginTop: dense ? space.s : space.l, alignSelf: 'center' }} />
       {/* key: al cambiar de periodo se olvida el día señalado */}
       <Chart key={range} points={shown.length >= 2 ? shown : points.slice(-2)} />
     </View>

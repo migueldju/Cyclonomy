@@ -193,7 +193,7 @@ function renderPage(page: Page) {
             <View style={styles.pts}><Txt style={styles.ptsText}>{points(r.points)}</Txt></View>
           </View>
           <View style={[styles.box, { padding: space.s }]}>
-            <ValueChart points={r.values as unknown as { day: string; value: number }[]} />
+            <ValueChart dense points={r.values as unknown as { day: string; value: number }[]} />
           </View>
         </>
       );
