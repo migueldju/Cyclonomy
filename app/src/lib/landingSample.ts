@@ -1,6 +1,7 @@
 // Datos de muestra para la portada de la web (quien la ve aún no tiene sesión y no puede leer la base de datos).
 // Ciclistas, valores, puntos y carreras reales del juego, sacados de la base de datos; se regeneran a mano.
 // Los equipos de la clasificación son inventados: las ligas de los jugadores son privadas.
+// El ranking está retocado a mano: Pogačar 1.º, Vingegaard 3.º y Evenepoel 4.º con 1.150 pts.
 export const SAMPLE = {
   "market": [
     {
@@ -56,12 +57,12 @@ export const SAMPLE = {
   ],
   "ranking": [
     {
-      "id": 297,
-      "name": "Jonas Vingegaard",
-      "nationality": "dk",
-      "team": "Team Visma | Lease a Bike",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Jonas_Vingegaard_PN26_%28cropped%29.jpg/500px-Jonas_Vingegaard_PN26_%28cropped%29.jpg",
-      "value": 4670000,
+      "id": 325,
+      "name": "Tadej Pogačar",
+      "nationality": "si",
+      "team": "UAE Team Emirates - XRG",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg/500px-Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg",
+      "value": 10200000,
       "points": 1805,
       "trend": 0
     },
@@ -76,13 +77,23 @@ export const SAMPLE = {
       "trend": 0
     },
     {
-      "id": 325,
-      "name": "Tadej Pogačar",
-      "nationality": "si",
-      "team": "UAE Team Emirates - XRG",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg/500px-Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg",
-      "value": 10200000,
+      "id": 297,
+      "name": "Jonas Vingegaard",
+      "nationality": "dk",
+      "team": "Team Visma | Lease a Bike",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Jonas_Vingegaard_PN26_%28cropped%29.jpg/500px-Jonas_Vingegaard_PN26_%28cropped%29.jpg",
+      "value": 4670000,
       "points": 1250,
+      "trend": 0
+    },
+    {
+      "id": 236,
+      "name": "Remco Evenepoel",
+      "nationality": "be",
+      "team": "Red Bull - BORA - hansgrohe",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/REMCO_EVENEPOEL.png/500px-REMCO_EVENEPOEL.png",
+      "value": 8290000,
+      "points": 1150,
       "trend": 0
     },
     {
@@ -103,16 +114,6 @@ export const SAMPLE = {
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Tom_Pidcock_%282023%29.jpg/500px-Tom_Pidcock_%282023%29.jpg",
       "value": 4140000,
       "points": 1005,
-      "trend": 0
-    },
-    {
-      "id": 28,
-      "name": "Lenny Martinez",
-      "nationality": "fr",
-      "team": "Bahrain Victorious",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
-      "value": 3350000,
-      "points": 995,
       "trend": 0
     }
   ],
