@@ -501,6 +501,7 @@ const da: Partial<Dict> = {
   "theme.light": "Lyst",
   "theme.dark": "Mørkt",
   "landing.capMarket": "Køb de bedste ryttere",
+  "landing.capRanking": "Sammenlign og find den bedste mulighed",
   "landing.capRider": "Optimer dit hold",
   "landing.capWorlds": "Point baseret på rigtige resultater",
   "landing.capStandings": "Dyst mod dine venner",

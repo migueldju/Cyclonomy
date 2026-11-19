@@ -501,6 +501,7 @@ const cs: Partial<Dict> = {
   "theme.light": "Světlý",
   "theme.dark": "Tmavý",
   "landing.capMarket": "Kupuj nejlepší jezdce",
+  "landing.capRanking": "Porovnávej a najdi nejlepší příležitost",
   "landing.capRider": "Vylepši svou sestavu",
   "landing.capWorlds": "Body podle skutečných výsledků",
   "landing.capStandings": "Soupeř s přáteli",

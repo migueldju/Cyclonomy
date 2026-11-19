@@ -18,10 +18,10 @@ type Page = 'market' | 'ranking' | 'rider' | 'worlds' | 'standings' | 'calendar'
 type Key = Parameters<typeof t>[0];
 
 // páginas del juego que gira la portada, con datos de muestra reales (ver landingSample)
-// `caption`: el rótulo que sale bajo el carrusel mientras la página está al frente
+// `caption`: el rótulo que sale sobre el carrusel mientras la página está al frente
 const PAGES: { page: Page; icon: IconName; title: () => string; caption?: Key }[] = [
   { page: 'market', icon: 'pricetags', title: () => t('tabs.market'), caption: 'landing.capMarket' },
-  { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title') },
+  { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title'), caption: 'landing.capRanking' },
   { page: 'rider', icon: 'person', title: () => SAMPLE.rider.name, caption: 'landing.capRider' },
   { page: 'worlds', icon: 'list', title: () => t('stage.scores'), caption: 'landing.capWorlds' },
   { page: 'standings', icon: 'podium', title: () => t('tabs.standings'), caption: 'landing.capStandings' },
@@ -72,6 +72,10 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
   const hover = Platform.OS === 'web' ? { onMouseEnter: () => setPaused(true), onMouseLeave: () => setPaused(false) } : {};
   return (
     <View style={[styles.wrap, { height: (CARD_H + 110) * size }]} {...hover}>
+      {/* el rótulo de la página del frente, encima */}
+      <Txt style={[styles.caption, { fontSize: 30 * Math.max(size, 0.85), lineHeight: 33 * Math.max(size, 0.85) }]} numberOfLines={2} accessibilityLiveRegion="polite">
+        {PAGES[front].caption ? t(PAGES[front].caption!) : ' '}
+      </Txt>
       <View style={[styles.stage, { height: (CARD_H + 20) * size }]}>
         {PAGES.map((p, i) => {
           const d = offsetOf(i, front);
@@ -104,10 +108,6 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
                      style={[styles.dot, i === front && styles.dotOn]} />
         ))}
       </View>
-      {/* el rótulo de la página del frente */}
-      <Txt style={[styles.caption, { fontSize: 30 * Math.max(size, 0.85), lineHeight: 33 * Math.max(size, 0.85) }]} numberOfLines={2} accessibilityLiveRegion="polite">
-        {PAGES[front].caption ? t(PAGES[front].caption!) : ' '}
-      </Txt>
     </View>
   );
 }
@@ -126,17 +126,18 @@ function Card({ icon, title, children }: { icon: IconName; title: string; childr
   );
 }
 
-const Box = ({ children }: { children: ReactNode }) => <View style={styles.box}>{children}</View>;
+const Box = ({ children, fill }: { children: ReactNode; fill?: boolean }) =>
+  <View style={[styles.box, fill && styles.boxFill]}>{children}</View>;
 
 function renderPage(page: Page) {
   switch (page) {
     case 'market':
       return (
-        <Box>
-          {SAMPLE.market.map((r, i) => {
+        <Box fill>
+          {MARKET.map((r, i) => {
             const trend = TREND[String(r.trend) as '1' | '0' | '-1'];
             return (
-              <View key={r.id} style={[styles.row, i < SAMPLE.market.length - 1 && styles.line]}>
+              <View key={r.id} style={[styles.row, i < MARKET.length - 1 && styles.line]}>
                 <RiderAvatar name={r.name} team={r.team} size={34} />
                 <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
                   <View style={styles.nameLine}>
@@ -158,9 +159,9 @@ function renderPage(page: Page) {
       );
     case 'ranking':
       return (
-        <Box>
-          {SAMPLE.ranking.map((r, i) => (
-            <View key={r.id} style={[styles.row, i < SAMPLE.ranking.length - 1 && styles.line]}>
+        <Box fill>
+          {RANKING.map((r, i) => (
+            <View key={r.id} style={[styles.row, i < RANKING.length - 1 && styles.line]}>
               <Txt variant="number" style={styles.rank}>{i + 1}</Txt>
               <RiderAvatar name={r.name} team={r.team} size={34} />
               <View style={{ flex: 1, minWidth: 0 }}>
@@ -284,6 +285,10 @@ const TREND = themed(() => ({
   '-1': { icon: 'arrow-down' as IconName, color: colors.red },
 }));
 
+// las filas que caben en la tarjeta
+const MARKET = SAMPLE.market.slice(0, 7);
+const RANKING = SAMPLE.ranking.slice(0, 8);
+
 // los cuatro primeros del Mundial (caben en la tarjeta)
 const WORLDS = SAMPLE.worlds.slice(0, 4);
 
@@ -320,6 +325,7 @@ const styles = themed(() => StyleSheet.create({
   barTitle: { fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.8, color: colors.onDark, flexShrink: 1 },
   body: { flex: 1, padding: space.l, gap: space.m, overflow: 'hidden' },
   box: { backgroundColor: colors.paper, borderRadius: 16, overflow: 'hidden' },
+  boxFill: { flex: 1, justifyContent: 'space-evenly' },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.s, paddingHorizontal: space.m, paddingVertical: 9 },
   line: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.line },
   rank: { width: 16, color: colors.inkSoft, fontSize: type.small },
@@ -342,7 +348,7 @@ const styles = themed(() => StyleSheet.create({
   section: { fontFamily: fonts.display, fontSize: 16, letterSpacing: 0.6, color: colors.ink, marginBottom: -6 },
   rowTight: { paddingVertical: 6 },
   caption: {
-    fontFamily: fonts.display, color: colors.jersey, letterSpacing: 0.8, textAlign: 'center', marginTop: space.m,
+    fontFamily: fonts.display, color: colors.jersey, letterSpacing: 0.8, textAlign: 'center', marginBottom: space.s,
     minHeight: 40, paddingHorizontal: space.l,
   },
   riderHead: { flexDirection: 'row', alignItems: 'center', gap: space.m, padding: space.m },

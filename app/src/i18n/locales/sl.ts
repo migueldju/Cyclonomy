@@ -501,6 +501,7 @@ const sl: Partial<Dict> = {
   "theme.light": "Svetla",
   "theme.dark": "Temna",
   "landing.capMarket": "Kupi najboljše kolesarje",
+  "landing.capRanking": "Primerjaj in najdi najboljšo priložnost",
   "landing.capRider": "Optimiziraj svojo ekipo",
   "landing.capWorlds": "Točke na podlagi pravih rezultatov",
   "landing.capStandings": "Tekmuj s prijatelji",

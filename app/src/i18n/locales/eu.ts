@@ -501,6 +501,7 @@ const eu: Partial<Dict> = {
   "theme.light": "Argia",
   "theme.dark": "Iluna",
   "landing.capMarket": "Fitxatu txirrindulari onenak",
+  "landing.capRanking": "Alderatu eta aurkitu aukerarik onena",
   "landing.capRider": "Hobetu zure taldea",
   "landing.capWorlds": "Benetako emaitzetan oinarritutako puntuazioak",
   "landing.capStandings": "Lehiatu zure lagunekin",

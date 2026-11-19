@@ -501,6 +501,7 @@ const ca: Partial<Dict> = {
   "theme.light": "Clar",
   "theme.dark": "Fosc",
   "landing.capMarket": "Fitxa els millors ciclistes",
+  "landing.capRanking": "Compara i troba la millor oportunitat",
   "landing.capRider": "Optimitza la teva plantilla",
   "landing.capWorlds": "Puntuacions basades en resultats reals",
   "landing.capStandings": "Competeix amb els teus amics",

@@ -500,6 +500,7 @@ const es = {
   "theme.light": "Claro",
   "theme.dark": "Oscuro",
   "landing.capMarket": "Ficha a los mejores ciclistas",
+  "landing.capRanking": "Compara y encuentra la mejor oportunidad",
   "landing.capRider": "Optimiza tu plantilla",
   "landing.capWorlds": "Puntuaciones basadas en resultados reales",
   "landing.capStandings": "Compite con tus amigos",

@@ -501,6 +501,7 @@ const ja: Partial<Dict> = {
   "theme.light": "ライト",
   "theme.dark": "ダーク",
   "landing.capMarket": "トップ選手を獲得しよう",
+  "landing.capRanking": "比較して最高のチャンスを見つけよう",
   "landing.capRider": "チームを最適化しよう",
   "landing.capWorlds": "実際のレース結果に基づくポイント",
   "landing.capStandings": "友達と競い合おう",

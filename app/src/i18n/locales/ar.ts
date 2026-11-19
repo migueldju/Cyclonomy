@@ -501,6 +501,7 @@ const ar: Partial<Dict> = {
   "theme.light": "فاتح",
   "theme.dark": "داكن",
   "landing.capMarket": "تعاقد مع أفضل الدرّاجين",
+  "landing.capRanking": "قارن واعثر على أفضل فرصة",
   "landing.capRider": "حسّن تشكيلتك",
   "landing.capWorlds": "نقاط مبنية على النتائج الحقيقية",
   "landing.capStandings": "نافس أصدقاءك",

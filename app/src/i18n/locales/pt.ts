@@ -501,6 +501,7 @@ const pt: Partial<Dict> = {
   "theme.light": "Claro",
   "theme.dark": "Escuro",
   "landing.capMarket": "Contrata os melhores ciclistas",
+  "landing.capRanking": "Compara e encontra a melhor oportunidade",
   "landing.capRider": "Otimiza o teu plantel",
   "landing.capWorlds": "Pontuações baseadas em resultados reais",
   "landing.capStandings": "Compete com os teus amigos",

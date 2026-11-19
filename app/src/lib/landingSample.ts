@@ -53,6 +53,46 @@ export const SAMPLE = {
       "value": 3200000,
       "points": 50,
       "trend": 0
+    },
+    {
+      "id": 355,
+      "name": "Tobias Halland Johannessen",
+      "nationality": "no",
+      "team": "Uno-X Mobility",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/NM_landevei_Ringerike_2025_senior_menn_-_17_Rasmus_Tiller%2C_9_Tobias_Halland_Johannessen.jpg/500px-NM_landevei_Ringerike_2025_senior_menn_-_17_Rasmus_Tiller%2C_9_Tobias_Halland_Johannessen.jpg",
+      "value": 3100000,
+      "points": 625,
+      "trend": 0
+    },
+    {
+      "id": 388,
+      "name": "Christian Scaroni",
+      "nationality": "it",
+      "team": "XDS Astana Team",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/SCARONI_Christian_-_arriv%C3%A9e_-_Faun_Ard%C3%A8che_Classic_2026.jpg/500px-SCARONI_Christian_-_arriv%C3%A9e_-_Faun_Ard%C3%A8che_Classic_2026.jpg",
+      "value": 3090000,
+      "points": 130,
+      "trend": 0
+    },
+    {
+      "id": 73,
+      "name": "Richard Carapaz",
+      "nationality": "ec",
+      "team": "NSN Cycling Team",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/GIRO5014_carapaz.jpg/500px-GIRO5014_carapaz.jpg",
+      "value": 3090000,
+      "points": 145,
+      "trend": 0
+    },
+    {
+      "id": 242,
+      "name": "Florian Lipowitz",
+      "nationality": "de",
+      "team": "Red Bull - BORA - hansgrohe",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Florian_Lipowitz_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Florian_Lipowitz_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
+      "value": 2719000,
+      "points": 385,
+      "trend": 0
     }
   ],
   "ranking": [
@@ -114,6 +154,36 @@ export const SAMPLE = {
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Tom_Pidcock_%282023%29.jpg/500px-Tom_Pidcock_%282023%29.jpg",
       "value": 4140000,
       "points": 1005,
+      "trend": 0
+    },
+    {
+      "id": 28,
+      "name": "Lenny Martinez",
+      "nationality": "fr",
+      "team": "Bahrain Victorious",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
+      "value": 3350000,
+      "points": 995,
+      "trend": 0
+    },
+    {
+      "id": 204,
+      "name": "Dorian Godon",
+      "nationality": "fr",
+      "team": "Netcompany INEOS",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Dorian_Godon_in_c%C3%B4te_de_Loucrup_during_Stage_6_of_2026_Tour_de_France.jpg/500px-Dorian_Godon_in_c%C3%B4te_de_Loucrup_during_Stage_6_of_2026_Tour_de_France.jpg",
+      "value": 1840000,
+      "points": 995,
+      "trend": 0
+    },
+    {
+      "id": 1,
+      "name": "Mathieu Van Der Poel",
+      "nationality": "nl",
+      "team": "Alpecin - Premier Tech",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Mathieu_Van_Der_Poel_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Mathieu_Van_Der_Poel_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
+      "value": 3690000,
+      "points": 925,
       "trend": 0
     }
   ],

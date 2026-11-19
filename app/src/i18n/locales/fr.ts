@@ -501,6 +501,7 @@ const fr: Partial<Dict> = {
   "theme.light": "Clair",
   "theme.dark": "Sombre",
   "landing.capMarket": "Recrute les meilleurs coureurs",
+  "landing.capRanking": "Compare et trouve la meilleure opportunité",
   "landing.capRider": "Optimise ton effectif",
   "landing.capWorlds": "Des points basés sur les vrais résultats",
   "landing.capStandings": "Affronte tes amis",

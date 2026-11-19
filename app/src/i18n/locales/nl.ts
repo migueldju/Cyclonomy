@@ -501,6 +501,7 @@ const nl: Partial<Dict> = {
   "theme.light": "Licht",
   "theme.dark": "Donker",
   "landing.capMarket": "Contracteer de beste renners",
+  "landing.capRanking": "Vergelijk en vind de beste kans",
   "landing.capRider": "Optimaliseer je selectie",
   "landing.capWorlds": "Punten op basis van echte uitslagen",
   "landing.capStandings": "Neem het op tegen je vrienden",

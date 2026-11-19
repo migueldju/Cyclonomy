@@ -501,6 +501,7 @@ const ru: Partial<Dict> = {
   "theme.light": "Светлая",
   "theme.dark": "Тёмная",
   "landing.capMarket": "Покупай лучших гонщиков",
+  "landing.capRanking": "Сравнивай и находи лучшие возможности",
   "landing.capRider": "Оптимизируй свой состав",
   "landing.capWorlds": "Очки по реальным результатам",
   "landing.capStandings": "Соревнуйся с друзьями",
