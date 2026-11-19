@@ -3,12 +3,11 @@ import { type ComponentProps, type ReactNode, useEffect, useRef, useState } from
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { MonthGrid } from '../../app/(tabs)/calendar';
 import { t } from '../i18n';
-import { moneyShort, points } from '../lib/format';
+import { moneyShort, ordinal, points } from '../lib/format';
 import { SAMPLE } from '../lib/landingSample';
 import type { CalendarRow } from '../lib/types';
 import { categoryName, colors, fonts, space, themed, type } from '../theme';
 import { Flag } from './Flag';
-import { CategoryBadge } from './Meta';
 import { PositionJersey } from './PositionJersey';
 import { RiderAvatar } from './RiderAvatar';
 import { ValueChart } from './ValueChart';
@@ -24,7 +23,7 @@ const PAGES: { page: Page; icon: IconName; title: () => string; caption?: Key }[
   { page: 'market', icon: 'pricetags', title: () => t('tabs.market'), caption: 'landing.capMarket' },
   { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title') },
   { page: 'rider', icon: 'person', title: () => SAMPLE.rider.name, caption: 'landing.capRider' },
-  { page: 'worlds', icon: 'earth', title: () => categoryName('WC'), caption: 'landing.capWorlds' },
+  { page: 'worlds', icon: 'list', title: () => t('stage.scores'), caption: 'landing.capWorlds' },
   { page: 'standings', icon: 'podium', title: () => t('tabs.standings'), caption: 'landing.capStandings' },
   { page: 'calendar', icon: 'calendar', title: () => t('tabs.calendar'), caption: 'landing.capCalendar' },
 ];
@@ -32,7 +31,7 @@ const N = PAGES.length;
 const HALF = Math.floor(N / 2);
 const EVERY = 3200;          // ms entre giro y giro
 const CARD_W = 320;
-const CARD_H = 500;
+const CARD_H = 560;
 
 // posición relativa de la página i con la `front` delante: de -HALF a HALF
 const offsetOf = (i: number, front: number) => {
@@ -198,30 +197,61 @@ function renderPage(page: Page) {
         </>
       );
     }
-    case 'worlds':
+    case 'worlds': {
+      // como la pantalla de puntuaciones de una carrera, con los equipos (inventados) de una liga
+      const owner = (id: number) => WORLDS_OWNERS[id];
+      const teams = Object.entries(WORLDS.reduce<Record<string, { pts: number; country: string }>>((acc, r) => {
+        const o = owner(r.id);
+        if (o) acc[o.team] = { pts: (acc[o.team]?.pts ?? 0) + r.score, country: o.country };
+        return acc;
+      }, {})).sort((x, y) => y[1].pts - x[1].pts);
       return (
         <>
-          <View style={styles.raceHead}>
-            <CategoryBadge code="WC" stageRace={false} name="World Championships" />
-            <Txt variant="small">27/09/2026 · Montréal</Txt>
+          <View style={[styles.box, styles.stageHead]}>
+            <View style={styles.nameLine}>
+              <Txt style={styles.stageTitle} numberOfLines={1}>{categoryName('WC')}</Txt><Flag code="ca" height={13} />
+            </View>
+            <Txt variant="small" style={styles.small}>{t('race.oneDay')} · 27/09</Txt>
+            <View style={styles.tabs}>
+              <View style={[styles.tab, styles.tabOn]}><Txt style={[styles.tabText, { color: colors.paper }]}>{t('stage.scores')}</Txt></View>
+              <View style={styles.tab}><Txt style={styles.tabText}>{t('stage.entries')}</Txt></View>
+            </View>
           </View>
+          <Txt style={styles.section}>{t('stage.leagueTeams')}</Txt>
           <Box>
-            {SAMPLE.worlds.map((r, i) => (
-              <View key={r.id} style={[styles.row, i < SAMPLE.worlds.length - 1 && styles.line]}>
-                <PositionJersey position={r.position} size={30} />
-                <RiderAvatar name={r.name} team={r.team} size={34} />
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <View style={styles.nameLine}>
-                    <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
-                  </View>
-                  <Txt variant="small" numberOfLines={1}>{r.team}</Txt>
-                </View>
-                <View style={styles.score}><Txt style={styles.scoreText}>+{points(r.score)}</Txt></View>
+            {teams.map(([team, v], i) => (
+              <View key={team} style={[styles.row, styles.rowTight, i < teams.length - 1 && styles.line]}>
+                <Txt variant="number" style={[styles.num, { width: 26 }]}>{ordinal(i + 1)}</Txt>
+                <Flag code={v.country} />
+                <Txt style={[styles.name, { flex: 1, fontFamily: fonts.bodyMedium }]} numberOfLines={1}>{team}</Txt>
+                <Txt variant="number" style={styles.num}>{points(v.pts)}</Txt>
+                <Ionicons name="chevron-down" size={14} color={colors.inkSoft} />
               </View>
             ))}
           </Box>
+          <Txt style={styles.section}>{t('stage.scores')}</Txt>
+          <Box>
+            {WORLDS.map((r, i) => {
+              const o = owner(r.id);
+              return (
+                <View key={r.id} style={[styles.row, styles.rowTight, i < WORLDS.length - 1 && styles.line]}>
+                  <RiderAvatar name={r.name} team={r.team} size={30} />
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <View style={styles.nameLine}>
+                      <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
+                    </View>
+                    <Txt variant="small" numberOfLines={1} style={styles.small}>
+                      {o ? t('stage.enteredBy', { teams: o.team }) : t('stage.noOwner')}
+                    </Txt>
+                  </View>
+                  <Txt variant="number" style={styles.num}>{points(r.score)}</Txt>
+                </View>
+              );
+            })}
+          </Box>
         </>
       );
+    }
     case 'standings':
       return (
         <Box>
@@ -253,6 +283,16 @@ const TREND = themed(() => ({
   '0': { icon: 'remove' as IconName, color: colors.inkSoft },
   '-1': { icon: 'arrow-down' as IconName, color: colors.red },
 }));
+
+// los cuatro primeros del Mundial (caben en la tarjeta)
+const WORLDS = SAMPLE.worlds.slice(0, 4);
+
+// quién tiene a cada ciclista del Mundial en la liga de muestra (equipos inventados; uno sin dueño)
+const WORLDS_OWNERS: Record<number, { team: string; country: string } | undefined> = Object.fromEntries(
+  WORLDS.map((r, i) => [r.id, [
+    { team: 'Los Escaladores', country: 'es' }, { team: 'Abanico CC', country: 'nl' }, { team: 'Pavé & Barro', country: 'be' },
+    undefined,
+  ][i]]));
 
 // equipos inventados (las ligas de los jugadores son privadas)
 const STANDINGS = [
@@ -293,6 +333,14 @@ const styles = themed(() => StyleSheet.create({
   crest: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
   crestText: { fontFamily: fonts.bodyBold, color: '#FFFFFF', fontSize: type.small },
   dots: { flexDirection: 'row', gap: 8, marginTop: space.m },
+  stageHead: { padding: space.m, gap: 2 },
+  stageTitle: { fontFamily: fonts.display, fontSize: 22, letterSpacing: 0.6, color: colors.ink, flexShrink: 1 },
+  tabs: { flexDirection: 'row', alignSelf: 'flex-start', backgroundColor: colors.line, borderRadius: 999, padding: 2, marginTop: 6 },
+  tab: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  tabOn: { backgroundColor: colors.ink },
+  tabText: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.ink },
+  section: { fontFamily: fonts.display, fontSize: 16, letterSpacing: 0.6, color: colors.ink, marginBottom: -6 },
+  rowTight: { paddingVertical: 6 },
   caption: {
     fontFamily: fonts.display, color: colors.jersey, letterSpacing: 0.8, textAlign: 'center', marginTop: space.m,
     minHeight: 40, paddingHorizontal: space.l,
