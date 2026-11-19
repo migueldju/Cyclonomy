@@ -22,7 +22,7 @@ type Key = Parameters<typeof t>[0];
 const PAGES: { page: Page; icon: IconName; title: () => string; caption?: Key }[] = [
   { page: 'market', icon: 'pricetags', title: () => t('tabs.market'), caption: 'landing.capMarket' },
   { page: 'ranking', icon: 'bar-chart', title: () => t('ranking.title'), caption: 'landing.capRanking' },
-  { page: 'rider', icon: 'person', title: () => SAMPLE.rider.name, caption: 'landing.capRider' },
+  { page: 'rider', icon: 'person', title: () => t('calendar.rider'), caption: 'landing.capRider' },
   { page: 'worlds', icon: 'list', title: () => t('stage.scores'), caption: 'landing.capWorlds' },
   { page: 'standings', icon: 'podium', title: () => t('tabs.standings'), caption: 'landing.capStandings' },
   { page: 'calendar', icon: 'calendar', title: () => t('tabs.calendar'), caption: 'landing.capCalendar' },
@@ -161,9 +161,9 @@ function renderPage(page: Page) {
       return (
         <Box fill>
           {RANKING.map((r, i) => (
-            <View key={r.id} style={[styles.row, i < RANKING.length - 1 && styles.line]}>
+            <View key={r.id} style={[styles.row, styles.rowDense, i < RANKING.length - 1 && styles.line]}>
               <Txt variant="number" style={styles.rank}>{i + 1}</Txt>
-              <RiderAvatar name={r.name} team={r.team} size={34} />
+              <RiderAvatar name={r.name} team={r.team} size={30} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <View style={styles.nameLine}>
                   <Txt style={styles.name} numberOfLines={1}>{r.name}</Txt><Flag code={r.nationality} />
@@ -287,7 +287,7 @@ const TREND = themed(() => ({
 
 // las filas que caben en la tarjeta
 const MARKET = SAMPLE.market.slice(0, 7);
-const RANKING = SAMPLE.ranking.slice(0, 8);
+const RANKING = SAMPLE.ranking.slice(0, 10);
 
 // los cuatro primeros del Mundial (caben en la tarjeta)
 const WORLDS = SAMPLE.worlds.slice(0, 4);
@@ -347,6 +347,7 @@ const styles = themed(() => StyleSheet.create({
   tabText: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.ink },
   section: { fontFamily: fonts.display, fontSize: 16, letterSpacing: 0.6, color: colors.ink, marginBottom: -6 },
   rowTight: { paddingVertical: 6 },
+  rowDense: { paddingVertical: 2 },
   caption: {
     fontFamily: fonts.display, color: colors.jersey, letterSpacing: 0.8, textAlign: 'center', marginBottom: space.s,
     minHeight: 40, paddingHorizontal: space.l,

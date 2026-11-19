@@ -1,7 +1,8 @@
 // Datos de muestra para la portada de la web (quien la ve aún no tiene sesión y no puede leer la base de datos).
 // Ciclistas, valores, puntos y carreras reales del juego, sacados de la base de datos; se regeneran a mano.
 // Los equipos de la clasificación son inventados: las ligas de los jugadores son privadas.
-// El ranking está retocado a mano: Pogačar 1.º, Vingegaard 3.º y Evenepoel 4.º con 1.150 pts.
+// El ranking es el top 10 de la temporada 2026 con los puntos Cyclonomy, calculados con los resultados reales
+// (etapas o clásicas, general, puntos y montaña; sin los puntos de líder diarios ni los de compañeros).
 export const SAMPLE = {
   "market": [
     {
@@ -103,27 +104,7 @@ export const SAMPLE = {
       "team": "UAE Team Emirates - XRG",
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg/500px-Tadej_Poga%C4%8Dar_at_2026_Tour_de_France_%28Stage_21%29_%28cropped%29.jpg",
       "value": 10200000,
-      "points": 1805,
-      "trend": 0
-    },
-    {
-      "id": 331,
-      "name": "Isaac Del Toro",
-      "nationality": "mx",
-      "team": "UAE Team Emirates - XRG",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Isaac_del_Toro_maglia_rosa.jpg/500px-Isaac_del_Toro_maglia_rosa.jpg",
-      "value": 7040000,
-      "points": 1320,
-      "trend": 0
-    },
-    {
-      "id": 297,
-      "name": "Jonas Vingegaard",
-      "nationality": "dk",
-      "team": "Team Visma | Lease a Bike",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Jonas_Vingegaard_PN26_%28cropped%29.jpg/500px-Jonas_Vingegaard_PN26_%28cropped%29.jpg",
-      "value": 4670000,
-      "points": 1250,
+      "points": 8815,
       "trend": 0
     },
     {
@@ -133,7 +114,37 @@ export const SAMPLE = {
       "team": "Red Bull - BORA - hansgrohe",
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/REMCO_EVENEPOEL.png/500px-REMCO_EVENEPOEL.png",
       "value": 8290000,
-      "points": 1150,
+      "points": 6915,
+      "trend": 0
+    },
+    {
+      "id": 331,
+      "name": "Isaac Del Toro",
+      "nationality": "mx",
+      "team": "UAE Team Emirates - XRG",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/Isaac_del_Toro_maglia_rosa.jpg/500px-Isaac_del_Toro_maglia_rosa.jpg",
+      "value": 7040000,
+      "points": 5595,
+      "trend": 0
+    },
+    {
+      "id": 56,
+      "name": "Paul Seixas",
+      "nationality": "fr",
+      "team": "Decathlon CMA CGM Team",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Paul_Seixas_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Paul_Seixas_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
+      "value": 6470000,
+      "points": 4900,
+      "trend": 0
+    },
+    {
+      "id": 297,
+      "name": "Jonas Vingegaard",
+      "nationality": "dk",
+      "team": "Team Visma | Lease a Bike",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Jonas_Vingegaard_PN26_%28cropped%29.jpg/500px-Jonas_Vingegaard_PN26_%28cropped%29.jpg",
+      "value": 4670000,
+      "points": 4265,
       "trend": 0
     },
     {
@@ -143,7 +154,7 @@ export const SAMPLE = {
       "team": "Alpecin - Premier Tech",
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Jasper_Philipsen_%282026%29.jpg/500px-Jasper_Philipsen_%282026%29.jpg",
       "value": 4282000,
-      "points": 1085,
+      "points": 3840,
       "trend": 0
     },
     {
@@ -153,27 +164,7 @@ export const SAMPLE = {
       "team": "Pinarello Q36.5 Pro Cycling Team",
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Tom_Pidcock_%282023%29.jpg/500px-Tom_Pidcock_%282023%29.jpg",
       "value": 4140000,
-      "points": 1005,
-      "trend": 0
-    },
-    {
-      "id": 28,
-      "name": "Lenny Martinez",
-      "nationality": "fr",
-      "team": "Bahrain Victorious",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Lenny_Martinez_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
-      "value": 3350000,
-      "points": 995,
-      "trend": 0
-    },
-    {
-      "id": 204,
-      "name": "Dorian Godon",
-      "nationality": "fr",
-      "team": "Netcompany INEOS",
-      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Dorian_Godon_in_c%C3%B4te_de_Loucrup_during_Stage_6_of_2026_Tour_de_France.jpg/500px-Dorian_Godon_in_c%C3%B4te_de_Loucrup_during_Stage_6_of_2026_Tour_de_France.jpg",
-      "value": 1840000,
-      "points": 995,
+      "points": 3580,
       "trend": 0
     },
     {
@@ -183,7 +174,27 @@ export const SAMPLE = {
       "team": "Alpecin - Premier Tech",
       "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Mathieu_Van_Der_Poel_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg/500px-Mathieu_Van_Der_Poel_on_the_podium_at_the_presentation_ceremony_for_Stage_5_of_the_2026_Tour_de_France.jpg",
       "value": 3690000,
-      "points": 925,
+      "points": 3530,
+      "trend": 0
+    },
+    {
+      "id": 1944,
+      "name": "Wout Van Aert",
+      "nationality": "be",
+      "team": "Team Visma | Lease a Bike",
+      "photo": null,
+      "value": 3520000,
+      "points": 3375,
+      "trend": 0
+    },
+    {
+      "id": 73,
+      "name": "Richard Carapaz",
+      "nationality": "ec",
+      "team": "NSN Cycling Team",
+      "photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/GIRO5014_carapaz.jpg/500px-GIRO5014_carapaz.jpg",
+      "value": 3090000,
+      "points": 3030,
       "trend": 0
     }
   ],
