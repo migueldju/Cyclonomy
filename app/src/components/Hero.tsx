@@ -44,9 +44,10 @@ export function StatTile({ label, value, color, icon, wide, onPress, open }: {
 }
 
 /** Selector de una opción entre pocas: pastilla con la elegida en negro */
-export function Pills<T extends string>({ options, value, onChange, style, compact }: {
+export function Pills<T extends string>({ options, value, onChange, style, compact, dense }: {
   options: { value: T; label: string }[]; value: T | null; onChange: (v: T) => void; style?: ViewStyle;
   compact?: boolean;              // pastillas más estrechas, para cuando son muchas
+  dense?: boolean;                // aún más estrechas, para huecos pequeños
 }) {
   return (
     <View style={[styles.pills, style]} accessibilityRole="tablist">
@@ -54,7 +55,7 @@ export function Pills<T extends string>({ options, value, onChange, style, compa
         const on = o.value === value;
         return (
           <Pressable key={o.value} onPress={() => onChange(o.value)} accessibilityRole="tab"
-                     accessibilityState={{ selected: on }} style={[styles.pill, compact && { paddingHorizontal: 10 }, on && styles.pillOn]}>
+                     accessibilityState={{ selected: on }} style={[styles.pill, compact && { paddingHorizontal: 10 }, dense && { paddingHorizontal: 7 }, on && styles.pillOn]}>
             <Txt style={[styles.pillText, on && { color: colors.paper }]}>{o.label}</Txt>
           </Pressable>
         );
