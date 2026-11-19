@@ -521,7 +521,7 @@ const de: Partial<Dict> = {
   "landing.f1T": "Der ganze Profikalender",
   "landing.f1": "Grand Tours, Monumente, WorldTour-, .Pro- und .1-Rennen, mit allen Fahrern der beiden höchsten Divisionen.",
   "landing.f2T": "Ein lebendiger Markt",
-  "landing.f2": "Werte, die sich täglich ändern, verdeckte Gebote und Angebote zwischen Spielern.",
+  "landing.f2": "Täglich aktualisiert und anpassbar: Wähle, wie viele Fahrer auf den Markt kommen und wann. Dazu Angebote zwischen Spielern.",
   "landing.f3T": "Ausstiegsklauseln",
   "landing.f3": "Zahle die Klausel eines Rivalen und der Fahrer gehört sofort dir. Schütze deine, indem du sie erhöhst oder sie sperrst.",
   "landing.f4T": "Ligen mit Freunden",

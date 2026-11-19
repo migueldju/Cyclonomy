@@ -521,7 +521,7 @@ const eu: Partial<Dict> = {
   "landing.f1T": "Egutegi profesional osoa",
   "landing.f1": "Itzuli handiak, monumentuak, WorldTour eta .Pro eta .1 lasterketak, bi maila nagusietako txirrindulari guztiekin.",
   "landing.f2T": "Merkatu bizia",
-  "landing.f2": "Egunero aldatzen diren balioak, eskaintza itsuak eta jokalarien arteko eskaintzak.",
+  "landing.f2": "Egunero eguneratzen da eta pertsonaliza daiteke: aukeratu zenbat txirrindulari ateratzen diren eta zer ordutan. Gainera, jokalarien arteko eskaintzak.",
   "landing.f3T": "Klausulak",
   "landing.f3": "Ordaindu aurkari baten klausula eta txirrindularia zurea da berehala. Babestu zureak klausula igota edo blindatuta.",
   "landing.f4T": "Lagunen arteko ligak",

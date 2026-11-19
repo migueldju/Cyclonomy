@@ -521,7 +521,7 @@ const cs: Partial<Dict> = {
   "landing.f1T": "Celý profesionální kalendář",
   "landing.f1": "Grand Tours, monumenty, WorldTour a závody .Pro a .1, se všemi jezdci dvou nejvyšších divizí.",
   "landing.f2T": "Živý trh",
-  "landing.f2": "Hodnoty, které se mění každý den, příhozy naslepo a nabídky mezi hráči.",
+  "landing.f2": "Aktualizuje se každý den a dá se přizpůsobit: vyber, kolik jezdců vyjde a v kolik hodin. Navíc nabídky mezi hráči.",
   "landing.f3T": "Výkupní klauzule",
   "landing.f3": "Zaplať klauzuli soupeře a jezdec je hned tvůj. Chraň své jejím zvýšením nebo jejich ochranou.",
   "landing.f4T": "Ligy s přáteli",

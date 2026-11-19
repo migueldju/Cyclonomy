@@ -521,7 +521,7 @@ const nl: Partial<Dict> = {
   "landing.f1T": "De hele profkalender",
   "landing.f1": "Grote rondes, monumenten, WorldTour en .Pro- en .1-koersen, met alle renners uit de twee hoogste divisies.",
   "landing.f2T": "Een levende markt",
-  "landing.f2": "Waardes die elke dag veranderen, blinde biedingen en voorstellen tussen spelers.",
+  "landing.f2": "Elke dag bijgewerkt en aanpasbaar: kies hoeveel renners er op de markt komen en hoe laat. Plus voorstellen tussen spelers.",
   "landing.f3T": "Afkoopsommen",
   "landing.f3": "Betaal de afkoopsom van een rivaal en de renner is meteen van jou. Bescherm de jouwe door die te verhogen of ze te beschermen.",
   "landing.f4T": "Competities met vrienden",

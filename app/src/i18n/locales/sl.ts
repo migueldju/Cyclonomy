@@ -521,7 +521,7 @@ const sl: Partial<Dict> = {
   "landing.f1T": "Ves profesionalni koledar",
   "landing.f1": "Velike dirke, spomeniki, WorldTour ter dirke .Pro in .1, z vsemi kolesarji dveh najvišjih divizij.",
   "landing.f2T": "Živ trg",
-  "landing.f2": "Vrednosti, ki se spreminjajo vsak dan, slepe ponudbe in ponudbe med igralci.",
+  "landing.f2": "Posodablja se vsak dan in ga lahko prilagodiš: izberi, koliko kolesarjev pride na trg in ob kateri uri. Poleg tega ponudbe med igralci.",
   "landing.f3T": "Odkupne klavzule",
   "landing.f3": "Plačaj klavzulo tekmeca in kolesar je takoj tvoj. Zaščiti svoje tako, da jo zvišaš ali jih zaščitiš.",
   "landing.f4T": "Lige s prijatelji",

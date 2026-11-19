@@ -521,7 +521,7 @@ const en: Partial<Dict> = {
   "landing.f1T": "The whole pro calendar",
   "landing.f1": "Grand Tours, Monuments, WorldTour, .Pro and .1 races, with every rider from the top two divisions.",
   "landing.f2T": "A living market",
-  "landing.f2": "Values that change every day, blind bids and offers between players.",
+  "landing.f2": "Updated every day and customisable: choose how many riders come up and at what time. Plus offers between players.",
   "landing.f3T": "Release clauses",
   "landing.f3": "Pay a rival's release clause and the rider is yours at once. Protect yours by raising it or shielding them.",
   "landing.f4T": "Leagues with friends",

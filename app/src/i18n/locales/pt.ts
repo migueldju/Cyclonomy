@@ -521,7 +521,7 @@ const pt: Partial<Dict> = {
   "landing.f1T": "Todo o calendário profissional",
   "landing.f1": "Grandes voltas, monumentos, WorldTour e corridas .Pro e .1, com todos os ciclistas das duas principais divisões.",
   "landing.f2T": "Mercado vivo",
-  "landing.f2": "Valores que mudam todos os dias, licitações às cegas e propostas entre jogadores.",
+  "landing.f2": "Atualiza-se todos os dias e é personalizável: escolhe quantos ciclistas saem e a que horas. Além disso, propostas entre jogadores.",
   "landing.f3T": "Cláusulas",
   "landing.f3": "Paga a cláusula de um rival e o ciclista é teu no momento. Protege os teus subindo-a ou blindando-os.",
   "landing.f4T": "Ligas entre amigos",

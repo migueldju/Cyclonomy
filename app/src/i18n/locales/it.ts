@@ -521,7 +521,7 @@ const it: Partial<Dict> = {
   "landing.f1T": "Tutto il calendario professionistico",
   "landing.f1": "Grandi giri, classiche monumento, WorldTour e corse .Pro e .1, con tutti i corridori delle due divisioni principali.",
   "landing.f2T": "Un mercato vivo",
-  "landing.f2": "Valori che cambiano ogni giorno, offerte al buio e proposte tra giocatori.",
+  "landing.f2": "Si aggiorna ogni giorno ed è personalizzabile: scegli quanti corridori escono e a che ora. In più, offerte tra giocatori.",
   "landing.f3T": "Clausole",
   "landing.f3": "Paga la clausola di un rivale e il corridore è tuo all'istante. Proteggi i tuoi alzandola o blindandoli.",
   "landing.f4T": "Leghe tra amici",

@@ -521,7 +521,7 @@ const ca: Partial<Dict> = {
   "landing.f1T": "Tot el calendari professional",
   "landing.f1": "Grans voltes, monuments, WorldTour i curses .Pro i .1, amb tots els ciclistes de les dues principals divisions.",
   "landing.f2T": "Mercat viu",
-  "landing.f2": "Valors que canvien cada dia, puges a cegues i ofertes entre jugadors.",
+  "landing.f2": "S'actualitza cada dia i és personalitzable: tria quants ciclistes surten i a quina hora. A més, ofertes entre jugadors.",
   "landing.f3T": "Clausulazos",
   "landing.f3": "Paga la clàusula d'un rival i el ciclista és teu a l'instant. Protegeix els teus pujant-la o blindant-los.",
   "landing.f4T": "Lligues entre amics",

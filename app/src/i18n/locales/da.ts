@@ -521,7 +521,7 @@ const da: Partial<Dict> = {
   "landing.f1T": "Hele den professionelle kalender",
   "landing.f1": "Grand Tours, monumenter, WorldTour og .Pro- og .1-løb, med alle ryttere fra de to øverste divisioner.",
   "landing.f2T": "Et levende marked",
-  "landing.f2": "Værdier, der ændrer sig hver dag, blinde bud og tilbud mellem spillere.",
+  "landing.f2": "Opdateres hver dag og kan tilpasses: vælg hvor mange ryttere der kommer på markedet og hvornår. Plus tilbud mellem spillere.",
   "landing.f3T": "Frikøbsklausuler",
   "landing.f3": "Betal en rivals klausul, og rytteren er din med det samme. Beskyt dine ved at hæve den eller beskytte dem.",
   "landing.f4T": "Ligaer med venner",

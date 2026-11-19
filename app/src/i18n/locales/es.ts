@@ -520,7 +520,7 @@ const es = {
   "landing.f1T": "Todo el calendario profesional",
   "landing.f1": "Grandes vueltas, monumentos, WorldTour y carreras .Pro y .1, con todos los ciclistas de las dos principales divisiones.",
   "landing.f2T": "Mercado vivo",
-  "landing.f2": "Valores que cambian cada día, pujas a ciegas y ofertas entre jugadores.",
+  "landing.f2": "Se actualiza cada día y es personalizable: elige cuántos ciclistas salen y a qué hora. Además, ofertas entre jugadores.",
   "landing.f3T": "Clausulazos",
   "landing.f3": "Paga la cláusula de un rival y el ciclista es tuyo al momento. Protege a los tuyos subiéndola o blindándolos.",
   "landing.f4T": "Ligas entre amigos",
