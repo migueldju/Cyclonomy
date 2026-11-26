@@ -29,7 +29,9 @@ SplashScreen.preventAutoHideAsync();
 SystemUI.setBackgroundColorAsync(colors.asphalt).catch(() => {});
 
 const AUTH_SCREENS = ['welcome', 'login', 'signup', 'reset-password', 'auth'];
-const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin'];
+const NO_LEAGUE_SCREENS = ['leagues', 'league', 'join', 'unirse', 'profile', 'security', 'admin', 'how'];
+// se pueden ver sin sesión (y también con ella)
+const PUBLIC_SCREENS = ['join', 'unirse', 'how'];
 
 export default function RootLayout() {
   return <ThemeProvider>{(scheme) => <Root scheme={scheme} />}</ThemeProvider>;
@@ -101,7 +103,7 @@ function Gate({ splash }: { splash: boolean }) {
     if (loading || !ready) return;
     if (!session) {
       // en la web, quien llega sin sesión ve la portada; en la app, directamente el acceso
-      if (!AUTH_SCREENS.includes(first) && first !== 'join' && first !== 'unirse') resetTo(Platform.OS === 'web' ? '/welcome' : '/login');
+      if (!AUTH_SCREENS.includes(first) && !PUBLIC_SCREENS.includes(first)) resetTo(Platform.OS === 'web' ? '/welcome' : '/login');
     } else if (AUTH_SCREENS.includes(first) && !settingPassword) {
       if (pendingInvite) {
         resetTo(`/join/${pendingInvite}`);

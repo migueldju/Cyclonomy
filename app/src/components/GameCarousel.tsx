@@ -69,11 +69,15 @@ export function GameCarousel({ size = 1 }: { size?: number }) {
   }, [front, vals]);
 
   const range = Array.from({ length: 2 * HALF + 1 }, (_, k) => k - HALF);
+  // los rótulos, siempre en una línea y todos del mismo tamaño: el que cabe para el más largo en este idioma
+  const [wrapW, setWrapW] = useState(0);
+  const longest = Math.max(...PAGES.map((p) => (p.caption ? t(p.caption).length : 0)));
+  const captionSize = Math.min(30 * Math.max(size, 0.85), wrapW ? (wrapW - space.l * 2) / (longest * 0.47) : 30);
   const hover = Platform.OS === 'web' ? { onMouseEnter: () => setPaused(true), onMouseLeave: () => setPaused(false) } : {};
   return (
-    <View style={[styles.wrap, { height: (CARD_H + 110) * size }]} {...hover}>
+    <View style={[styles.wrap, { height: (CARD_H + 110) * size }]} {...hover} onLayout={(e) => setWrapW(e.nativeEvent.layout.width)}>
       {/* el rótulo de la página del frente, encima */}
-      <Txt style={[styles.caption, { fontSize: 30 * Math.max(size, 0.85), lineHeight: 33 * Math.max(size, 0.85) }]} numberOfLines={2} accessibilityLiveRegion="polite">
+      <Txt style={[styles.caption, { fontSize: captionSize, lineHeight: captionSize * 1.15 }]} numberOfLines={1} accessibilityLiveRegion="polite">
         {PAGES[front].caption ? t(PAGES[front].caption!) : ' '}
       </Txt>
       <View style={[styles.stage, { height: (CARD_H + 20) * size }]}>
