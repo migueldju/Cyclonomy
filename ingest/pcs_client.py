@@ -19,6 +19,7 @@ NOT_FOUND = "__404__"
 
 log = logging.getLogger("ingest.pcs")
 _last = 0.0
+_blocked = False          # PCS ya ha bloqueado en esta pasada: no se insiste
 
 
 class Blocked(RuntimeError):
@@ -30,13 +31,15 @@ def get_html(path: str, max_age_h: float = 24, session: requests.Session | None 
 
     max_age_h=0 obliga a descargar de nuevo (resultados del día).
     """
-    global _last
+    global _last, _blocked
     CACHE.mkdir(parents=True, exist_ok=True)
     f = CACHE / (hashlib.md5(path.encode()).hexdigest() + ".html")
     if max_age_h > 0 and f.exists() and time.time() - f.stat().st_mtime < max_age_h * 3600:
         txt = f.read_text(encoding="utf-8")
         return None if txt == NOT_FOUND else txt
 
+    if _blocked:
+        raise Blocked(f"PCS rechazó la petición de '{path}' (¿bloqueo antibot?)")
     http = session or requests
     for attempt in range(4):
         wait = MIN_DELAY - (time.time() - _last)
@@ -50,6 +53,10 @@ def get_html(path: str, max_age_h: float = 24, session: requests.Session | None 
         if resp.status_code == 404:
             f.write_text(NOT_FOUND, encoding="utf-8")
             return None
+        if resp.status_code == 403 and resp.headers.get("cf-mitigated") == "challenge":
+            # comprobación antibot de Cloudflare: reintentar no sirve (antes se esperaban 5 minutos por página)
+            _blocked = True
+            break
         if resp.status_code in (403, 429, 503):
             log.warning("PCS respondió %s a %s (intento %s)", resp.status_code, path, attempt + 1)
             time.sleep(30 * (attempt + 1))

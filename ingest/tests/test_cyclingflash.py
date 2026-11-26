@@ -36,6 +36,14 @@ class CalendarTests(unittest.TestCase):
             self.assertIsNone(cf.race_slug("tour-de-bretagne", "Tour de Bretagne", 2026, dt.date(2026, 4, 7)))
 
 
+class SlugTests(unittest.TestCase):
+    def test_candidates_from_our_data(self):
+        self.assertEqual(cf.candidates("itzulia-basque-country", "Itzulia Basque Country", 2026),
+                         ["itzulia-basque-country-2026"])
+        self.assertEqual(cf.candidates("region-pays-de-la-loire", "Région Pays de la Loire Tour", 2026),
+                         ["region-pays-de-la-loire-2026", "region-pays-de-la-loire-tour-2026"])
+
+
 class RiderTests(unittest.TestCase):
     INDEX = ({"paul-seixas", "mattias-skjelmose-jensen", "sergio-higuita", "ion-izagirre"},
              {"paul seixas": "paul-seixas", "mattias skjelmose": "mattias-skjelmose-jensen",
