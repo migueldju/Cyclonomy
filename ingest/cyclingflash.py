@@ -3,7 +3,8 @@
 CyclingFlash permite el acceso automático a sus páginas de carreras (robots.txt). Se le pide poco y despacio:
 una petición cada MIN_DELAY segundos, solo cuando PCS falla.
 
-  /calendar/road/{año}/men-elite/{mes}            calendario del mes: cada carrera con su fecha → su página
+  /race/{carrera}-{año}                           la carrera: su slug sale de nuestros datos (slug de PCS o nombre)
+  /calendar/road/{año}/men-elite/{mes}            solo si no: el calendario del mes, por fecha y nombre
   /race/{carrera}-{año}/result                    resultado de una clásica
   /race/{carrera}-{año}/result/stage-{n}          resultado de la etapa n (clasificación completa)
   /race/{carrera}-{año}/result/stage-{n}/gc       general tras la etapa  (/points: puntos, /mountain: montaña)
@@ -143,26 +144,40 @@ def to_pcs(cf_slug: str, name: str, index: tuple[set[str], dict[str, str]]) -> s
 
 
 # --------------------------------------------------------------------------- lo que pide la ingesta
-def _race(db, race_id: int) -> tuple[str | None, str]:
+def candidates(pcs_slug: str, name: str, season: int) -> list[str]:
+    """Slugs probables de la carrera en CyclingFlash, sacados de nuestros datos: el de PCS con el año
+    («itzulia-basque-country-2026») o el nombre con el año («region-pays-de-la-loire-tour-2026»)."""
+    return list(dict.fromkeys([f"{pcs_slug}-{season}", f"{normalize(name).replace(' ', '-')}-{season}"]))
+
+
+def _page(db, race_id: int, suffix: str) -> tuple[str | None, str | None, str]:
+    """Primera página de la carrera que existe (/race/{slug}{suffix}) con los slugs probables; si ninguno, el de su
+    calendario. Devuelve (página, slug, nombre)."""
     pcs_slug, name, season, start = db.fetchone(
         "select pcs_slug, name, season, start_date from public.race where id = %s", (race_id,))
+    for slug in candidates(pcs_slug, name, season):
+        page = get(f"/race/{slug}{suffix}")
+        if page:
+            return page, slug, name
     slug = race_slug(pcs_slug, name, season, start)
     if not slug:
-        log.warning("CyclingFlash: no encuentro %s (%s) en su calendario", name, start)
-    return slug, name
+        log.warning("CyclingFlash: no encuentro %s (%s)", name, start)
+        return None, None, name
+    return get(f"/race/{slug}{suffix}"), slug, name
 
 
 def fetch_results(db, race_id: int, number: int, is_stage_race: bool) -> dict[str, list[tuple[str, int]]]:
     """Como sources.fetch_results, pero desde CyclingFlash: {tipo: [(slug de PCS, puesto)]}."""
-    slug, name = _race(db, race_id)
+    path = "/result" + (f"/stage-{number}" if is_stage_race else "")
+    first, slug, name = _page(db, race_id, path)
     if not slug:
         return {}
-    base = f"/race/{slug}/result" + (f"/stage-{number}" if is_stage_race else "")
+    base = f"/race/{slug}{path}"
     kinds = (("stage", ""), ("gc", "/gc"), ("points", "/points"), ("kom", "/mountain")) if is_stage_race else (("stage", ""),)
     index = rider_index(db)
     out = {}
     for kind, suffix in kinds:
-        page = get(base + suffix)
+        page = first if kind == "stage" else get(base + suffix)
         if not page:
             continue
         rows = [(to_pcs(s, n, index), int(r)) for r, s, n in parse_rows(page) if r and r.isdigit()]
@@ -198,8 +213,7 @@ def parse_startlist(page: str) -> list[dict]:
 def fetch_startlist(db, race_id: int) -> list[dict]:
     """Lista de salida desde CyclingFlash, como sources.fetch_startlist_full: [{slug (de PCS), name, nationality, bib,
     team}]."""
-    slug, _ = _race(db, race_id)
-    page = get(f"/race/{slug}/startlist") if slug else None
+    page, _, _ = _page(db, race_id, "/startlist")
     if not page:
         return []
     index = rider_index(db)
