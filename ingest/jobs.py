@@ -9,6 +9,7 @@ Horario (hora de Madrid):
                     · results    → 30 min después de la llegada estimada: resultados + puntos
                                    (reintenta cada 30 min, hasta 6 veces)
                     · recheck    → al día siguiente: si PCS corrigió algo, se recalcula
+                  si PCS bloquea la ingesta, resultados y listas de salida se piden a CyclingFlash
   lunes 03:00     equipos y plantillas
   lunes 03:30     calendario
 """
@@ -22,7 +23,8 @@ import smtplib
 import urllib.request
 from email.message import EmailMessage
 
-from . import sources, store
+from . import cyclingflash, sources, store
+from .pcs_client import Blocked
 from .tz import MADRID
 
 log = logging.getLogger("ingest.jobs")
@@ -220,7 +222,7 @@ def run_task(db, task: dict) -> str:
     if task["kind"] == "lineup":
         try:
             total, ours = load_startlist(db, task["race_id"], slug, season)
-        except NotReady:
+        except (NotReady, Blocked):
             # PCS no responde: vale la que ya se cargó antes; si no hay ninguna, se reintenta. Pasado LINEUP_GIVE_UP desde
             # el cierre (carreras sin lista en PCS, como las CRI por parejas) se cierra igual: corre quien se inscribió a mano
             # y los resultados pueden puntuarse
@@ -232,7 +234,7 @@ def run_task(db, task: dict) -> str:
         n = db.scalar("select public.auto_lineup(%s)", (task["race_id"],))
         return f"lista de salida: {total} ciclistas ({ours} del juego); alineaciones automáticas: {n} equipos"
 
-    res = sources.fetch_results(slug, season, task["number"], task["is_stage_race"])
+    res = fetch_results(db, task)
     if task["kind"] == "results":
         if not db.scalar("select auto_lineup_done from public.race where id = %s", (task["race_id"],)):
             raise NotReady("faltan las alineaciones automáticas")
@@ -254,10 +256,30 @@ def run_task(db, task: dict) -> str:
     return "sin cambios"
 
 
+def fetch_results(db, task: dict) -> dict[str, list[tuple[str, int]]]:
+    """Resultados de la etapa: de PCS y, si PCS bloquea la ingesta, de CyclingFlash."""
+    try:
+        return sources.fetch_results(task["slug"], task["season"], task["number"], task["is_stage_race"])
+    except Blocked as exc:
+        log.warning("%s; se piden los resultados a CyclingFlash", exc)
+        res = cyclingflash.fetch_results(db, task["race_id"], task["number"], task["is_stage_race"])
+        if not res:
+            raise
+        return res
+
+
 def load_startlist(db, race_id: int, slug: str, season: int) -> tuple[int, int]:
-    """Lee la lista de salida de PCS y la guarda (la del juego y la completa). Devuelve (total, del juego)."""
-    full = sources.fetch_startlist_full(slug, season)
-    slugs = [r["slug"] for r in full] or sources.fetch_startlist(slug, season)
+    """Lee la lista de salida de PCS y la guarda (la del juego y la completa). Devuelve (total, del juego).
+    Si PCS bloquea la ingesta, la de CyclingFlash (también con dorsales y equipos)."""
+    try:
+        full = sources.fetch_startlist_full(slug, season)
+        slugs = [r["slug"] for r in full] or sources.fetch_startlist(slug, season)
+    except Blocked as exc:
+        log.warning("%s; se pide la lista de salida a CyclingFlash", exc)
+        full = cyclingflash.fetch_startlist(db, race_id)
+        slugs = [r["slug"] for r in full]
+        if not slugs:
+            raise
     if not slugs:
         raise NotReady("lista de salida vacía")
     ours = store.set_startlist(db, race_id, slugs)
