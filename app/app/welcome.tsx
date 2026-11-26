@@ -7,6 +7,7 @@ import { Button } from '@/components/Button';
 import { Features, HowItWorks } from '@/components/GameIntro';
 import { Pills } from '@/components/Hero';
 import { GameCarousel } from '@/components/GameCarousel';
+import { LanguageButton } from '@/components/LanguagePicker';
 import { Txt } from '@/components/Txt';
 import { t } from '@/i18n';
 import { cardShadow, colors, fonts, space, themed, UCI_RAINBOW } from '@/theme';
@@ -69,6 +70,7 @@ export default function Welcome() {
           <Image source={require('../assets/logo-horizontal.png')} style={styles.logo} resizeMode="contain"
                  tintColor={colors.onDark} accessibilityLabel="Cyclonomy" />
           <View style={styles.navButtons}>
+            <LanguageButton />
             {wide ? (
               <>
                 <View ref={navIn} collapsable={false}>

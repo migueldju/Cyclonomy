@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
-import type { Lang } from '../i18n';
+import { LANGUAGES, t, useI18n, type Lang } from '../i18n';
 import { colors, fonts, space, themed } from '../theme';
 import { Flag } from './Flag';
 import { Sheet } from './Modal';
@@ -87,7 +87,47 @@ export function LanguagePicker({ label, hideLabel, languages, value, onChange }:
   );
 }
 
+/**
+ * Botón pequeño para cambiar el idioma (bandera y código), para las cabeceras oscuras como la de la portada.
+ * Abre la misma lista que el selector del perfil y guarda la elección en el dispositivo.
+ */
+export function LanguageButton() {
+  const { lang, setLang } = useI18n();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Pressable onPress={() => setOpen(true)} accessibilityRole="button" accessibilityLabel={t('profile.language')}
+                 style={({ pressed }) => [styles.button, pressed && { opacity: 0.7 }]}>
+        <View style={styles.flag}><LangFlag lang={lang} /></View>
+        <Txt style={styles.code}>{lang.toUpperCase()}</Txt>
+        <Ionicons name="chevron-down" size={14} color={colors.onDark} />
+      </Pressable>
+      <Sheet visible={open} onClose={() => setOpen(false)} title={t('profile.language')}>
+        <ScrollView style={{ maxHeight: 420 }}>
+          {LANGUAGES.map((l) => {
+            const on = l.code === lang;
+            return (
+              <Pressable key={l.code} onPress={() => { setOpen(false); setLang(l.code); }} accessibilityRole="radio"
+                         accessibilityState={{ checked: on }}
+                         style={({ pressed }) => [styles.option, (pressed || on) && { backgroundColor: colors.road }]}>
+                <View style={styles.flag}><LangFlag lang={l.code} /></View>
+                <Txt style={[{ flex: 1 }, on && { fontFamily: fonts.bodyBold }]}>{l.name}</Txt>
+                {on ? <Ionicons name="checkmark" size={18} color={colors.green} /> : null}
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </Sheet>
+    </>
+  );
+}
+
 const styles = themed(() => StyleSheet.create({
+  button: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderColor: '#5A6870', borderRadius: 999,
+    paddingHorizontal: 10, minHeight: 34,
+  },
+  code: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.onDark, letterSpacing: 0.3 },
   field: {
     flexDirection: 'row', alignItems: 'center', gap: space.s, backgroundColor: colors.paper, borderWidth: 1,
     borderColor: colors.line, borderRadius: 6, paddingHorizontal: space.m, paddingVertical: 12,
